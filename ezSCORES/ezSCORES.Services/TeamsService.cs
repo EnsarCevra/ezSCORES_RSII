@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Services.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +10,25 @@ namespace ezSCORES.Services
 {
 	public class TeamsService : ITeamsService
 	{
-		public List<Teams> List = new List<Teams>()
+		public EzScoresdbRsiiContext Context { get; set; }
+		public TeamsService(EzScoresdbRsiiContext context)
 		{
-			new Teams
-			{
-				Id = 1,
-				Name = "Bjelopoljac"
-			},
-			new Teams
-			{
-				Id = 2,
-				Name = "Lokomotiva"
-			}
-		};
+			Context = context;
+		}
+		
 		public List<Teams> GetList()
 		{
-			return List;
+			var list = Context.Teams.ToList();
+			var result = new List<Model.Teams>();
+			list.ForEach(item =>
+			{
+				result.Add(new Model.Teams()
+				{
+					Id = item.Id,
+					Name = item.Name
+				});
+			});
+			return result;
 		}
 	}
 }
