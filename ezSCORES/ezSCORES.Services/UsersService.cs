@@ -53,7 +53,7 @@ namespace ezSCORES.Services
 			Mapper.Map(request, entity);
 			entity.PasswordSalt = GenerateSalt();
 			entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
-			entity.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+			entity.CreatedAt = DateTime.Now;
 			Context.Add(entity);
 			Context.SaveChanges();
 
@@ -94,7 +94,7 @@ namespace ezSCORES.Services
 				entity.PasswordSalt = GenerateSalt();
 				entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
 			}
-			entity.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
+			entity.ModifiedAt = DateTime.Now;
 			Context.SaveChanges();
 
 			return Mapper.Map<Users>(entity);

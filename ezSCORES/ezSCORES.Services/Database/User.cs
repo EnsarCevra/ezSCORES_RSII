@@ -19,7 +19,7 @@ public partial class User
 
     public string Email { get; set; } = null!;
 
-    public int PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; }
 
     public bool IsActive { get; set; }
 
@@ -29,15 +29,13 @@ public partial class User
 
     public bool IsDeleted { get; set; }
 
-    public DateOnly? RemovedAt { get; set; }
+    public DateTime? RemovedAt { get; set; }
 
     public string? Organization { get; set; }
 
-    public bool IsActive2 { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateOnly CreatedAt { get; set; }
-
-    public DateOnly? ModifiedAt { get; set; }
+    public DateTime? ModifiedAt { get; set; }
 
     public virtual ICollection<Competition> Competitions { get; set; } = new List<Competition>();
 

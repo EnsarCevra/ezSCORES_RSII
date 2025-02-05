@@ -17,7 +17,7 @@ public partial class Match
 
     public int? WinnerId { get; set; }
 
-    public DateOnly DateAndTime { get; set; }
+    public DateTime DateAndTime { get; set; }
 
     public bool IsCompleted { get; set; }
 
@@ -27,15 +27,15 @@ public partial class Match
 
     public bool IsDeleted { get; set; }
 
-    public DateOnly? RemovedAt { get; set; }
+    public DateTime? RemovedAt { get; set; }
 
     public bool IsUnderway { get; set; }
 
     public bool IsActive { get; set; }
 
-    public DateOnly CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateOnly? ModifiedAt { get; set; }
+    public DateTime? ModifiedAt { get; set; }
 
     public virtual CompetitionsTeam AwayTeam { get; set; } = null!;
 

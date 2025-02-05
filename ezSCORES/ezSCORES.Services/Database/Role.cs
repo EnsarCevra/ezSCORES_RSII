@@ -13,13 +13,13 @@ public partial class Role
 
     public bool IsDeleted { get; set; }
 
-    public DateOnly? RemovedAt { get; set; }
+    public DateTime? RemovedAt { get; set; }
 
     public bool IsActive { get; set; }
 
-    public DateOnly CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateOnly? ModifiedAt { get; set; }
+    public DateTime? ModifiedAt { get; set; }
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

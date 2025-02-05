@@ -13,11 +13,11 @@ public partial class CompetitionsTeamsPlayer
 
     public int GoalsTotal { get; set; }
 
-    public int IsVerified { get; set; }
+    public bool IsVerified { get; set; }
 
     public bool IsDeleted { get; set; }
 
-    public DateOnly? RemovedAt { get; set; }
+    public DateTime? RemovedAt { get; set; }
 
     public virtual CompetitionsTeam CompetitionsTeams { get; set; } = null!;
 

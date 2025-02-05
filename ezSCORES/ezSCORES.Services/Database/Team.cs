@@ -17,13 +17,13 @@ public partial class Team
 
     public bool IsDeleted { get; set; }
 
-    public DateOnly? RemovedAt { get; set; }
+    public DateTime? RemovedAt { get; set; }
 
     public bool IsActive { get; set; }
 
-    public DateOnly CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateOnly? ModifiedAt { get; set; }
+    public DateTime? ModifiedAt { get; set; }
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
