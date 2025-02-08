@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddTransient<ITeamsService, TeamsService>();
 builder.Services.AddTransient<IUsersService, UsersService>();
+builder.Services.AddTransient<ICompetitionsService, CompetitionsService>();
 builder.Services.AddControllers();
 builder.Services.AddMapster();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

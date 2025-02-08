@@ -1,5 +1,8 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
+using Mapster;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,27 +11,25 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-	public class TeamsService : ITeamsService
+	public class TeamsService : BaseService<Teams, TeamsSearchObject, Team>, ITeamsService
 	{
-		public EzScoresdbRsiiContext Context { get; set; }
-		public TeamsService(EzScoresdbRsiiContext context)
+		public TeamsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
-			Context = context;
 		}
 		
-		public List<Teams> GetList()
-		{
-			var list = Context.Teams.ToList();
-			var result = new List<Model.Teams>();
-			list.ForEach(item =>
-			{
-				result.Add(new Model.Teams()
-				{
-					Id = item.Id,
-					Name = item.Name
-				});
-			});
-			return result;
-		}
+		//public List<Teams> GetList(TeamsSearchObject searchObject)
+		//{
+		//	var result = new List<Model.Teams>();
+		//	var query = Context.Teams.AsQueryable();
+		//	if(!string.IsNullOrWhiteSpace(searchObject.Name))
+		//	{
+		//		query = query.Where(x => x.Name.StartsWith(searchObject.Name));
+		//	}
+		//	if(searchObject.SelectionId!=null)
+		//	{
+		//		query = query.Where(x => x.SelectionId == searchObject.SelectionId);
+		//	}
+		//	return result;
+		//}
 	}
 }

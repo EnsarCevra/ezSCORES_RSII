@@ -20,11 +20,12 @@ namespace ezSCORES.Model
 
 		public string Email { get; set; } = null!;
 
-		public int PhoneNumber { get; set; }
+		public string PhoneNumber { get; set; }
 
 		public bool IsActive { get; set; }
 
 		public string? Organization { get; set; }
+		public virtual Roles Role { get; set; } = null!;
 	}
 
 }

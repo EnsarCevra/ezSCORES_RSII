@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,17 +8,10 @@ namespace ezSCORES.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class TeamsController : ControllerBase
+	public class TeamsController : BaseController<Teams, TeamsSearchObject>
 	{
-		protected ITeamsService _service;
-		public TeamsController(ITeamsService service) 
+		public TeamsController(ITeamsService service) : base (service)
 		{
-			_service = service;
-		}
-		[HttpGet]
-		public List<Teams>GetList()
-		{
-			return _service.GetList();
 		}
 	}
 }
