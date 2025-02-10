@@ -1,5 +1,5 @@
 ﻿using ezSCORES.Model;
-using ezSCORES.Model.Requests;
+using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Services.Database;
 using MapsterMapper;
 using System;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-	public class CompetitionsService : ICompetitionsService
+    public class CompetitionsService : ICompetitionsService
 	{
 		public EzScoresdbRsiiContext Context { get; set; }
 		public IMapper Mapper;

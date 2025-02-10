@@ -1,5 +1,5 @@
 ﻿using ezSCORES.Model;
-using ezSCORES.Model.Requests;
+using ezSCORES.Model.Requests.UserRequests;
 using ezSCORES.Model.SearchObjects;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-	public interface IUsersService : IService<Users, UserSearchObject>
+    public interface IUsersService : ICRUDService<Users, UserSearchObject, UsersInsertRequests, UsersUpdateRequest>
 	{
-		//PagedResult<Users> GetList(UserSearchObject searchObject);
-		Users Insert(UsersInsertRequests request);
-		Users Update(int id, UsersUpdateRequest request);
 	}
 }

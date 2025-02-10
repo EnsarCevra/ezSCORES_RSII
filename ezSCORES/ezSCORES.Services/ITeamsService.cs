@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-	public interface ITeamsService : IService<Teams, TeamsSearchObject>
+    public interface ITeamsService : ICRUDService<Teams, TeamsSearchObject, TeamsInsertRequest, TeamsUpdateRequest>
 	{
 	}
 }

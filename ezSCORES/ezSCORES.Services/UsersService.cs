@@ -1,5 +1,4 @@
 ﻿using ezSCORES.Model;
-using ezSCORES.Model.Requests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
 using MapsterMapper;
@@ -13,10 +12,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Dynamic;
+using ezSCORES.Model.Requests.UserRequests;
 
 namespace ezSCORES.Services
 {
-	public class UsersService : BaseService<Users, UserSearchObject, User>, IUsersService
+    public class UsersService : BaseCRUDService<Users, UserSearchObject, User, UsersInsertRequests, UsersUpdateRequest>, IUsersService
 	{
 		public UsersService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
@@ -56,66 +56,48 @@ namespace ezSCORES.Services
 			}
 			return filteredQuery;
 		}
-		//public PagedResult<Users> GetList(UserSearchObject searchObject)
-		//{
-		//	var resultList = new List<Users>();
-		//	var query = Context.Users.AsQueryable();
-		//	if(!string.IsNullOrWhiteSpace(searchObject?.FirstNameGTE))
-		//	{
-		//		query = query.Where(x => x.FirstName.StartsWith(searchObject.FirstNameGTE));
-		//	}
-		//	if (!string.IsNullOrWhiteSpace(searchObject?.LastNameGTE))
-		//	{
-		//		query = query.Where(x => x.LastName.StartsWith(searchObject.LastNameGTE));
-		//	}
-		//	if (!string.IsNullOrWhiteSpace(searchObject?.Email))
-		//	{
-		//		query = query.Where(x => x.Email == searchObject.Email);
-		//	}
-		//	if (!string.IsNullOrWhiteSpace(searchObject?.UserName))
-		//	{
-		//		query = query.Where(x => x.UserName == searchObject.UserName);
-		//	}
-		//	if(searchObject.IsRolesIncluded == true)
-		//	{
-		//		query = query.Include(x => x.Role);
-		//	}
-		//	int count = query.Count();
-		//	if (!string.IsNullOrWhiteSpace(searchObject.OrderBy))
-		//	{
-		//		//query = query.OrderBy(searchObject.OrderBy);
-		//	}
-		//	if (searchObject?.Page.HasValue == true && searchObject?.PageSize.HasValue == true)
-		//	{
-		//		query = query.Skip(searchObject.Page.Value * searchObject.PageSize.Value).Take(searchObject.PageSize.Value);
-		//	}
-		//	var list = query.ToList();
-		//	resultList = Mapper.Map(list, resultList);
-		//	PagedResult<Users> result = new PagedResult<Users>()
-		//	{
-		//		Count = count,
-		//		ResultList = resultList
-		//	};
-		//	return result;
-		//}
-
-		public Users Insert(UsersInsertRequests request)
+		public override void BeforeInsert(UsersInsertRequests request, User entity)
 		{
+			base.BeforeInsert(request, entity);
 			if (request.Password != request.PasswordConfirmation)
 			{
 				throw new Exception("Lozinke se ne podudaraju!");
 			}
-
-			Database.User entity = new Database.User();
-			Mapper.Map(request, entity);
 			entity.PasswordSalt = GenerateSalt();
 			entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
-			entity.CreatedAt = DateTime.Now;
-			Context.Add(entity);
-			Context.SaveChanges();
-
-			return Mapper.Map<Users>(entity);
+			entity.CreatedAt = DateTime.UtcNow;
 		}
+		public override void BeforeUpdate(UsersUpdateRequest request, User entity)
+		{
+
+			if (request.Password != null)
+			{
+				if (request.Password != request.PasswordConfirmation)
+				{
+					throw new Exception("Lozinke se ne podudaraju!");
+				}
+				entity.PasswordSalt = GenerateSalt();
+				entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
+			}
+			entity.ModifiedAt = DateTime.Now;
+		}
+		//public Users Insert(UsersInsertRequests request)
+		//{
+		//	if (request.Password != request.PasswordConfirmation)
+		//	{
+		//		throw new Exception("Lozinke se ne podudaraju!");
+		//	}
+
+		//	Database.User entity = new Database.User();
+		//	Mapper.Map(request, entity);
+		//	entity.PasswordSalt = GenerateSalt();
+		//	entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
+		//	entity.CreatedAt = DateTime.Now;
+		//	Context.Add(entity);
+		//	Context.SaveChanges();
+
+		//	return Mapper.Map<Users>(entity);
+		//}
 		public static string GenerateSalt()
 		{
 			var byteArray = RandomNumberGenerator.GetBytes(16);
@@ -134,27 +116,6 @@ namespace ezSCORES.Services
 
 			byte[] inArray = algorithm.ComputeHash(dst);
 			return Convert.ToBase64String(inArray);
-		}
-
-		public Users Update(int id, UsersUpdateRequest request)
-		{
-			var entity = Context.Users.Find(id);
-
-			Mapper.Map(request, entity);
-
-			if (request.Password != null)
-			{
-				if (request.Password != request.PasswordConfirmation)
-				{
-					throw new Exception("Lozinke se ne podudaraju!");
-				}
-				entity.PasswordSalt = GenerateSalt();
-				entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
-			}
-			entity.ModifiedAt = DateTime.Now;
-			Context.SaveChanges();
-
-			return Mapper.Map<Users>(entity);
 		}
 	}
 }

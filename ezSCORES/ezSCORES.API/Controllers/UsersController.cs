@@ -1,5 +1,5 @@
 ﻿using ezSCORES.Model;
-using ezSCORES.Model.Requests;
+using ezSCORES.Model.Requests.UserRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
 using Microsoft.AspNetCore.Http;
@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ezSCORES.API.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
-	public class UsersController : BaseController<Users, UserSearchObject>
+	public class UsersController : BaseCRUDController<Users, UserSearchObject, UsersInsertRequests, UsersUpdateRequest>
 	{
 		public UsersController(IUsersService service) : base(service) { }
 	}

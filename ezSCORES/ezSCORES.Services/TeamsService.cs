@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
 using Mapster;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-	public class TeamsService : BaseService<Teams, TeamsSearchObject, Team>, ITeamsService
+    public class TeamsService : BaseCRUDService<Teams, TeamsSearchObject, Team, TeamsInsertRequest, TeamsUpdateRequest>, ITeamsService
 	{
 		public TeamsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
