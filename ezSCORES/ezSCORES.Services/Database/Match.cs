@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
 
-public partial class Match
+public partial class Match : ICreated, IModified, ISoftDelete
 {
     public int Id { get; set; }
 

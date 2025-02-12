@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
 
-public partial class CompetitionsTeamsPlayer
+public partial class CompetitionsTeamsPlayer : ICreated, IModified, ISoftDelete
 {
     public int Id { get; set; }
 
@@ -18,8 +18,12 @@ public partial class CompetitionsTeamsPlayer
     public bool IsDeleted { get; set; }
 
     public DateTime? RemovedAt { get; set; }
+	public bool IsActive { get; set; }
+	public DateTime CreatedAt { get; set; }
 
-    public virtual CompetitionsTeam CompetitionsTeams { get; set; } = null!;
+	public DateTime? ModifiedAt { get; set; }
+
+	public virtual CompetitionsTeam CompetitionsTeams { get; set; } = null!;
 
     public virtual ICollection<Goal> Goals { get; set; } = new List<Goal>();
 

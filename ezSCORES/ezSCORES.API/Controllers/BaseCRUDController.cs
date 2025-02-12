@@ -21,5 +21,10 @@ namespace ezSCORES.API.Controllers
 		{
 			return _service.Update(id, request);
 		}
+		[HttpDelete("{id}")]
+		public void Delete(int id)
+		{
+			_service.Delete(id);
+		}
 	}
 }

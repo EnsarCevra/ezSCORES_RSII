@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
 
-public partial class CompetitionsTeam
+public partial class CompetitionsTeam : ICreated, IModified, ISoftDelete
 {
     public int Id { get; set; }
 

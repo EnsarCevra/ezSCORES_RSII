@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ezSCORES.Services.Database;
 
@@ -11,9 +12,11 @@ using ezSCORES.Services.Database;
 namespace ezSCORES.Services.Migrations
 {
     [DbContext(typeof(EzScoresdbRsiiContext))]
-    partial class EzScoresdbRsiiContextModelSnapshot : ModelSnapshot
+    [Migration("20250212190045_SetUniCodeToTrueForStringProps")]
+    partial class SetUniCodeToTrueForStringProps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

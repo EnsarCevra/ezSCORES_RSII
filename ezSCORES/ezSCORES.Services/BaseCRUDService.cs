@@ -40,11 +40,38 @@ namespace ezSCORES.Services
 
 			Mapper.Map(request, entity);
 
+			if(entity is IModified modified)
+			{
+				modified.ModifiedAt = DateTime.Now;
+			}
+
 			Context.SaveChanges();
 
 			return Mapper.Map<TModel>(entity);
 		}
+		public virtual void Delete(int id)
+		{
+			var set = Context.Set<TDbEntity>();
 
+			var entity = set.Find(id);
+
+			if(entity == null)
+			{
+				throw new Exception("Selected entity doesn't exist");
+			}
+
+			if(entity is ISoftDelete softDeleteEntity)
+			{
+				softDeleteEntity.IsDeleted = true;
+				softDeleteEntity.RemovedAt = DateTime.Now;
+				Context.Update(entity);
+			}
+			else
+			{
+				Context.Remove(entity);
+			}
+			Context.SaveChanges();
+		}
 		public virtual void BeforeUpdate(TUpdate request, TDbEntity entity)
 		{
 

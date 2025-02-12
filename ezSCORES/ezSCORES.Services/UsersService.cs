@@ -80,23 +80,6 @@ namespace ezSCORES.Services
 			}
 			entity.ModifiedAt = DateTime.Now;
 		}
-		//public Users Insert(UsersInsertRequests request)
-		//{
-		//	if (request.Password != request.PasswordConfirmation)
-		//	{
-		//		throw new Exception("Lozinke se ne podudaraju!");
-		//	}
-
-		//	Database.User entity = new Database.User();
-		//	Mapper.Map(request, entity);
-		//	entity.PasswordSalt = GenerateSalt();
-		//	entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
-		//	entity.CreatedAt = DateTime.Now;
-		//	Context.Add(entity);
-		//	Context.SaveChanges();
-
-		//	return Mapper.Map<Users>(entity);
-		//}
 		public static string GenerateSalt()
 		{
 			var byteArray = RandomNumberGenerator.GetBytes(16);

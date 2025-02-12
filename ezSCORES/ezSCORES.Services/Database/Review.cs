@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
 
-public partial class Review
+public partial class Review : ICreated, IModified, ISoftDelete
 {
     public int Id { get; set; }
 
@@ -21,7 +21,7 @@ public partial class Review
 
     public DateTime CreatedAt { get; set; }
 
-    public DateTime ModifiedAt { get; set; }
+    public DateTime? ModifiedAt { get; set; }
 
     public virtual Competition Competition { get; set; } = null!;
 

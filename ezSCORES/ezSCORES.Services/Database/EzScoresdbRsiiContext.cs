@@ -77,7 +77,7 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Message)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.Competition).WithMany(p => p.Applications)
                 .HasForeignKey(d => d.CompetitionId)
@@ -100,7 +100,7 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Competition>(entity =>
@@ -113,13 +113,13 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Season)
                 .HasMaxLength(30)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.City).WithMany(p => p.Competitions)
                 .HasForeignKey(d => d.CityId)
@@ -285,7 +285,7 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.Competition).WithMany(p => p.Groups)
                 .HasForeignKey(d => d.CompetitionId)
@@ -336,10 +336,10 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.FirstName)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.LastName)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Referee>(entity =>
@@ -352,10 +352,10 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.FirstName)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.LastName)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Review>(entity =>
@@ -387,10 +387,10 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.Competition).WithMany(p => p.Rewards)
                 .HasForeignKey(d => d.CompetitionId)
@@ -408,10 +408,10 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Selection>(entity =>
@@ -424,7 +424,7 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Sponsor>(entity =>
@@ -435,7 +435,7 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Stadium>(entity =>
@@ -448,7 +448,7 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Team>(entity =>
@@ -461,7 +461,7 @@ public partial class EzScoresdbRsiiContext : DbContext
 
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.Selection).WithMany(p => p.Teams)
                 .HasForeignKey(d => d.SelectionId)
@@ -487,13 +487,13 @@ public partial class EzScoresdbRsiiContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.FirstName)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.LastName)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Organization)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.PasswordHash)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -502,7 +502,7 @@ public partial class EzScoresdbRsiiContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)

@@ -47,6 +47,10 @@ namespace ezSCORES.Services
 		}
 		public virtual IQueryable<TDbEntity> AddFilter(TSearch search, IQueryable<TDbEntity> query)
 		{
+			if(search.IsDeleted!=null)
+			{
+				query = query.Where(x => EF.Property<bool>(x, "IsDeleted") == search.IsDeleted);
+			}
 			if (!string.IsNullOrWhiteSpace(search.Name))
 			{
 				var property = typeof(TDbEntity).GetProperty("Name");

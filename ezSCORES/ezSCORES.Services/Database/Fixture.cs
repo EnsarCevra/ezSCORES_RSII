@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
 
-public partial class Fixture
+public partial class Fixture : ICreated, IModified, ISoftDelete
 {
     public int Id { get; set; }
 
