@@ -65,7 +65,6 @@ namespace ezSCORES.Services
 			}
 			entity.PasswordSalt = GenerateSalt();
 			entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
-			entity.CreatedAt = DateTime.UtcNow;
 		}
 		public override void BeforeUpdate(UsersUpdateRequest request, User entity)
 		{

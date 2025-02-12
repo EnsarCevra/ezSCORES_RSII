@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
@@ -12,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public class TeamsService : BaseCRUDService<Teams, TeamsSearchObject, Team, TeamsInsertRequest, TeamsUpdateRequest>, ITeamsService
+    public class RolesService : BaseCRUDService<Roles, BaseSearchObject, Role,RoleUpsertRequest, RoleUpsertRequest>, IRolesService
 	{
-		public TeamsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		public RolesService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
 	}

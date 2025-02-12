@@ -9,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<ITeamsService, TeamsService>();
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<ICompetitionsService, CompetitionsService>();
+builder.Services.AddTransient<IPlayersService, PlayersService>();
+builder.Services.AddTransient<ICitiesService, CitiesService>();
+builder.Services.AddTransient<IRefereesService, RefereesService>();
+builder.Services.AddTransient<IRolesService, RolesService>();
+builder.Services.AddTransient<ISelectionsService, SelectionsService>();
+builder.Services.AddTransient<ISponsorsService, SponsorsService>();
+builder.Services.AddTransient<IStadiumsService, StadiumsService>();
 builder.Services.AddControllers();
 builder.Services.AddMapster();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

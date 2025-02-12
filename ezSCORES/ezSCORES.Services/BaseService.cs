@@ -47,6 +47,14 @@ namespace ezSCORES.Services
 		}
 		public virtual IQueryable<TDbEntity> AddFilter(TSearch search, IQueryable<TDbEntity> query)
 		{
+			if (!string.IsNullOrWhiteSpace(search.Name))
+			{
+				var property = typeof(TDbEntity).GetProperty("Name");
+				if (property != null)
+				{
+					query = query.Where(x => EF.Property<string>(x, "Name").ToLower().StartsWith(search.Name.ToLower()));
+				}
+			}
 			return query;
 		}
 		public TModel GetById(int id)

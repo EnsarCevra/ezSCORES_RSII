@@ -6,5 +6,8 @@ namespace ezSCORES.Model.Requests
 {
 	public class RoleUpsertRequest
 	{
+		public string Name { get; set; }
+
+		public string Description { get; set; }
 	}
 }

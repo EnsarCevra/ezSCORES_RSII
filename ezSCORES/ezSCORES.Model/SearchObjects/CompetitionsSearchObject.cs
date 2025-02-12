@@ -4,15 +4,13 @@ using System.Text;
 
 namespace ezSCORES.Model.SearchObjects
 {
-	public class CompetitionsSearchObject
+	public class CompetitionsSearchObject : BaseSearchObject
 	{
 		public int? SelectionId { get; set; }
 
 		public string? Season { get; set; } = null!;
 
 		public int? CityId { get; set; }
-
-		public string? Name { get; set; } = null!;
 		public int? CompetitionType { get; set; }
 		public DateTime? StartDate { get; set; }
 

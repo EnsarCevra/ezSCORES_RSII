@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ezSCORES.Model.Requests.CompetitionRequests;
+using ezSCORES.Model.SearchObjects;
 
 namespace ezSCORES.Services
 {
-    public interface ICompetitionsService
+    public interface ICompetitionsService : ICRUDService<Competitions, CompetitionsSearchObject, CompetitionsInsertRequest, CompetitionsUpdateRequest>
 	{
-		Competitions Insert(CompetitionsInsertRequest request);
 	}
 }

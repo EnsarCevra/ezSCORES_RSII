@@ -9,29 +9,10 @@ namespace ezSCORES.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class CompetitionsController : ControllerBase
+	public class CompetitionsController : BaseCRUDController<Competitions, CompetitionsSearchObject, CompetitionsInsertRequest, CompetitionsUpdateRequest>
 	{
-		protected ICompetitionsService _service;
-		public CompetitionsController(ICompetitionsService service) 
+		public CompetitionsController(ICompetitionsService service) : base(service)
 		{
-			_service = service;
 		}
-		[HttpGet]
-		//public List<Users>GetList([FromQuery]UserSearchObject searchObject)
-		//{
-		//	return _service.GetList(searchObject);
-		//}
-
-		[HttpPost]
-		public Competitions Insert(CompetitionsInsertRequest request)
-		{
-			return _service.Insert(request);
-		}
-
-		//[HttpPut("{id}")]
-		//public Users Update(int id, UsersUpdateRequest request)
-		//{
-		//	return _service.Update(id, request);
-		//}
 	}
 }
