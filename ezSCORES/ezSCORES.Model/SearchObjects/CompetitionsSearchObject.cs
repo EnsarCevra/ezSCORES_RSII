@@ -16,5 +16,6 @@ namespace ezSCORES.Model.SearchObjects
 
 		public DateTime? ApplicationEndDate { get; set; }
 		public int? Status { get; set; }
+		public bool? IsCompetitionRefereesIncluded { get; set; }
 	}
 }

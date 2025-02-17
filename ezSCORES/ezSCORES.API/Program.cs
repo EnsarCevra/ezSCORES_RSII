@@ -14,8 +14,17 @@ builder.Services.AddTransient<ICitiesService, CitiesService>();
 builder.Services.AddTransient<IRefereesService, RefereesService>();
 builder.Services.AddTransient<IRolesService, RolesService>();
 builder.Services.AddTransient<ISelectionsService, SelectionsService>();
-builder.Services.AddTransient<ISponsorsService, SponsorsService>();
+builder.Services.AddTransient<ICompetitionsRefereesService, CompetitionsRefereesService>();
+builder.Services.AddTransient<ICompetitionsSponsorsService, CompetitionsSponsorsService>();
+builder.Services.AddTransient<IFavoriteCompetitionsService, FavoriteCompetitionsService>();
+builder.Services.AddTransient<IGroupsService, GroupesService>();
+builder.Services.AddTransient<IMatchesService, MatchesService>();
+builder.Services.AddTransient<IRewardsService, RewardsService>();
 builder.Services.AddTransient<IStadiumsService, StadiumsService>();
+builder.Services.AddTransient<ISponsorsService, SponsorsService>();
+//builder.Services.AddTransient<IStadiumsService, StadiumsService>();
+//builder.Services.AddTransient<IStadiumsService, StadiumsService>();
+
 builder.Services.AddControllers();
 builder.Services.AddMapster();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

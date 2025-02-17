@@ -22,6 +22,10 @@ namespace ezSCORES.Services
 		{
 			TDbEntity entity = Mapper.Map<TDbEntity>(request);
 			BeforeInsert(request, entity);
+			if(entity is ICreated created)
+			{
+				created.CreatedAt = DateTime.Now;
+			}
 			Context.Add(entity);
 			Context.SaveChanges();
 

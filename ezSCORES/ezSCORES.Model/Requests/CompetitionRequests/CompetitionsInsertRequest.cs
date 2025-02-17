@@ -29,7 +29,6 @@ namespace ezSCORES.Model.Requests.CompetitionRequests
         public DateTime ApplicationEndDate { get; set; }
 
         public int? Fee { get; set; }
-        public int Status { get; set; }
 
         public int MaxPlayersPerTeam { get; set; }
     }

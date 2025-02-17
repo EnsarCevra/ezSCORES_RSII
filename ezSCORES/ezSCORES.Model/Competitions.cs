@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ezSCORES.Model.ENUMs;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -30,8 +31,9 @@ namespace ezSCORES.Model
 		public DateTime ApplicationEndDate { get; set; }
 
 		public int? Fee { get; set; }
-		public int Status { get; set; }
+		public CompetitionStatus Status { get; set; }
 
 		public int MaxPlayersPerTeam { get; set; }
+		public virtual ICollection<CompetitionsReferees> CompetitionsReferees { get; set; } = new List<CompetitionsReferees>();
 	}
 }

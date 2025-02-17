@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ezSCORES.Model.ENUMs;
+using System;
 using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
@@ -35,7 +36,7 @@ public partial class Competition : ICreated, IModified, ISoftDelete
 
     public DateTime? RemovedAt { get; set; }
 
-    public int Status { get; set; }
+    public CompetitionStatus Status { get; set; }
 
     public int MaxPlayersPerTeam { get; set; }
 
