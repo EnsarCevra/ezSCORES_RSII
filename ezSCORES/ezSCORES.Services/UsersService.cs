@@ -61,7 +61,7 @@ namespace ezSCORES.Services
 			base.BeforeInsert(request, entity);
 			if (request.Password != request.PasswordConfirmation)
 			{
-				throw new Exception("Lozinke se ne podudaraju!");
+				throw new UserException("Lozinke se ne podudaraju!");
 			}
 			entity.PasswordSalt = GenerateSalt();
 			entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);

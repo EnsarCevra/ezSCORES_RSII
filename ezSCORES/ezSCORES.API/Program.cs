@@ -1,3 +1,4 @@
+using ezSCORES.API.Filters;
 using ezSCORES.Services;
 using ezSCORES.Services.Database;
 using Mapster;
@@ -25,7 +26,10 @@ builder.Services.AddTransient<ISponsorsService, SponsorsService>();
 //builder.Services.AddTransient<IStadiumsService, StadiumsService>();
 //builder.Services.AddTransient<IStadiumsService, StadiumsService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers( x =>
+{
+	x.Filters.Add<ExceptionFilter>();
+});
 builder.Services.AddMapster();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
