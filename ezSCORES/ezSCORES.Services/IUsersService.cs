@@ -11,5 +11,6 @@ namespace ezSCORES.Services
 {
     public interface IUsersService : ICRUDService<Users, UserSearchObject, UsersInsertRequests, UsersUpdateRequest>
 	{
+		Users Login(string username, string password);
 	}
 }

@@ -99,5 +99,20 @@ namespace ezSCORES.Services
 			byte[] inArray = algorithm.ComputeHash(dst);
 			return Convert.ToBase64String(inArray);
 		}
+
+		public Users Login(string username, string password)
+		{
+			var entity = Context.Users.Include(x=>x.Role).FirstOrDefault(x => x.UserName == username);
+			if(entity == null)
+			{
+				return null;
+			}
+			var hash = GenerateHash(entity.PasswordSalt, password);
+			if(hash != entity.PasswordHash)
+			{
+				return null;
+			}
+			return this.Mapper.Map<Users>(entity);
+		}
 	}
 }
