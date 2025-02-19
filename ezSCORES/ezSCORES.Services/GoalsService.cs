@@ -1,6 +1,5 @@
 ﻿using ezSCORES.Model;
-using ezSCORES.Model.Requests;
-using ezSCORES.Model.Requests.MatchRequests;
+using ezSCORES.Model.Requests.GoalRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
@@ -14,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public class MatchesService : BaseCRUDService<Matches, MatchSearchObject, Match, MatchInsertRequest, MatchUpdateRequest>, IMatchesService
+    public class GoalsService : BaseCRUDService<Goals, BaseSearchObject, Goal,GoalInsertRequest, GoalUpdateRequest>, IGoalsService
 	{
-		public MatchesService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		public GoalsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
 	}

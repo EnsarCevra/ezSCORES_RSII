@@ -31,10 +31,8 @@ namespace ezSCORES.Services
 
 			return Mapper.Map<TModel>(entity);
 		}
-		public virtual void BeforeInsert(TInsert request, TDbEntity entity)
-		{
-
-		}
+		public virtual void BeforeInsert(TInsert request, TDbEntity entity)	{	}
+		public virtual void AfterInsert(TInsert request, TDbEntity entity)	{   }
 
 		public TModel Update(int id, TUpdate request)
 		{
@@ -76,9 +74,7 @@ namespace ezSCORES.Services
 			}
 			Context.SaveChanges();
 		}
-		public virtual void BeforeUpdate(TUpdate request, TDbEntity entity)
-		{
-
-		}
+		public virtual void BeforeUpdate(TUpdate request, TDbEntity entity)	{	}
+		public virtual void AfterUpdate(TUpdate request, TDbEntity entity) { }
 	}
 }

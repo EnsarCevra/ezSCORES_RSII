@@ -1,9 +1,11 @@
 ﻿using ezSCORES.Model;
 using ezSCORES.Model.Requests;
-using ezSCORES.Model.Requests.MatchRequests;
+using ezSCORES.Model.Requests.ReviewRequests;
+using ezSCORES.Model.Requests.RewardRequest;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
+using ezSCORES.Services.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +13,9 @@ namespace ezSCORES.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class MatchesController : BaseCRUDController<Matches, MatchSearchObject, MatchInsertRequest, MatchUpdateRequest>
+	public class ReviewsController : BaseCRUDController<Reviews, BaseSearchObject, ReviewInsertRequest, ReviewUpdateRequest>
 	{
-		public MatchesController(IMatchesService service) : base (service)
+		public ReviewsController(IReviewsService service) : base (service)
 		{
 		}
 	}

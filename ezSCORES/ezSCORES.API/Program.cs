@@ -26,8 +26,9 @@ builder.Services.AddTransient<IMatchesService, MatchesService>();
 builder.Services.AddTransient<IRewardsService, RewardsService>();
 builder.Services.AddTransient<IStadiumsService, StadiumsService>();
 builder.Services.AddTransient<ISponsorsService, SponsorsService>();
-//builder.Services.AddTransient<IStadiumsService, StadiumsService>();
-//builder.Services.AddTransient<IStadiumsService, StadiumsService>();
+builder.Services.AddTransient<IReviewsService, ReviewsService>();
+builder.Services.AddTransient<IGoalsService, GoalsService>();
+builder.Services.AddTransient<IFixturesService, FixturesService>();
 
 builder.Services.AddControllers( x =>
 {
