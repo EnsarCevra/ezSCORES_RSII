@@ -6,8 +6,6 @@ namespace ezSCORES.Model.SearchObjects
 {
 	public class RefereesSearchObject : BaseSearchObject
 	{
-		public string? FirstName { get; set; }
-		public string? LastName { get; set; }
-		public DateTime? BirthDate { get; set; }
+		public string? FirstNameLastNameGTE{ get; set; }
 	}
 }

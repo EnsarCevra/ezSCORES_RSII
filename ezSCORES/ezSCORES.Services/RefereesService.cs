@@ -18,5 +18,16 @@ namespace ezSCORES.Services
 		public RefereesService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
+
+		public override IQueryable<Referee> AddFilter(RefereesSearchObject search, IQueryable<Referee> query)
+		{
+			base.AddFilter(search, query);
+			if (!string.IsNullOrWhiteSpace(search?.FirstNameLastNameGTE))
+			{
+				query = query.Where(x => (x.FirstName + " " + x.LastName).StartsWith(search.FirstNameLastNameGTE)
+					|| (x.LastName + " " + x.FirstName).StartsWith(search.FirstNameLastNameGTE));
+			}
+			return query;
+		}
 	}
 }

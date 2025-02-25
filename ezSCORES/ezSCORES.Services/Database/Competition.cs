@@ -12,7 +12,7 @@ public partial class Competition : ICreated, IModified, ISoftDelete
 
     public int SelectionId { get; set; }
 
-    public string Season { get; set; } = null!;
+    public string Season { get; set; } = null!; 
 
     public int CityId { get; set; }
 
@@ -20,7 +20,7 @@ public partial class Competition : ICreated, IModified, ISoftDelete
 
     public string Description { get; set; } = null!;
 
-    public int CompetitionType { get; set; }
+    public CompetitionType CompetitionType { get; set; }
 
     public int MaxTeamCount { get; set; }
 

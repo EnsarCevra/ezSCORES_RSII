@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ezSCORES.Model.ENUMs;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,7 +15,7 @@ namespace ezSCORES.Model
 
 		public int MatchLength { get; set; }
 
-		public int GameStage { get; set; }
+		public GameStage GameStage { get; set; }
 
 		public bool IsCurrentlyActive { get; set; }
 

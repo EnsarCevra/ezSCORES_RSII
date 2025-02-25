@@ -7,5 +7,6 @@ namespace ezSCORES.Model.SearchObjects
 	public class TeamsSearchObject : BaseSearchObject
 	{
 		public int? SelectionId { get; set; }
+		public bool OnlyUsersTeams { get; set; }
 	}
 }

@@ -28,6 +28,7 @@ namespace ezSCORES.Services
 			}
 			Context.Add(entity);
 			Context.SaveChanges();
+			AfterInsert(request, entity);
 
 			return Mapper.Map<TModel>(entity);
 		}
@@ -48,6 +49,7 @@ namespace ezSCORES.Services
 			}
 
 			Context.SaveChanges();
+			AfterUpdate(request, entity);
 
 			return Mapper.Map<TModel>(entity);
 		}

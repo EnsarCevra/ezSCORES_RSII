@@ -20,7 +20,7 @@ namespace ezSCORES.Model
 
 		public string Description { get; set; } = null!;
 
-		public int CompetitionType { get; set; }
+		public CompetitionType CompetitionType { get; set; }
 
 		public int MaxTeamCount { get; set; }
 
@@ -31,7 +31,7 @@ namespace ezSCORES.Model
 		public DateTime ApplicationEndDate { get; set; }
 
 		public int? Fee { get; set; }
-		public CompetitionStatus Status { get; set; }
+		public CompetitionStatus Status { get; set; } = ENUMs.CompetitionStatus.Preparation;
 
 		public int MaxPlayersPerTeam { get; set; }
 		public virtual ICollection<CompetitionsReferees> CompetitionsReferees { get; set; } = new List<CompetitionsReferees>();

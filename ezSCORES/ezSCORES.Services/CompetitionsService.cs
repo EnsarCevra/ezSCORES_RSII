@@ -21,12 +21,44 @@ namespace ezSCORES.Services
 
 		public override IQueryable<Competition> AddFilter(CompetitionsSearchObject search, IQueryable<Competition> query)
 		{
+			base.AddFilter(search, query);
+			if (search.SelectionId != null)
+			{
+				query = query.Where(x=>x.SelectionId == search.SelectionId);
+			}
+			if(!string.IsNullOrWhiteSpace(search.Season))
+			{
+				query = query.Where(x=>x.Season == search.Season);
+			}
+			if(search.StartDate != null)
+			{
+				query = query.Where(x => x.StartDate.Date == search.StartDate.Value.Date);
+			}
+			if (search.ApplicationEndDate != null)
+			{
+				query = query.Where(x => x.StartDate.Date == search.ApplicationEndDate.Value.Date);
+			}
+			if (search.CityId != null)
+			{
+				query = query.Where(x => x.CityId == search.CityId);
+			}
+			if (search.CompetitionType != null)
+			{
+				query = query.Where(x => x.CompetitionType == search.CompetitionType);
+			}
+			if(search.Status != null)
+			{
+				query = query.Where(x => x.Status == search.Status);
+			}
 			if(search.IsCompetitionRefereesIncluded == true)
 			{
 				query = query.Include(x => x.CompetitionsReferees).ThenInclude(x=>x.Referee);
 			}
-			return base.AddFilter(search, query);
-			
+			if(search.MatchDay  != null)
+			{
+				query = query.Include(x => x.Fixtures).ThenInclude(x => x.Matches.Where(x => x.DateAndTime.Date == search.MatchDay.Value.Date));
+			}
+			return query;
 		}
 	}
 }

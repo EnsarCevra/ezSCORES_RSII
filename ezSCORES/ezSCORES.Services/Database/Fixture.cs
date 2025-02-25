@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ezSCORES.Model.ENUMs;
+using System;
 using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
@@ -13,7 +14,7 @@ public partial class Fixture : ICreated, IModified, ISoftDelete
 
     public int MatchLength { get; set; }
 
-    public int GameStage { get; set; }
+    public GameStage GameStage { get; set; }
 
     public bool IsCurrentlyActive { get; set; }
 

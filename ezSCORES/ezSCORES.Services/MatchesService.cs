@@ -19,5 +19,23 @@ namespace ezSCORES.Services
 		public MatchesService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
+
+		public override IQueryable<Match> AddFilter(MatchSearchObject search, IQueryable<Match> query)
+		{
+			base.AddFilter(search, query);
+			if(search.FixtureId != null)
+			{
+				query = query.Where(x => x.FixtureId == search.FixtureId);
+			}
+			if(search.StadiumId != null)
+			{
+				query = query.Where(x=>x.StadiumId == search.StadiumId);
+			}
+			if(search.DateAndTime != null)
+			{
+				query = query.Where(x => x.DateAndTime.Date == search.DateAndTime.Value.Date);
+			}
+			return query;
+		}
 	}
 }

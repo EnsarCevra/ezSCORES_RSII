@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ezSCORES.Model.Requests.CompetitionRequests
+namespace ezSCORES.Model.Requests.ApplicationRequests
 {
-    public class ApplicationInsertRequest
-    {
+	public class ApplicationUpdateRequest
+	{
 		public int TeamId { get; set; }
 
 		public int CompetitionId { get; set; }
 
 		public string? Message { get; set; }
-		public List<int> PlayerIds { get; set; }
+		public List<int>? PlayerIds { get; set; }
 	}
 }

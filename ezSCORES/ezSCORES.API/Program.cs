@@ -1,6 +1,7 @@
 using ezSCORES.API.Authentication;
 using ezSCORES.API.Filters;
 using ezSCORES.Services;
+using ezSCORES.Services.Auth;
 using ezSCORES.Services.Database;
 using Mapster;
 using Microsoft.AspNetCore.Authentication;
@@ -10,6 +11,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddTransient<IApplicationService, ApplicationService>();
 builder.Services.AddTransient<ITeamsService, TeamsService>();
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<ICompetitionsService, CompetitionsService>();
@@ -29,6 +31,8 @@ builder.Services.AddTransient<ISponsorsService, SponsorsService>();
 builder.Services.AddTransient<IReviewsService, ReviewsService>();
 builder.Services.AddTransient<IGoalsService, GoalsService>();
 builder.Services.AddTransient<IFixturesService, FixturesService>();
+
+builder.Services.AddTransient<IActiveUserService, ActiveUserService>();
 
 builder.Services.AddControllers( x =>
 {
@@ -61,6 +65,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var connectionString = builder.Configuration.GetConnectionString("ezSCORES_Connection");
 builder.Services.AddDbContext<EzScoresdbRsiiContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
