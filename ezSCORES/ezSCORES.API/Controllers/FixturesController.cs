@@ -12,7 +12,7 @@ namespace ezSCORES.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class FixturesController : BaseCRUDController<Fixtures, BaseSearchObject, FixtureInsertRequest, FixtureUpdateRequest>
+	public class FixturesController : BaseCRUDController<Fixtures, BaseCompetitionSearchObject, FixtureInsertRequest, FixtureUpdateRequest>
 	{
 		public FixturesController (IFixturesService service) : base (service)
 		{

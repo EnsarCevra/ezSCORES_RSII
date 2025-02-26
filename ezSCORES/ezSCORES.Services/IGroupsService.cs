@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public interface IGroupsService : ICRUDService<Groups, BaseSearchObject, GroupInsertRequest, GroupUpdateRequest>
+    public interface IGroupsService : ICRUDService<Groups, GroupSearchObject, GroupInsertRequest, GroupUpdateRequest>
 	{
 	}
 }

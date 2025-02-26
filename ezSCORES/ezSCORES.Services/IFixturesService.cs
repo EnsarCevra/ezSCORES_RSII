@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public interface IFixturesService : ICRUDService<Fixtures, BaseSearchObject, FixtureInsertRequest, FixtureUpdateRequest>
+    public interface IFixturesService : ICRUDService<Fixtures, BaseCompetitionSearchObject, FixtureInsertRequest, FixtureUpdateRequest>
 	{
 	}
 }

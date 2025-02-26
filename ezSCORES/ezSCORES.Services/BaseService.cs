@@ -63,8 +63,10 @@ namespace ezSCORES.Services
 		}
 		public TModel GetById(int id)
 		{
-			var entity = Context.Set<TDbEntity>().Find(id);
-			if(entity != null)
+			var query = Context.Set<TDbEntity>().AsQueryable();
+			query = ApplyIncludes(query);
+			var entity = query.FirstOrDefault(e => EF.Property<int>(e, "Id") == id);
+			if (entity != null)
 			{
 				return Mapper.Map<TModel>(entity);
 			}
@@ -73,5 +75,7 @@ namespace ezSCORES.Services
 				return null;
 			}
 		}
+
+		protected virtual IQueryable<TDbEntity> ApplyIncludes(IQueryable<TDbEntity> query){ return query; }
 	}
 }

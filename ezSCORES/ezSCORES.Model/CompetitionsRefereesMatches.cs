@@ -11,5 +11,6 @@ namespace ezSCORES.Model
 		public int CompetitionsRefereesId { get; set; }
 
 		public int MatchId { get; set; }
+		public virtual CompetitionsReferees CompetitionReferee { get; set; }
 	}
 }

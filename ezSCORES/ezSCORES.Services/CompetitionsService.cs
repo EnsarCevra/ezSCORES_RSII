@@ -60,5 +60,15 @@ namespace ezSCORES.Services
 			}
 			return query;
 		}
+		protected override IQueryable<Competition> ApplyIncludes(IQueryable<Competition> query)
+		{
+			return query.Include(x => x.CompetitionsReferees)
+						.ThenInclude(x => x.Referee)
+						.Include(x => x.CompetitionsSponsors)
+						.ThenInclude(x => x.Sponsor)
+						.Include(x => x.Rewards)
+						.Include(x => x.City)
+						.Include(x => x.Selection);
+		}
 	}
 }

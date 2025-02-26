@@ -31,6 +31,8 @@ builder.Services.AddTransient<ISponsorsService, SponsorsService>();
 builder.Services.AddTransient<IReviewsService, ReviewsService>();
 builder.Services.AddTransient<IGoalsService, GoalsService>();
 builder.Services.AddTransient<IFixturesService, FixturesService>();
+builder.Services.AddTransient<ICompetitionTeamsService, CompetitionTeamsService>();
+
 
 builder.Services.AddTransient<IActiveUserService, ActiveUserService>();
 

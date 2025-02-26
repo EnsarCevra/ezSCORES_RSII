@@ -35,5 +35,10 @@ namespace ezSCORES.Model
 
 		public int MaxPlayersPerTeam { get; set; }
 		public virtual ICollection<CompetitionsReferees> CompetitionsReferees { get; set; } = new List<CompetitionsReferees>();
+		public virtual ICollection<CompetitionsSponsors> CompetitionsSponsors { get; set; } = new List<CompetitionsSponsors>();
+		public virtual ICollection<Rewards> Rewards { get; set; } = new List<Rewards>();
+
+		public virtual Selections Selection { get; set; } = null!;
+		public virtual Cities City { get; set; } = null!;
 	}
 }

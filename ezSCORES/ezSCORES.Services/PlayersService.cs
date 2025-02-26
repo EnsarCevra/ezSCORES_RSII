@@ -27,11 +27,11 @@ namespace ezSCORES.Services
 				query = query.Where(x => (x.FirstName + " " + x.LastName).StartsWith(search.FirstNameLastNameGTE)
 					|| (x.LastName + " " + x.FirstName).StartsWith(search.FirstNameLastNameGTE));
 			}
-			if(search.BirthDate == null && search.Year != null)
+			if(search?.BirthDate == null && search?.Year != null)
 			{
 				query = query.Where(x => x.BirthDate.Date.Year == search.Year);
 			}
-			if (search.BirthDate != null)
+			if (search?.BirthDate != null)
 			{
 				query = query.Where(x=>x.BirthDate.Date == search.BirthDate.Value.Date);
 			}

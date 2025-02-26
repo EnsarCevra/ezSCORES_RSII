@@ -13,5 +13,6 @@ namespace ezSCORES.Model
 		public int SponsorId { get; set; }
 
 		public int? Type { get; set; }
+		public virtual Sponsors Sponsor {  get; set; }
 	}
 }

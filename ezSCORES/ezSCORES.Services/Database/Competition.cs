@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
 
-public partial class Competition : ICreated, IModified, ISoftDelete
+public partial class Competition : ICreated, IModified, ISoftDelete, IHasName
 {
     public int Id { get; set; }
 

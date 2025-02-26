@@ -3,11 +3,13 @@ using ezSCORES.Model;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {
@@ -32,7 +34,17 @@ namespace ezSCORES.Services
 
 			return Mapper.Map<TModel>(entity);
 		}
-		public virtual void BeforeInsert(TInsert request, TDbEntity entity)	{	}
+		public virtual void BeforeInsert(TInsert request, TDbEntity entity)
+		{
+			var property = typeof(TDbEntity).GetProperty("Name");
+			if (property != null && (entity is IHasName nameEntity))
+			{
+				if(Context.Set<TDbEntity>().Any(x => EF.Property<string>(x, "Name") == nameEntity.Name))
+				{
+					throw new UserException("Entitet sa ovim imenom već postoji!");
+				}
+			}
+		}
 		public virtual void AfterInsert(TInsert request, TDbEntity entity)	{   }
 
 		public TModel Update(int id, TUpdate request)
@@ -76,7 +88,7 @@ namespace ezSCORES.Services
 			}
 			Context.SaveChanges();
 		}
-		public virtual void BeforeUpdate(TUpdate request, TDbEntity entity)	{	}
+		public virtual void BeforeUpdate(TUpdate request, TDbEntity entity)	{   }
 		public virtual void AfterUpdate(TUpdate request, TDbEntity entity) { }
 	}
 }

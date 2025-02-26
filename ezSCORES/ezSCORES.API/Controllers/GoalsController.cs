@@ -12,7 +12,7 @@ namespace ezSCORES.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class GoalsController : BaseCRUDController<Goals, BaseSearchObject, GoalInsertRequest, GoalUpdateRequest>
+	public class GoalsController : BaseCRUDController<Goals, GoalSearchObject, GoalInsertRequest, GoalUpdateRequest>
 	{
 		public GoalsController(IGoalsService service) : base (service)
 		{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ezSCORES.Services.Database;
 
-public partial class Stadium : ICreated, IModified, ISoftDelete
+public partial class Stadium : ICreated, IModified, ISoftDelete, IHasName
 {
     public int Id { get; set; }
 

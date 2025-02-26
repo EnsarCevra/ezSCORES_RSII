@@ -5,6 +5,7 @@ using ezSCORES.Model.Requests.CompetitionsSponsorsRequest;
 using ezSCORES.Model.Requests.FavoriteCompetitionRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
+using ezSCORES.Services.Auth;
 using ezSCORES.Services.Database;
 using Mapster;
 using MapsterMapper;
@@ -18,8 +19,16 @@ namespace ezSCORES.Services
 {
     public class FavoriteCompetitionsService : BaseCRUDService<FavoriteCompetitions, BaseSearchObject, FavoriteCompetition,FavoriteCompetitionInsertRequest, FavoriteCompetitionUpdateRequest>, IFavoriteCompetitionsService
 	{
-		public FavoriteCompetitionsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		private readonly IActiveUserService _activeUserService;
+		public FavoriteCompetitionsService(EzScoresdbRsiiContext context, IMapper mapper, IActiveUserService activeUserService) : base(context, mapper)
 		{
+			_activeUserService = activeUserService;
+		}
+
+		public override IQueryable<FavoriteCompetition> AddFilter(BaseSearchObject search, IQueryable<FavoriteCompetition> query)
+		{
+			query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId());
+			return query;
 		}
 	}
 }

@@ -24,5 +24,14 @@ namespace ezSCORES.Model
 
 		public bool IsCompletedInRegullarTime { get; set; }
 		public bool IsUnderway { get; set; }
+		public virtual CompetitionsTeams AwayTeam { get; set; } = null!;
+
+		public virtual ICollection<CompetitionsRefereesMatches> CompetitionsRefereesMatches { get; set; } = new List<CompetitionsRefereesMatches>();
+
+		public virtual ICollection<Goals> Goals { get; set; } = new List<Goals>();
+
+		public virtual CompetitionsTeams HomeTeam { get; set; } = null!;
+
+		public virtual Stadiums Stadium { get; set; } = null!;
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace ezSCORES.Model
@@ -15,5 +16,6 @@ namespace ezSCORES.Model
 		public int GoalsTotal { get; set; }
 
 		public bool IsVerified { get; set; }
+		public virtual Players Player { get; set; } = null!;
 	}
 }

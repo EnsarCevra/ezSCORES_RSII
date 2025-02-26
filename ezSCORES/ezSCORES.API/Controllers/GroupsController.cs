@@ -11,7 +11,7 @@ namespace ezSCORES.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class GroupsController : BaseCRUDController<Groups, BaseSearchObject, GroupInsertRequest, GroupUpdateRequest>
+	public class GroupsController : BaseCRUDController<Groups, GroupSearchObject, GroupInsertRequest, GroupUpdateRequest>
 	{
 		public GroupsController(IGroupsService service) : base (service)
 		{

@@ -5,6 +5,7 @@ using ezSCORES.Services.Auth;
 using ezSCORES.Services.Database;
 using Mapster;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace ezSCORES.Services
 			}
 			if(search.OnlyUsersTeams)
 			{
-				query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId());
+				query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId()).Include(x=>x.Selection);
 			}
 			return query;
 		}

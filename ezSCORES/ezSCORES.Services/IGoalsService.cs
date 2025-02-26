@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public interface IGoalsService : ICRUDService<Goals, BaseSearchObject, GoalInsertRequest, GoalUpdateRequest>
+    public interface IGoalsService : ICRUDService<Goals, GoalSearchObject, GoalInsertRequest, GoalUpdateRequest>
 	{
 	}
 }
