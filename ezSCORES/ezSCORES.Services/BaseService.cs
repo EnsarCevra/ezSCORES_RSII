@@ -72,10 +72,25 @@ namespace ezSCORES.Services
 			}
 			else
 			{
-				return null;
+				throw new UserException("Zapis nije pronađen!");
 			}
 		}
 
 		protected virtual IQueryable<TDbEntity> ApplyIncludes(IQueryable<TDbEntity> query){ return query; }
+
+		public async Task<TModel> GetByIdAsync(int id)
+		{
+			var query = Context.Set<TDbEntity>().AsQueryable();
+			query = ApplyIncludes(query);
+			var entity = await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+			if (entity != null)
+			{
+				return Mapper.Map<TModel>(entity);
+			}
+			else
+			{
+				throw new UserException("Zapis nije pronađen!");
+			}
+		}
 	}
 }

@@ -7,6 +7,7 @@ using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
 using Mapster;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,25 @@ namespace ezSCORES.Services
 	{
 		public ApplicationService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
+		}
+
+		public override IQueryable<Application> AddFilter(ApplicationSearchObject search, IQueryable<Application> query)
+		{
+			//filter by status?
+			if(search.CompetitionId != null)
+			{
+				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x => x.Team).ThenInclude(x => x.User);
+			}
+			return query;
+		}
+		protected override IQueryable<Application> ApplyIncludes(IQueryable<Application> query)
+		{
+			return query.Include(x => x.Team)
+							.ThenInclude(x => x.User)
+							.Include(x => x.Team)
+							.ThenInclude(x => x.CompetitionsTeams)
+							.ThenInclude(x => x.CompetitionsTeamsPlayers)
+							.ThenInclude(x=>x.Player);
 		}
 
 		public override void BeforeInsert(ApplicationInsertRequest request, Application entity)
@@ -44,6 +64,7 @@ namespace ezSCORES.Services
 				created.CreatedAt = DateTime.Now;
 			}
 			Context.Add(competitionTeamEntity);
+			Context.SaveChanges();
 			foreach (var playerId in request.PlayerIds)
 			{
 				var competitionTeamPlayer = new CompetitionsTeamsPlayer

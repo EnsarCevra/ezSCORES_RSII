@@ -19,5 +19,6 @@ namespace ezSCORES.Model
 		public float? PaIdAmount { get; set; }
 
 		public bool? IsAccepted { get; set; }
+		public virtual Teams Team { get; set; } = null!;
 	}
 }

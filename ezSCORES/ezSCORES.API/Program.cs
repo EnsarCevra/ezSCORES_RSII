@@ -1,4 +1,5 @@
 using ezSCORES.API.Authentication;
+using ezSCORES.API.Authorization;
 using ezSCORES.API.Filters;
 using ezSCORES.Services;
 using ezSCORES.Services.Auth;
@@ -32,7 +33,12 @@ builder.Services.AddTransient<IReviewsService, ReviewsService>();
 builder.Services.AddTransient<IGoalsService, GoalsService>();
 builder.Services.AddTransient<IFixturesService, FixturesService>();
 builder.Services.AddTransient<ICompetitionTeamsService, CompetitionTeamsService>();
+builder.Services.AddTransient<ICompetitionsRefereesMatchService, CompetitionsRefereesMatchService>();
+builder.Services.AddTransient<ICompetitionsTeamsPlayersService, CompetitionsTeamsPlayersService>();
 
+
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+//builder.Services.AddScoped<ICompetitionsService, CompetitionsService>();
 
 builder.Services.AddTransient<IActiveUserService, ActiveUserService>();
 
@@ -70,6 +76,8 @@ builder.Services.AddDbContext<EzScoresdbRsiiContext>(options => options.UseSqlSe
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+app.UseMiddleware<AuthorizationMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

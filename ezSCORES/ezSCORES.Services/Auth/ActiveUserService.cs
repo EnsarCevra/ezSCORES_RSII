@@ -30,9 +30,15 @@ namespace ezSCORES.Services.Auth
 			return activeUserId;
 		}
 
-		public string GetActiveUserRole()
+		public int? GetActiveUserRole()
 		{
-			throw new NotImplementedException();
+			var activeUser = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (activeUser == null)
+			{
+				return null;
+			}
+			var activeUserRoleId = _context.Users.Where(x => x.UserName == activeUser).Select(x => x.Role.Id).FirstOrDefault();
+			return activeUserRoleId;
 		}
 
 		public string GetActiveUserUsername()

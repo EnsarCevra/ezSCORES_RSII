@@ -10,6 +10,6 @@ namespace ezSCORES.Services.Auth
 	{
 		int? GetActiveUserId();
 		string GetActiveUserUsername();
-		string GetActiveUserRole();
+		int? GetActiveUserRole();
 	}
 }

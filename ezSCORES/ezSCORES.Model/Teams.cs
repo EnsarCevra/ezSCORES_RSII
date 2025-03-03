@@ -11,5 +11,7 @@ namespace ezSCORES.Model
 		public string Name { get; set; }
 		public int SelectionId { get; set; }
 		public byte[]? Picture { get; set; }
+		public virtual Users User { get; set; } = null!;
+		public virtual ICollection<CompetitionsTeams> CompetitionsTeams { get; set; } = new List<CompetitionsTeams>();
 	}
 }

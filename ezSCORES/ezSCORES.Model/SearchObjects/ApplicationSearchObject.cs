@@ -6,9 +6,10 @@ namespace ezSCORES.Model.SearchObjects
 {
 	public class ApplicationSearchObject : BaseCompetitionSearchObject
 	{
-		public int TeamId { get; set; }
+		public int? TeamId { get; set; }
+		public int? CompetitionId { get; set; }
 
-		public bool IsPaId { get; set; }
+		public bool? IsPaId { get; set; }
 
 		public bool? IsAccepted { get; set; }
 	}

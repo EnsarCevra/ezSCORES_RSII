@@ -3,6 +3,7 @@ using ezSCORES.Model;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,6 @@ namespace ezSCORES.Services
 			Context.Add(entity);
 			Context.SaveChanges();
 			AfterInsert(request, entity);
-
 			return Mapper.Map<TModel>(entity);
 		}
 		public virtual void BeforeInsert(TInsert request, TDbEntity entity)

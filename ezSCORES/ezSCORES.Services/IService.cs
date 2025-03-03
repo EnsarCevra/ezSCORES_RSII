@@ -12,5 +12,6 @@ namespace ezSCORES.Services
 	{
 		public Model.PagedResult<TModel> GetPaged(TSearch search);	
 		public TModel GetById(int id);
+		public Task<TModel> GetByIdAsync(int id);
 	}
 }
