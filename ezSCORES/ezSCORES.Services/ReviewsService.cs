@@ -20,5 +20,22 @@ namespace ezSCORES.Services
 		public ReviewsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
+
+		public override void BeforeInsert(ReviewInsertRequest request, Review entity)
+		{
+			var competition = Context.Competitions.Find(request.CompetitionId);
+			if(request.Rating < 1 || request.Rating > 5)
+			{
+				throw new UserException("Ocjena mora biti u rangu 1-5!");
+			}
+		}
+
+		public override void BeforeUpdate(ReviewUpdateRequest request, Review entity)
+		{
+			if (request.Rating < 1 || request.Rating > 5)
+			{
+				throw new UserException("Ocjena mora biti u rangu 1-5!");
+			}
+		}
 	}
 }

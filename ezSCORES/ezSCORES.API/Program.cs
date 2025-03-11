@@ -75,7 +75,30 @@ var connectionString = builder.Configuration.GetConnectionString("ezSCORES_Conne
 builder.Services.AddDbContext<EzScoresdbRsiiContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddHttpContextAccessor();
 
+
+builder.Services.AddCors(options =>
+
+{
+
+	options.AddDefaultPolicy(builder =>
+
+	{
+
+		builder.WithOrigins("http://localhost:4200")
+
+			.AllowAnyMethod()
+
+			.AllowAnyHeader()
+
+			.AllowCredentials();
+
+	});
+
+});
+
 var app = builder.Build();
+
+app.UseCors();
 
 app.UseMiddleware<AuthorizationMiddleware>();
 

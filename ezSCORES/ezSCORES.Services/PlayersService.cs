@@ -37,5 +37,13 @@ namespace ezSCORES.Services
 			}
 			return query;
 		}
+
+		public override void BeforeInsert(PlayerUpsertRequest request, Player entity)
+		{
+			if (Context.Players.Where(x => request.FirstName == x.FirstName && request.LastName == x.LastName && request.BirthDate == x.BirthDate).Any())
+			{
+				throw new UserException("Igrač sa unesenim imenom, prezimenom  i datumom rođenja već postoji!");
+			}
+		}
 	}
 }

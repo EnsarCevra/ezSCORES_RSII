@@ -70,5 +70,19 @@ namespace ezSCORES.Services
 						.Include(x => x.City)
 						.Include(x => x.Selection);
 		}
+		public override void BeforeInsert(CompetitionsInsertRequest request, Competition entity)
+		{
+			base.BeforeInsert(request, entity);
+		}
+
+		public override void BeforeUpdate(CompetitionsUpdateRequest request, Competition entity)
+		{
+			base.BeforeUpdate(request, entity);
+			//can be updated when competition is in preparation mode
+			if(entity.Status != Model.ENUMs.CompetitionStatus.Preparation)
+			{
+				throw new UserException("Izmjene možete vršiti samo u fazi pripreme takmičenja!");
+			}
+		}
 	}
 }

@@ -19,5 +19,27 @@ namespace ezSCORES.Services
 		public RewardsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
+
+		public override void BeforeInsert(RewardInsertRequest request, Reward entity)
+		{
+			if(request.RankingPosition != null)
+			{
+				if(Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition).Any())
+				{
+					throw new UserException("Nagrada za ovo mjesto već postoji!");
+				}
+			}
+		}
+
+		public override void BeforeUpdate(RewardUpdateRequest request, Reward entity)
+		{
+			if (request.RankingPosition != null)
+			{
+				if (Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition).Any())
+				{
+					throw new UserException("Nagrada za ovo mjesto već postoji!");
+				}
+			}
+		}
 	}
 }

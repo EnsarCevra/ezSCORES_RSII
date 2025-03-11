@@ -94,9 +94,10 @@ namespace ezSCORES.Services.Auth
 		public async Task<bool> CanUserAccessCompetitionTeamAsync(int userId, int competitionTeamId)
 		{
 			var competitionTeam = await _competitionTeamsService.GetByIdAsync(competitionTeamId);
+			var team = await _teamsService.GetByIdAsync(competitionTeam.TeamId);
 			var competition = await _competitionsService.GetByIdAsync(competitionTeam.CompetitionId);
 			//should Team owner also have access?
-			return competition?.UserId == userId;
+			return competition?.UserId == userId || team.UserId == userId;
 		}
 
 		public async Task<bool> CanUserAccessCompetitionRefereeMatchAsync(int userId, int competitionRefereeMatchId)
@@ -111,8 +112,9 @@ namespace ezSCORES.Services.Auth
 		{
 			var competitionTeamPlayer = await _competitionTeamPlayerService.GetByIdAsync(competitionTeamPlayerId);
 			var competitionTeam = await _competitionTeamsService.GetByIdAsync(competitionTeamPlayer.CompetitionsTeamsId);
+			var team = await _teamsService.GetByIdAsync(competitionTeam.TeamId);
 			var competition = await _competitionsService.GetByIdAsync(competitionTeam.CompetitionId);
-			return competition?.UserId == userId;
+			return competition?.UserId == userId || team.UserId != userId;
 		}
 
 		public async Task<bool> CanUserAccessFavoriteCompetitionAsync(int userId, int favoriteCompetitionId)

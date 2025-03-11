@@ -29,5 +29,12 @@ namespace ezSCORES.Services
 			}
 			return query;
 		}
+		public override void BeforeInsert(GroupInsertRequest request, Group entity)
+		{
+			if(Context.Groups.Where(x=>x.Name == request.Name && request.CompetitionId == x.CompetitionId).Any())
+			{
+				throw new UserException($"Grupa {request.Name} već postoji na ovom takmičenju!");
+			}
+		}
 	}
 }

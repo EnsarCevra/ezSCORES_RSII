@@ -29,5 +29,20 @@ namespace ezSCORES.Services
 			}
 			return query;
 		}
+
+		public override void BeforeInsert(RefereeUpsertRequest request, Referee entity)
+		{
+			if(Context.Referees.Where(x => request.FirstName == x.FirstName && request.LastName == x.LastName).Any())
+			{
+				throw new UserException("Sudac sa unesenim imenom i prezimenom već postoji!");
+			}
+		}
+		public override void BeforeUpdate(RefereeUpsertRequest request, Referee entity)
+		{
+			if (Context.Referees.Where(x => request.FirstName == x.FirstName && request.LastName == x.LastName).Any())
+			{
+				throw new UserException("Sudac sa unesenim imenom i prezimenom već postoji!");
+			}
+		}
 	}
 }

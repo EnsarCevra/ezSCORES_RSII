@@ -26,7 +26,8 @@ namespace ezSCORES.Services
 			base.AddFilter(search, query);
 			if(search.FixtureId != null)
 			{
-				query = query.Where(x => x.FixtureId == search.FixtureId);
+				query = query.Where(x => x.FixtureId == search.FixtureId)
+					.OrderByDescending(x=>x.DateAndTime);
 			}
 			if(search.StadiumId != null)
 			{
@@ -46,6 +47,19 @@ namespace ezSCORES.Services
 						.Include(x => x.Stadium)
 						.Include(x => x.Goals)
 						.Include(x => x.CompetitionsRefereesMatches).ThenInclude(x => x.CompetitionsReferees).ThenInclude(x => x.Referee);
+		}
+
+		public override void BeforeInsert(MatchInsertRequest request, Match entity)
+		{
+			if(request.HomeTeamId == request.AwayTeamId)
+			{
+				throw new UserException("Domaći i gostujući tim ne mogu biti isti!");
+			}
+			var stadium = Context.Stadiums.Find(request.StadiumId);
+			if(stadium == null || stadium.IsDeleted)
+			{
+				throw new UserException("Stadion koji ste odabrali ne postoji ili je izbrisan!");
+			}
 		}
 	}
 }

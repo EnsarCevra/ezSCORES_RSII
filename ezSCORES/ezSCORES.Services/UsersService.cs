@@ -59,6 +59,10 @@ namespace ezSCORES.Services
 		public override void BeforeInsert(UsersInsertRequests request, User entity)
 		{
 			base.BeforeInsert(request, entity);
+			if(Context.Users.Where(x=>x.UserName == request.UserName).Any())
+			{
+				throw new UserException("Korisničko ime je zauzeto");
+			}
 			if (request.Password != request.PasswordConfirmation)
 			{
 				throw new UserException("Lozinke se ne podudaraju!");

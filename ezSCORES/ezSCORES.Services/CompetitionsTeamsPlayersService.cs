@@ -39,5 +39,11 @@ namespace ezSCORES.Services
 		{
 			return query.Include(x => x.Player);
 		}
+
+		public override void BeforeInsert(CompetitionTeamsPlayerUpsertRequest request, CompetitionsTeamsPlayer entity)
+		{
+			base.BeforeInsert(request, entity);
+			//this is being trigerred when Player is inserted on a team that is already on competition
+		}
 	}
 }

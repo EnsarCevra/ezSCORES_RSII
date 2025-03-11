@@ -18,5 +18,12 @@ namespace ezSCORES.API.Controllers
 		public ApplicationsController(IApplicationService service) : base (service)
 		{
 		}
+
+		[HttpPatch("{id}/toggle-status")]
+		[Authorize(Roles = Constants.Roles.Admin + "," + Constants.Roles.Organizer)]
+		public Applications ToogleStatus(int id, ToogleStatusRequest request)
+		{
+			return (_service as IApplicationService).ToogleStatus(id, request);
+		}
 	}
 }

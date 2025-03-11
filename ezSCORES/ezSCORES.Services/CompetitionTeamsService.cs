@@ -34,5 +34,11 @@ namespace ezSCORES.Services
 			}
 			return query;
 		}
+
+		public override void BeforeInsert(CompetitionTeamInsertRequest request, CompetitionsTeam entity)
+		{
+			base.BeforeInsert(request, entity);
+			//this is being triggered when player is chosinh team and players for competition during application process
+		}
 	}
 }

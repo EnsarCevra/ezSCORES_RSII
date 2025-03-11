@@ -14,5 +14,6 @@ namespace ezSCORES.Services
 {
     public interface IApplicationService : ICRUDService<Applications, ApplicationSearchObject, ApplicationInsertRequest, ApplicationUpdateRequest>
 	{
+		Applications? ToogleStatus(int id, ToogleStatusRequest status);
 	}
 }

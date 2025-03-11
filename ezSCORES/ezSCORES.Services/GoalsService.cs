@@ -24,7 +24,9 @@ namespace ezSCORES.Services
 		{
 			if(search.MatchId != null)
 			{
-				query = query.Where(x => x.MatchId == search.MatchId).Include(x=>x.CompetitionTeamPlayer).ThenInclude(x=>x.Player);
+				query = query.Where(x => x.MatchId == search.MatchId)
+					.OrderBy(x=>x.SequenceNumber)
+					.Include(x=>x.CompetitionTeamPlayer).ThenInclude(x=>x.Player);
 			}
 			return query;
 		}

@@ -8,5 +8,6 @@ namespace ezSCORES.Model.SearchObjects
 	{
 		public int? SelectionId { get; set; }
 		public bool OnlyUsersTeams { get; set; }
+		public bool? IncludeTeamsThatAlreadyAppliedForCompetition { get; set; }
 	}
 }

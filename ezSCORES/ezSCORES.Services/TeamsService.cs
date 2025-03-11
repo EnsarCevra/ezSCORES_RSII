@@ -35,13 +35,25 @@ namespace ezSCORES.Services
 			if(search.OnlyUsersTeams)
 			{
 				query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId()).Include(x=>x.Selection);
+				if (search.IncludeTeamsThatAlreadyAppliedForCompetition != null)
+				{
+					if (search.IncludeTeamsThatAlreadyAppliedForCompetition == false)
+					{
+						// dont know how to implement this yet
+					}
+				}
 			}
 			return query;
 		}
 
 		public override void BeforeInsert(TeamsInsertRequest request, Team entity)
 		{
-			//validation required
+			//no validation required for now
+		}
+		protected override IQueryable<Team> ApplyIncludes(IQueryable<Team> query)
+		{
+			return query.Include(x => x.Selection);
+			
 		}
 	}
 }
