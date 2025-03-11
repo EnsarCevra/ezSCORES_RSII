@@ -25,5 +25,15 @@ namespace ezSCORES.API.Controllers
 		{
 			return (_service as IApplicationService).ToogleStatus(id, request);
 		}
+		[HttpPost("/validate-team")]
+		public void ValidateTeam(ValidateTeamRequest request)
+		{
+			(_service as IApplicationService).ValidateTeam(request.TeamId, request.CompetitionId);
+		}
+		[HttpPost("/validate-players")]
+		public void ValidatePlayers(ValidatePlayersRequest request)
+		{
+			(_service as IApplicationService).ValidatePlayers(request.PlayerIds, request.CompetitionId);
+		}
 	}
 }

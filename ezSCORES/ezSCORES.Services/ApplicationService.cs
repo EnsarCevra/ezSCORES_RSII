@@ -1,4 +1,5 @@
-﻿using ezSCORES.Model;
+﻿using Azure.Core;
+using ezSCORES.Model;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.ApplicationRequests;
 using ezSCORES.Model.Requests.CompetitionRequests;
@@ -69,48 +70,12 @@ namespace ezSCORES.Services
 				{
 					throw new UserException($"Prijavu nije moguće izvršiti - maksimalan broj igrača po ekipi je {competition.MaxPlayersPerTeam}, a vi prijavljujete {request.PlayerIds.Count} igrača!");
 				}
-				if (competition.Selection.AgeMax != null)//when selection is not null it is age restricted competition
+				if(teamSelection != null)
 				{
-					if (teamSelection!.AgeMax == null || (teamSelection!.AgeMax > competition.Selection.AgeMax))//if team is senior team or exceedes year gap 
-					{
-						throw new UserException($"Ovo takmičenje je namijenjeno za selekciju {competition.Selection.Name}, a vaš tim je  selekcija {teamSelection.Name}!");
-					}
+					ValidateTeamSelection(competition.Selection, teamSelection);
+					ValidatePlayersForCompetition(request.PlayerIds, competition.Id, teamSelection);
 				}
-				else //in this case it is senior or veteran futsal
-				{
-					if(teamSelection!.Id != 10)//if it is veterans only veteran teams are allowed
-					{
-						throw new UserException($"Ovo takmičenje je namijenjeno samo za veteranske ekipe");
-					}
-				}
-				//if selection is null it is senior futsal meaning all can apply 
-				
 			}
-			ValidatePlayersForCompetition(request.PlayerIds, competition.Id, teamSelection);
-			//var existingPlayersOnCompetition = Context.CompetitionsTeamsPlayers
-			//	.Where(x => request.PlayerIds.Contains(x.PlayerId) && x.CompetitionsTeams.CompetitionId == request.CompetitionId)
-			//	.Select(x => x.PlayerId)
-			//	.ToList();
-			//if (!existingPlayersOnCompetition.IsNullOrEmpty())
-			//{
-			//	throw new UserException($"Sljedeći igrači su već registrirani na takmičenju: {string.Join(",", existingPlayersOnCompetition)}");
-			//}
-
-			//var today = DateTime.Today;
-			//var ageRestrictedPlayers = Context.Players
-			//		.Where(x => request.PlayerIds.Contains(x.Id))
-			//		.ToList()
-			//		.Where(player => {
-			//			int age = today.Year - player.BirthDate.Year;
-			//			if (player.BirthDate > today.AddYears(-age)) age--;
-
-			//			return teamSelection.AgeMax == null ? age < 40 : age > teamSelection.AgeMax;
-			//		})
-			//		.Select(player=> player.Id).ToList();
-			//if(ageRestrictedPlayers != null)
-			//{
-			//	throw new UserException($"Sljedeći igrači ne mogu igrati na takmičenju zbog dobnih restrikcija: {string.Join(",", ageRestrictedPlayers)}");
-			//}
 
 			CompetitionsTeam competitionTeamEntity = Mapper.Map<CompetitionsTeam>(request);
 			if (competitionTeamEntity is ICreated created)
@@ -213,7 +178,11 @@ namespace ezSCORES.Services
 					int age = today.Year - player.BirthDate.Year;
 					if (player.BirthDate > today.AddYears(-age)) age--;
 
-					return teamSelection.AgeMax == null ? age < 40 : age > teamSelection.AgeMax;
+					if(teamSelection.AgeMax == null)
+					{
+						return teamSelection.Id == 10 ? age < 40 : false;
+					}
+					return age > teamSelection.AgeMax;
 				})
 				.Select(player => player.Id)
 				.ToList();
@@ -224,5 +193,56 @@ namespace ezSCORES.Services
 			}
 		}
 
+		public void ValidateTeam(int teamId, int competitionId)
+		{
+			if (Context.CompetitionsTeams.Any(x => x.TeamId == teamId && x.CompetitionId == competitionId && !x.IsDeleted))
+			{
+				throw new UserException("Ovaj tim je već prijavljen na takmičenje!");
+			}
+			var data = Context.Competitions
+								.Where(c => c.Id == competitionId)
+								.Select(c => new
+								{
+									   CompetitionSelection = c.Selection,
+									   TeamSelection = Context.Teams.Where(t => t.Id == teamId).Select(t => t.Selection).FirstOrDefault()
+								})
+								.FirstOrDefault();
+			if(data == null || data.TeamSelection == null)
+			{
+				throw new UserException("Takmičenje ili tim ne postoje.");
+			}
+			ValidateTeamSelection(data.CompetitionSelection, data.TeamSelection);
+		}
+		private void ValidateTeamSelection(Selection competitionSelection, Selection teamSelection)
+		{
+			if (competitionSelection.AgeMax != null) // Age-restricted competition
+			{
+				if (teamSelection!.AgeMax == null || teamSelection.AgeMax > competitionSelection.AgeMax)
+				{
+					throw new UserException($"Ovo takmičenje je namijenjeno za selekciju {competitionSelection.Name}, a vaš tim je selekcija {teamSelection.Name}!");
+				}
+			}
+			else // Senior or veteran futsal
+			{
+				if (teamSelection!.Id != 10) // If it is veterans, only veteran teams are allowed
+				{
+					throw new UserException("Ovo takmičenje je namijenjeno samo za veteranske ekipe");
+				}
+			}
+		}
+
+		public void ValidatePlayers(List<int> playerIds, int competitionId)
+		{
+			var competitionSelection = Context.Competitions.Where(x => x.Id == competitionId).
+				Select(x => x.Selection).FirstOrDefault();
+			if(competitionSelection != null)
+			{
+				ValidatePlayersForCompetition(playerIds, competitionId, competitionSelection);
+			}
+			else
+			{
+				throw new UserException("Selekcija na odabranom takmičenju ne postoji ili nije unesena!");
+			}
+		}
 	}
 }

@@ -15,5 +15,7 @@ namespace ezSCORES.Services
     public interface IApplicationService : ICRUDService<Applications, ApplicationSearchObject, ApplicationInsertRequest, ApplicationUpdateRequest>
 	{
 		Applications? ToogleStatus(int id, ToogleStatusRequest status);
+		void ValidateTeam(int teamId, int competitionId);
+		void ValidatePlayers(List<int> playerIds, int competitionId);
 	}
 }
