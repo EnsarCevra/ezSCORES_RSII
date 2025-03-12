@@ -13,5 +13,7 @@ namespace ezSCORES.Services
 {
     public interface IMatchesService : ICRUDService<Matches, MatchSearchObject, MatchInsertRequest, MatchUpdateRequest>
 	{
+		void StartMatch(int id);
+		void FinishMatch(int id, FinishMatchRequest request);
 	}
 }

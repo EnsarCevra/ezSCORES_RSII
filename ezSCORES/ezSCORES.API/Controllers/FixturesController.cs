@@ -17,5 +17,17 @@ namespace ezSCORES.API.Controllers
 		public FixturesController (IFixturesService service) : base (service)
 		{
 		}
+
+		[HttpPatch("{id}/activate-fixture")]
+		public void ActivateFixture(int id)
+		{
+			(_service as IFixturesService).ActivateFixture(id);
+		}
+
+		[HttpPatch("{id}/finish-fixture")]
+		public void FinishFixture(int id)
+		{
+			(_service as IFixturesService).FinishFixture(id);
+		}
 	}
 }

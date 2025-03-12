@@ -13,5 +13,7 @@ namespace ezSCORES.Services
 {
     public interface IFixturesService : ICRUDService<Fixtures, BaseCompetitionSearchObject, FixtureInsertRequest, FixtureUpdateRequest>
 	{
+		void ActivateFixture(int fixtureId);
+		void FinishFixture(int fixtureId);
 	}
 }

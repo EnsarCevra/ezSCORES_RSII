@@ -61,5 +61,25 @@ namespace ezSCORES.Services
 				throw new UserException("Stadion koji ste odabrali ne postoji ili je izbrisan!");
 			}
 		}
+
+		public void StartMatch(int id)
+		{
+			var match = Context.Matches.Find(id);
+			if(!Context.Fixtures.Where(x=>x.Id == match!.FixtureId).FirstOrDefault()!.IsActive)
+			{
+				throw new UserException("Ova utakmica nije dio trenutno aktivnog kola!");
+			}
+			match!.IsUnderway = true;
+			Context.SaveChanges();
+		}
+
+		public void FinishMatch(int id, FinishMatchRequest request)
+		{
+			var match = Context.Matches.Find(id);
+			match!.IsUnderway = false;
+			match.IsCompleted = true;
+			match.IsCompletedInRegullarTime = request.IsCompletedInRegullarTime;
+			Context.SaveChanges();
+		}
 	}
 }

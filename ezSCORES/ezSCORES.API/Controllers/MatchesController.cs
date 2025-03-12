@@ -16,5 +16,17 @@ namespace ezSCORES.API.Controllers
 		public MatchesController(IMatchesService service) : base (service)
 		{
 		}
+
+		[HttpPatch("{id}/start-match")]
+		public void StartMatch(int id)
+		{
+			(_service as IMatchesService).StartMatch(id);
+		}
+
+		[HttpPatch("{id}/finish-fixture")]
+		public void FinishFixture(int id, FinishMatchRequest request)
+		{
+			(_service as IMatchesService).FinishMatch(id, request);
+		}
 	}
 }
