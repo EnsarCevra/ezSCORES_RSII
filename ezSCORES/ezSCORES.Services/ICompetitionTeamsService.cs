@@ -13,5 +13,6 @@ namespace ezSCORES.Services
 {
     public interface ICompetitionTeamsService : ICRUDService<CompetitionsTeams, CompetitionTeamsSearchObject, CompetitionTeamInsertRequest, CompetitionTeamUpdateRequest>
 	{
+		void AddTeamsToGroup(AddTeamsToGroupRequest request);
 	}
 }

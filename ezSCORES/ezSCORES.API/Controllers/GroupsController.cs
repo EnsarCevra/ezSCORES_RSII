@@ -16,5 +16,10 @@ namespace ezSCORES.API.Controllers
 		public GroupsController(IGroupsService service) : base (service)
 		{
 		}
+		[HttpGet("{competitionId}/get-group-standings")]
+		public List<GroupStandingsDTO> GetGroupStandings(int competitionId)
+		{
+			return (_service as IGroupsService).GetGroupStandings(competitionId);
+		}
 	}
 }

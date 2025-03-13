@@ -1,5 +1,6 @@
 ﻿using ezSCORES.Model;
 using ezSCORES.Model.Requests;
+using ezSCORES.Model.Requests.ApplicationRequests;
 using ezSCORES.Model.Requests.CompetitionTeamsRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
@@ -17,6 +18,12 @@ namespace ezSCORES.API.Controllers
 	{
 		public CompetitionTeamsController(ICompetitionTeamsService service) : base (service)
 		{
+		}
+		[HttpPatch("/assign-group")]
+		[Authorize(Roles = Constants.Roles.Admin + "," + Constants.Roles.Organizer)]
+		public void AddTeamsToGroup(AddTeamsToGroupRequest request)
+		{
+			(_service as ICompetitionTeamsService).AddTeamsToGroup(request);
 		}
 	}
 }

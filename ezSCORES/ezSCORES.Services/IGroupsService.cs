@@ -13,5 +13,6 @@ namespace ezSCORES.Services
 {
     public interface IGroupsService : ICRUDService<Groups, GroupSearchObject, GroupInsertRequest, GroupUpdateRequest>
 	{
+		public List<GroupStandingsDTO> GetGroupStandings(int competitionId);
 	}
 }

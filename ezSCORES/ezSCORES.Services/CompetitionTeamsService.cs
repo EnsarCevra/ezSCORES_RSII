@@ -35,6 +35,27 @@ namespace ezSCORES.Services
 			return query;
 		}
 
+		public void AddTeamsToGroup(AddTeamsToGroupRequest request)
+		{
+			var teams = Context.CompetitionsTeams.Where(x => request.CompetitionTeamIds.Contains(x.Id)
+														&& x.GroupId != request.GroupId 
+														&& !x.IsDeleted);// take only teams that are not already in this group
+			// if I send non existant competitionTeamId it will ignore it
+			if(teams.Any() && teams.All(x=>x.CompetitionId == request.CompetitionId))
+			{
+				foreach (var team in teams)
+				{
+					team.GroupId = request.GroupId;
+				}
+				Context.SaveChanges();
+			}
+			else
+			{
+				throw new UserException("Dodavanje nije moguće - jedan ili više odabranih timova ne pripada takmičenju");
+			}
+			
+		}
+
 		public override void BeforeInsert(CompetitionTeamInsertRequest request, CompetitionsTeam entity)
 		{
 			base.BeforeInsert(request, entity);

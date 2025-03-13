@@ -60,6 +60,14 @@ namespace ezSCORES.Services
 			{
 				throw new UserException("Stadion koji ste odabrali ne postoji ili je izbrisan!");
 			}
+			var fixtureGameStage = Context.Fixtures.Where(x => x.Id == request.FixtureId).FirstOrDefault()?.GameStage;
+			if(fixtureGameStage != null)
+			{
+				if(fixtureGameStage == Model.ENUMs.GameStage.GroupPhase && entity.HomeTeam.GroupId != entity.AwayTeam.GroupId)
+				{
+					throw new UserException("Ekipe moraju pripadati istoj grupi!");
+				}
+			}
 		}
 
 		public void StartMatch(int id)
