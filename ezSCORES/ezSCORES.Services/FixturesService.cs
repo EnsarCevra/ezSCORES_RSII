@@ -53,6 +53,10 @@ namespace ezSCORES.Services
 					.Include(x => x.Matches)
 					.OrderByDescending(x => x.GameStage)
 					.ThenByDescending(x => x.SequenceNumber);
+				foreach (var fixture in query)
+				{
+					fixture.Matches.OrderByDescending(x => x.DateAndTime);
+				}
 			}
 			return query;
 

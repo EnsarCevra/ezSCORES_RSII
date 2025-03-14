@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.ENUMs;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
@@ -83,6 +84,37 @@ namespace ezSCORES.Services
 			{
 				throw new UserException("Izmjene možete vršiti samo u fazi pripreme takmičenja!");
 			}
+		}
+
+		public Competitions? ToogleCompetitionStatus(int id, CompetitionStatus status)
+		{
+			var competition = Context.Competitions.Include(x=>x.Groups).FirstOrDefault(x=>x.Id == id);
+			if(competition != null)
+			{
+				if(status == CompetitionStatus.ApplicationsClosed && competition.CompetitionType == CompetitionType.League)
+				{
+					if(competition.Groups.Count < 1)//if someone changes status multiple times we want to avoid creating new groups all the time
+					{
+						var group = new Group
+						{
+							CompetitionId = competition.Id,
+							Name = competition.Name,
+							CreatedAt = DateTime.Now
+						};
+						Context.Add(group);
+						Context.SaveChanges();
+						var competitionTeams = Context.CompetitionsTeams.Where(x => x.CompetitionId == competition.Id).ToList();
+						foreach(var team in competitionTeams)
+						{
+							team.GroupId = group.Id;
+						}
+					}
+					
+				}
+				competition.Status = status;
+				Context.SaveChanges();
+			}
+			return Mapper.Map<Competitions>(competition);
 		}
 	}
 }

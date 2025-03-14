@@ -15,7 +15,11 @@ namespace ezSCORES.API.Controllers
 		public CompetitionsController(ICompetitionsService service) : base(service)
 		{
 		}
-
+		[HttpPatch("/toggle-competition-status{id}")]
+		public Competitions ToggleCompetitionStatus(int id, ToggleCompetitionStatusRequest request)
+		{
+			return (_service as ICompetitionsService).ToogleCompetitionStatus(id, request.Status);
+		}
 		[AllowAnonymous]
 		public override PagedResult<Competitions> GetList([FromQuery] CompetitionsSearchObject searchObject)
 		{

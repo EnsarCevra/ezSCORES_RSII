@@ -30,5 +30,28 @@ namespace ezSCORES.Services
 			}
 			return query;
 		}
+		public override void BeforeInsert(GoalInsertRequest request, Goal entity)
+		{
+			var match = Context.Matches.Where(x => x.Id == entity.MatchId).
+				Select(x => new
+				{
+					Match = x,
+					MatchLength = x.Fixture.MatchLength 
+				}).FirstOrDefault();
+			if(request.ScoredAtMinute < 0 || request.ScoredAtMinute > match!.MatchLength)
+			{
+				throw new UserException($"Unijeli ste sljedeci minut pogotka:{request.ScoredAtMinute}, a utakmica traje {match!.MatchLength} minuta!");
+			}
+			if (request.CompetitionTeamPlayerId != null)
+			{
+				var playerTeamId = Context.CompetitionsTeamsPlayers.Where(x => x.Id == request.CompetitionTeamPlayerId)
+					.Select(x => x.CompetitionsTeamsId).FirstOrDefault();
+				if((request.IsHomeGoal && match.Match.HomeTeamId!=playerTeamId) ||
+					(!request.IsHomeGoal && match.Match.AwayTeamId != playerTeamId))
+				{
+					throw new UserException("Odabrani strijelac nije član ekipe koja je postigla pogodak!");
+				}
+			}
+		}
 	}
 }

@@ -23,7 +23,7 @@ namespace ezSCORES.API.Controllers
 			(_service as IMatchesService).StartMatch(id);
 		}
 
-		[HttpPatch("{id}/finish-fixture")]
+		[HttpPatch("{id}/finish-match")]
 		public void FinishFixture(int id, FinishMatchRequest request)
 		{
 			(_service as IMatchesService).FinishMatch(id, request);

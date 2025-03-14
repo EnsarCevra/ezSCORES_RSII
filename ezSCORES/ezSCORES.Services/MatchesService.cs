@@ -63,9 +63,14 @@ namespace ezSCORES.Services
 			var fixtureGameStage = Context.Fixtures.Where(x => x.Id == request.FixtureId).FirstOrDefault()?.GameStage;
 			if(fixtureGameStage != null)
 			{
-				if(fixtureGameStage == Model.ENUMs.GameStage.GroupPhase && entity.HomeTeam.GroupId != entity.AwayTeam.GroupId)
+				if(fixtureGameStage == Model.ENUMs.GameStage.GroupPhase)
 				{
-					throw new UserException("Ekipe moraju pripadati istoj grupi!");
+					var homeTeamGroupId = Context.CompetitionsTeams.Where(x => x.Id == request.HomeTeamId).Select(x=>x.GroupId).FirstOrDefault();
+					var awayTeamGroupId = Context.CompetitionsTeams.Where(x => x.Id == request.AwayTeamId).Select(x=>x.GroupId).FirstOrDefault();
+					if (homeTeamGroupId != awayTeamGroupId)
+					{
+						throw new UserException("Ekipe moraju pripadati istoj grupi!");
+					}
 				}
 			}
 		}
@@ -84,9 +89,20 @@ namespace ezSCORES.Services
 		public void FinishMatch(int id, FinishMatchRequest request)
 		{
 			var match = Context.Matches.Find(id);
+			var homeGoals = Context.Goals.Count(g => g.MatchId == match!.Id && g.IsHomeGoal);
+			var awayGoals = Context.Goals.Count(g => g.MatchId == match!.Id && !g.IsHomeGoal);
+			if(!request.IsCompletedInRegullarTime)
+			{
+				//this means it went on penalty shoutout and has to be processed 
+			}
+			match!.WinnerId = homeGoals > awayGoals ? match.HomeTeamId
+			  : awayGoals > homeGoals ? match.AwayTeamId
+			  : null;  // Null when draw
+			//match!.WinnerId = request.WinnerId;
 			match!.IsUnderway = false;
 			match.IsCompleted = true;
 			match.IsCompletedInRegullarTime = request.IsCompletedInRegullarTime;
+			
 			Context.SaveChanges();
 		}
 	}

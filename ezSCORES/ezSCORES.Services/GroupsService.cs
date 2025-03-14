@@ -29,6 +29,10 @@ namespace ezSCORES.Services
 			}
 			return query;
 		}
+		protected override IQueryable<Group> ApplyIncludes(IQueryable<Group> query)
+		{
+			return query.Include(x => x.CompetitionsTeams).ThenInclude(x => x.Team);
+		}
 		public override void BeforeInsert(GroupInsertRequest request, Group entity)
 		{
 			if(Context.Groups.Where(x=>x.Name == request.Name && request.CompetitionId == x.CompetitionId).Any())

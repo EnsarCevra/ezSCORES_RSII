@@ -15,6 +15,7 @@ namespace ezSCORES.Model
 		public int? GroupId { get; set; }
 
 		public bool IsEliminated { get; set; }
+		public virtual Teams Team { get; set; } = null!;
 		public virtual ICollection<CompetitionsTeamsPlayers> CompetitionsTeamsPlayers { get; set; } = new List<CompetitionsTeamsPlayers>();
 	}
 }

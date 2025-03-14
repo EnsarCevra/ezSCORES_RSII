@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ezSCORES.Model.ENUMs;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,7 +18,7 @@ namespace ezSCORES.Model.Requests.CompetitionRequests
 
         public string Description { get; set; } = null!;
 
-        public int CompetitionType { get; set; }
+        public CompetitionType CompetitionType { get; set; }
 
         public int MaxTeamCount { get; set; }
 
