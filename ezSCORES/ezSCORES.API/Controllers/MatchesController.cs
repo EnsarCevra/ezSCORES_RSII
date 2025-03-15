@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.MatchRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
@@ -16,7 +17,11 @@ namespace ezSCORES.API.Controllers
 		public MatchesController(IMatchesService service) : base (service)
 		{
 		}
-
+		[HttpGet("/get-match-details/{id}")]
+		public MatchDTO GetMatchDetails(int id)
+		{
+			return (_service as IMatchesService).GetMatchDetails(id);
+		}
 		[HttpPatch("{id}/start-match")]
 		public void StartMatch(int id)
 		{

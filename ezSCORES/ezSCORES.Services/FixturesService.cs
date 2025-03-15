@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.FixtureRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
@@ -53,10 +54,6 @@ namespace ezSCORES.Services
 					.Include(x => x.Matches)
 					.OrderByDescending(x => x.GameStage)
 					.ThenByDescending(x => x.SequenceNumber);
-				foreach (var fixture in query)
-				{
-					fixture.Matches.OrderByDescending(x => x.DateAndTime);
-				}
 			}
 			return query;
 
@@ -68,12 +65,17 @@ namespace ezSCORES.Services
 			//can insert onlly when status applications closed and underway
 			//can insert group game stage only if competition is with groups
 			//after validation get highest squence number to increment it for current one
-			int previousMaxSequenceNumber = Context.Fixtures.Where(x => x.CompetitionId == entity.CompetitionId)
+			if(entity.GameStage == Model.ENUMs.GameStage.GroupPhase || entity.GameStage == Model.ENUMs.GameStage.League)
+			{
+				//some tournamens have sequence numbers even on later stages but that won't be included for now
+				int previousMaxSequenceNumber = Context.Fixtures.Where(x => x.CompetitionId == entity.CompetitionId && !x.IsDeleted)
 				.OrderByDescending(x => x.SequenceNumber)
 				.Select(x => x.SequenceNumber)
 				.FirstOrDefault();
-			//this will work if no deletion of fixtures is quarantied and if its all same game stage
-			entity.SequenceNumber = previousMaxSequenceNumber + 1;
+				//this will work if no deletion of fixtures is quarantied and if its all same game stage
+				entity.SequenceNumber = previousMaxSequenceNumber + 1;
+			}
+			
 		}
 
 		public void FinishFixture(int fixtureId)
@@ -93,9 +95,89 @@ namespace ezSCORES.Services
 			Context.SaveChanges();
 		}
 
+		public List<FixtureDTO> GetFixturesByCompetition(GetFixturesByCompetitionRequest request)
+		{
+			var fixtures = Context.Fixtures
+							.AsSplitQuery() // ✅ Optimizes query execution
+							.Where(f => f.CompetitionId == request.competitionId && !f.IsDeleted
+							&&( (request.GetSchedule && !f.IsCompleted && !f.IsCurrentlyActive) || (!request.GetSchedule && (f.IsCompleted || f.IsCurrentlyActive) ) ))
+							.OrderByDescending(f => f.GameStage) // ✅ Latest game stages first
+							.ThenByDescending(f => f.SequenceNumber) // ✅ Latest sequence first
+							.Include(f => f.Matches)
+								.ThenInclude(m => m.HomeTeam).ThenInclude(t => t.Team)
+							.Include(f => f.Matches)
+								.ThenInclude(m => m.AwayTeam).ThenInclude(t => t.Team)
+							.Include(f => f.Matches)
+								.ThenInclude(m => m.Stadium)
+							.Select(f => new FixtureDTO
+							{
+								Id = f.Id,
+								GameStage = f.GameStage,
+								SequenceNumber = f.SequenceNumber,
+								Matches = f.Matches
+									.OrderByDescending(m => m.DateAndTime) // ✅ Latest matches first
+									.Select(m => new MatchDTO
+									{
+										MatchId = m.Id,
+										DateAndTime = m.DateAndTime,
+										HomeTeam = new TeamDTO
+										{
+											Id = m.HomeTeam.Team.Id,
+											Name = m.HomeTeam.Team.Name
+										},
+										AwayTeam = new TeamDTO
+										{
+											Id = m.AwayTeam.Team.Id,
+											Name = m.AwayTeam.Team.Name
+										},
+										Stadium = m.Stadium != null ? m.Stadium.Name : null,
+										HomeTeamScore = m.IsCompleted ? Context.Goals.Count(g => g.MatchId == m.Id && g.IsHomeGoal) : null,
+										AwayTeamScore = m.IsCompleted ? Context.Goals.Count(g => g.MatchId == m.Id && !g.IsHomeGoal) : null
+									})
+									.ToList()
+							})
+							.ToList();
+
+			return fixtures;
+		}
+
 		protected override IQueryable<Fixture> ApplyIncludes(IQueryable<Fixture> query)
 		{
-			return query.Include(x => x.Matches);
+			return query.Include(x => x.Matches).ThenInclude(x => x.HomeTeam).ThenInclude(x => x.Team)
+							.Include(x => x.Matches).ThenInclude(x => x.AwayTeam).ThenInclude(x => x.Team);
+		}
+
+		public override void Delete(int id)
+		{
+			var fixtureToDelete = Context.Fixtures
+			.FirstOrDefault(f => f.Id == id && !f.IsDeleted);
+
+			if (fixtureToDelete != null)
+			{
+				if(fixtureToDelete.GameStage == Model.ENUMs.GameStage.GroupPhase || fixtureToDelete.GameStage == Model.ENUMs.GameStage.League)
+				{
+					int sequenceNumberToDelete = fixtureToDelete.SequenceNumber;
+
+					// Update sequence numbers for remaining fixtures
+					var fixturesToUpdate = Context.Fixtures
+						.Where(f => f.CompetitionId == fixtureToDelete.CompetitionId &&
+									f.SequenceNumber > sequenceNumberToDelete &&
+									!f.IsDeleted)
+						.ToList();
+
+					foreach (var fixture in fixturesToUpdate)
+					{
+						fixture.SequenceNumber -= 1;
+					}
+				}
+				// Mark the fixture as deleted (soft delete)
+				fixtureToDelete.IsDeleted = true;
+				Context.SaveChanges();
+			}
+			else
+			{
+				throw new UserException("Odabrani zapis ne postoji!");
+			}
 		}
 	}
 }

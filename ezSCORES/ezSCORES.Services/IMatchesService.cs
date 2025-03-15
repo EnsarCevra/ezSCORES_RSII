@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.MatchRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
@@ -15,5 +16,6 @@ namespace ezSCORES.Services
 	{
 		void StartMatch(int id);
 		void FinishMatch(int id, FinishMatchRequest request);
+		MatchDTO GetMatchDetails(int id);
 	}
 }

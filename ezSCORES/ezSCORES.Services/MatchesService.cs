@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.MatchRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {
@@ -38,15 +40,6 @@ namespace ezSCORES.Services
 				query = query.Where(x => x.DateAndTime.Date == search.DateAndTime.Value.Date);
 			}
 			return query;
-		}
-
-		protected override IQueryable<Match> ApplyIncludes(IQueryable<Match> query)
-		{
-			return query.Include(x => x.HomeTeam)
-						.Include(x => x.AwayTeam)
-						.Include(x => x.Stadium)
-						.Include(x => x.Goals)
-						.Include(x => x.CompetitionsRefereesMatches).ThenInclude(x => x.CompetitionsReferees).ThenInclude(x => x.Referee);
 		}
 
 		public override void BeforeInsert(MatchInsertRequest request, Match entity)
@@ -104,6 +97,53 @@ namespace ezSCORES.Services
 			match.IsCompletedInRegullarTime = request.IsCompletedInRegullarTime;
 			
 			Context.SaveChanges();
+		}
+
+		public MatchDTO GetMatchDetails(int id)
+		{
+			var match = Context.Matches.AsSplitQuery()
+						.Include(x => x.HomeTeam).ThenInclude(x => x.Team)
+						.Include(x => x.HomeTeam).ThenInclude(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player)
+						.Include(x => x.AwayTeam).ThenInclude(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player)
+						.Include(x => x.AwayTeam).ThenInclude(x => x.Team)
+						.Include(x => x.Stadium)
+						.Include(x => x.Goals).ThenInclude(x => x.CompetitionTeamPlayer).ThenInclude(x => x.Player)
+						.Include(x => x.CompetitionsRefereesMatches).ThenInclude(x => x.CompetitionsReferees).ThenInclude(x => x.Referee)
+						.Where(x => x.Id == id)
+						.Select(x => new MatchDTO
+						{
+							MatchId = x.Id,
+							DateAndTime = x.DateAndTime,
+							HomeTeam = new TeamDTO
+							{
+								Id = x.HomeTeam.Id,
+								Name = x.HomeTeam.Team.Name,
+								Players = x.HomeTeam.CompetitionsTeamsPlayers.Select(p => new PlayerDTO
+								{
+									Id = p.Id,
+									Name = p.Player.FirstName + " " + p.Player.LastName
+								}).ToList()
+							},
+							AwayTeam = new TeamDTO
+							{
+								Id = x.AwayTeam.Id,
+								Name = x.AwayTeam.Team.Name,
+								Players = x.AwayTeam.CompetitionsTeamsPlayers.Select(p => new PlayerDTO
+								{
+									Id = p.Id,
+									Name = p.Player.FirstName + " " + p.Player.LastName
+								}).ToList()
+							},
+							Stadium = x.Stadium.Name,
+							Goals = x.Goals.Select(g => new GoalDTO
+							{
+								Id = g.Id,
+								Scorer = g.CompetitionTeamPlayer != null ? g.CompetitionTeamPlayer.Player.FirstName + " " + g.CompetitionTeamPlayer.Player.LastName : null
+							}).ToList(),
+						}).FirstOrDefault();
+			if (match == null)
+				throw new UserException("Odabrana utakmica ne postoji!");
+			return match;
 		}
 	}
 }

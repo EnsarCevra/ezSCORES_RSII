@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.FixtureRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
@@ -15,5 +16,6 @@ namespace ezSCORES.Services
 	{
 		void ActivateFixture(int fixtureId);
 		void FinishFixture(int fixtureId);
+		List<FixtureDTO> GetFixturesByCompetition(GetFixturesByCompetitionRequest request);
 	}
 }

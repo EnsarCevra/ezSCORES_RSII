@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.FixtureRequests;
 using ezSCORES.Model.Requests.GroupRequests;
@@ -28,6 +29,11 @@ namespace ezSCORES.API.Controllers
 		public void FinishFixture(int id)
 		{
 			(_service as IFixturesService).FinishFixture(id);
+		}
+		[HttpGet("/get-fixtures-by-competition")]
+		public List<FixtureDTO> GetFixturesByCompetition([FromQuery] GetFixturesByCompetitionRequest request)
+		{
+			return (_service as IFixturesService).GetFixturesByCompetition(request);
 		}
 	}
 }

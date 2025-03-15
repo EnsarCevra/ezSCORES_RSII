@@ -17,5 +17,6 @@ namespace ezSCORES.Model
 		public int ScoredAtMinute { get; set; }
 
 		public bool IsHomeGoal { get; set; }
+		public virtual CompetitionsTeamsPlayers? CompetitionTeamPlayer { get; set; }
 	}
 }
