@@ -1,4 +1,4 @@
-﻿namespace ezSCORES.API.Constants
+﻿namespace ezSCORES.Model.Constants
 {
 	public static class Roles
 	{

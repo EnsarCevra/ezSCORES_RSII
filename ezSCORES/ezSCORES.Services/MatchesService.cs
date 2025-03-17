@@ -48,6 +48,17 @@ namespace ezSCORES.Services
 			{
 				throw new UserException("Domaći i gostujući tim ne mogu biti isti!");
 			}
+			var competitionId = Context.Fixtures.Find(request.FixtureId)!.CompetitionId;
+
+			var nonParticipatingTeamsIds = new List<int> {request.HomeTeamId, request.AwayTeamId }
+								.Except(Context.CompetitionsTeams
+									.Where(ct => ct.CompetitionId == competitionId)
+									.Select(ct => ct.TeamId))
+								.ToList();
+			if(nonParticipatingTeamsIds.Count > 0)
+			{
+				throw new UserException($"Timovi ne pripadaju takmičenju: {string.Join(",", nonParticipatingTeamsIds)}");
+			}
 			var stadium = Context.Stadiums.Find(request.StadiumId);
 			if(stadium == null || stadium.IsDeleted)
 			{
@@ -104,16 +115,22 @@ namespace ezSCORES.Services
 			var match = Context.Matches.AsSplitQuery()
 						.Include(x => x.HomeTeam).ThenInclude(x => x.Team)
 						.Include(x => x.HomeTeam).ThenInclude(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player)
+						.Include(x => x.HomeTeam).ThenInclude(x => x.Group)
 						.Include(x => x.AwayTeam).ThenInclude(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player)
 						.Include(x => x.AwayTeam).ThenInclude(x => x.Team)
 						.Include(x => x.Stadium)
 						.Include(x => x.Goals).ThenInclude(x => x.CompetitionTeamPlayer).ThenInclude(x => x.Player)
 						.Include(x => x.CompetitionsRefereesMatches).ThenInclude(x => x.CompetitionsReferees).ThenInclude(x => x.Referee)
+						.Include(x=>x.Fixture)
 						.Where(x => x.Id == id)
 						.Select(x => new MatchDTO
 						{
 							MatchId = x.Id,
 							DateAndTime = x.DateAndTime,
+							FixtureId = x.FixtureId,
+							Group = x.HomeTeam.Group.Name,
+							GameStage = x.Fixture.GameStage,
+							FixtureSequenceNumber = x.Fixture.SequenceNumber,
 							HomeTeam = new TeamDTO
 							{
 								Id = x.HomeTeam.Id,
@@ -143,6 +160,8 @@ namespace ezSCORES.Services
 						}).FirstOrDefault();
 			if (match == null)
 				throw new UserException("Odabrana utakmica ne postoji!");
+			if (match.Group != null && match.GameStage != Model.ENUMs.GameStage.GroupPhase && match.GameStage == Model.ENUMs.GameStage.League)
+				match.Group = null;//if it's not group stage, group name will not be displayed
 			return match;
 		}
 	}

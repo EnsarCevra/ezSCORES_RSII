@@ -23,7 +23,7 @@ namespace ezSCORES.API.Controllers
 			return base.GetList(searchObject);
 		}
 
-		[Authorize(Roles = Constants.Roles.Admin)]
+		[Authorize(Roles = Model.Constants.Roles.Admin)]
 		public override Roles Insert(RoleUpsertRequest request)
 		{
 			return base.Insert(request);

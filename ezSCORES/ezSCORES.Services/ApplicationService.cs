@@ -167,7 +167,14 @@ namespace ezSCORES.Services
 
 			if (existingPlayersOnCompetition.Any())
 			{
-				throw new UserException($"Sljedeći igrači su već registrirani na takmičenju: {string.Join(",", existingPlayersOnCompetition)}");
+				if(existingPlayersOnCompetition.Count>1)
+				{
+					throw new UserException($"Sljedeći igrači su već registrirani na takmičenju: {string.Join(",", existingPlayersOnCompetition)}");
+				}
+				else
+				{
+					throw new UserException($"Igrači je već registrovan na takmičenje: {existingPlayersOnCompetition[0]}");
+				}
 			}
 
 			var today = DateTime.Today;
@@ -189,7 +196,14 @@ namespace ezSCORES.Services
 
 			if (ageRestrictedPlayers.Any())
 			{
-				throw new UserException($"Sljedeći igrači ne mogu igrati na takmičenju zbog dobnih restrikcija: {string.Join(",", ageRestrictedPlayers)}");
+				if(ageRestrictedPlayers.Count>1)
+				{
+					throw new UserException($"Sljedeći igrači ne mogu igrati na takmičenju zbog dobnih restrikcija: {string.Join(",", ageRestrictedPlayers)}");
+				}
+				else
+				{
+					throw new UserException($"Igrači ne može igrati na takmičenju zbog dobnih restrikcija: {ageRestrictedPlayers[0]}");
+				}
 			}
 		}
 

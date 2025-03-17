@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ezSCORES.Model.ENUMs;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,5 +16,9 @@ namespace ezSCORES.Model.DTOs
 		public string Stadium { get; set; }
 		public List<GoalDTO> Goals { get; set; }
 		public List<string> Referees { get; set; }
+		public int FixtureId { get; set; }
+		public string? Group { get; set; }
+		public int FixtureSequenceNumber { get; set; }
+		public GameStage GameStage{ get; set; }
 	}
 }

@@ -4,10 +4,10 @@ using System.Text;
 
 namespace ezSCORES.Model.SearchObjects
 {
-	public class TeamsSearchObject : BaseSearchObject
+	public class TeamsSearchObject : BaseCompetitionSearchObject
 	{
 		public int? SelectionId { get; set; }
 		public bool OnlyUsersTeams { get; set; }
-		public bool? IncludeTeamsThatAlreadyAppliedForCompetition { get; set; }
+		public bool? IncludeTeamsThatAlreadyAppliedForCompetition { get; set; } = false;
 	}
 }

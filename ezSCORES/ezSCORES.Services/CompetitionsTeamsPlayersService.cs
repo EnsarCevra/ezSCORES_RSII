@@ -18,8 +18,10 @@ namespace ezSCORES.Services
 {
     public class CompetitionsTeamsPlayersService : BaseCRUDService<CompetitionsTeamsPlayers, CompetitionTeamsPlayersSearchObject, CompetitionsTeamsPlayer,CompetitionTeamsPlayerUpsertRequest, CompetitionTeamsPlayerUpsertRequest>, ICompetitionsTeamsPlayersService
 	{
-		public CompetitionsTeamsPlayersService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		private readonly IApplicationService _applicationService;
+		public CompetitionsTeamsPlayersService(EzScoresdbRsiiContext context, IMapper mapper, IApplicationService applicationService) : base(context, mapper)
 		{
+			_applicationService = applicationService;
 		}
 
 		public override IQueryable<CompetitionsTeamsPlayer> AddFilter(CompetitionTeamsPlayersSearchObject search, IQueryable<CompetitionsTeamsPlayer> query)
@@ -43,7 +45,13 @@ namespace ezSCORES.Services
 		public override void BeforeInsert(CompetitionTeamsPlayerUpsertRequest request, CompetitionsTeamsPlayer entity)
 		{
 			base.BeforeInsert(request, entity);
-			//this is being trigerred when Player is inserted on a team that is already on competition
+			List<int> player = [request.PlayerId];
+			var competitionId = Context.CompetitionsTeams.Find(request.CompetitionsTeamsId)?.CompetitionId;
+			if(competitionId == null)
+			{
+				throw new UserException("Odabrani tim ne postoji!");//compeitionId must be inserted so if its null that means CompetitionTeams doesn't exist
+			}
+			_applicationService.ValidatePlayers(player, competitionId.Value);
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.Requests.ApplicationRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Auth;
@@ -7,6 +8,7 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,14 +34,17 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.SelectionId == search.SelectionId);
 			}
-			if(search.OnlyUsersTeams)
+			if(search.OnlyUsersTeams && _activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)//used when applying to a new competition when we don't want to show teams with whom user already applied for compeition
 			{
-				query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId()).Include(x=>x.Selection);
+				var currrentUserId = _activeUserService.GetActiveUserId();
+				query = query.Where(x => x.UserId == currrentUserId).Include(x=>x.Selection);
 				if (search.IncludeTeamsThatAlreadyAppliedForCompetition != null)
 				{
-					if (search.IncludeTeamsThatAlreadyAppliedForCompetition == false)
+					if (search.IncludeTeamsThatAlreadyAppliedForCompetition == false && search.CompetitionId != null)
 					{
-						// dont know how to implement this yet
+						query = query
+							.Where(t => !Context.Applications
+								.Any(a => a.TeamId == t.Id && a.CompetitionId == search.CompetitionId && (a.IsAccepted == null || a.IsAccepted == true)));
 					}
 				}
 			}
@@ -48,7 +53,7 @@ namespace ezSCORES.Services
 
 		public override void BeforeInsert(TeamsInsertRequest request, Team entity)
 		{
-			//no validation required for now
+			entity.UserId = _activeUserService.GetActiveUserId() ?? throw new InvalidOperationException("Authenticated user ID cannot be null.");
 		}
 		protected override IQueryable<Team> ApplyIncludes(IQueryable<Team> query)
 		{
