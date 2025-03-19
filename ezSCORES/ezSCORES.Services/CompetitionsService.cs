@@ -2,6 +2,7 @@
 using ezSCORES.Model.ENUMs;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
+using ezSCORES.Services.CompetitionStatusStateMachine;
 using ezSCORES.Services.Database;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,22 @@ namespace ezSCORES.Services
 {
     public class CompetitionsService : BaseCRUDService<Competitions, CompetitionsSearchObject, Competition, CompetitionsInsertRequest, CompetitionsUpdateRequest>, ICompetitionsService
 	{
-		public CompetitionsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		public BaseCompetitionState BaseCompetitionState { get; set; }
+		public CompetitionsService(EzScoresdbRsiiContext context, IMapper mapper, BaseCompetitionState baseCompetitionState) : base(context, mapper)
 		{
+			BaseCompetitionState = baseCompetitionState;
 		}
-
+		public override Competitions Insert(CompetitionsInsertRequest request)
+		{
+			var state = BaseCompetitionState.CreateState(CompetitionStatus.Initial);
+			return state.Insert(request);
+		}
+		public override Competitions Update(int id, CompetitionsUpdateRequest request)
+		{
+			var entity = GetById(id);
+			var state = BaseCompetitionState.CreateState(entity.Status);
+			return state.Update(id, request);
+		}
 		public override IQueryable<Competition> AddFilter(CompetitionsSearchObject search, IQueryable<Competition> query)
 		{
 			base.AddFilter(search, query);
@@ -115,6 +128,40 @@ namespace ezSCORES.Services
 				Context.SaveChanges();
 			}
 			return Mapper.Map<Competitions>(competition);
+		}
+		public Competitions PreparationState(int id)
+		{
+			var competition = Context.Competitions.Find(id);
+			var state = BaseCompetitionState.CreateState(competition.Status);
+			return state.Peparation(id);
+		}
+
+		public Competitions OpenAplications(int id)
+		{
+			var competition = Context.Competitions.Find(id);
+			var state = BaseCompetitionState.CreateState(competition.Status);
+			return state.OpenAplications(id);
+		}
+
+		public Competitions CloseApplications(int id)
+		{
+			var competition = Context.Competitions.Find(id);
+			var state = BaseCompetitionState.CreateState(competition.Status);
+			return state.CloseApplications(id);
+		}
+
+		public Competitions StartCompetition(int id)
+		{
+			var competition = Context.Competitions.Find(id);
+			var state = BaseCompetitionState.CreateState(competition.Status);
+			return state.StartCompetition(id);
+		}
+
+		public Competitions FinishCompetition(int id)
+		{
+			var competition = Context.Competitions.Find(id);
+			var state = BaseCompetitionState.CreateState(competition.Status);
+			return state.FinishCompetition(id);
 		}
 	}
 }

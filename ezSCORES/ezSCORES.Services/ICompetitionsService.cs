@@ -13,5 +13,10 @@ namespace ezSCORES.Services
     public interface ICompetitionsService : ICRUDService<Competitions, CompetitionsSearchObject, CompetitionsInsertRequest, CompetitionsUpdateRequest>
 	{
 		Competitions? ToogleCompetitionStatus(int id, CompetitionStatus status);
+		Competitions PreparationState(int id);
+		Competitions OpenAplications(int id);
+		Competitions CloseApplications(int id);
+		Competitions StartCompetition(int id);
+		Competitions FinishCompetition(int id);
 	}
 }

@@ -112,6 +112,7 @@ namespace ezSCORES.Services
 					throw new UserException("Status prijave možete mijenjati samo kada je status takmičenja prijave otvorene ili prijave zatvorene!");
 				}
 				application.IsAccepted = request.Status;
+				//if status is false application is denied - you have to delete every related entity that has been already created - CompetitionTeams and CompetitionTeamsPlayers
 				Context.SaveChanges();
 				return Mapper.Map<Applications>(application);
 			}

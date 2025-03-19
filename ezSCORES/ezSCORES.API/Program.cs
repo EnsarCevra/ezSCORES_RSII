@@ -3,6 +3,7 @@ using ezSCORES.API.Authorization;
 using ezSCORES.API.Filters;
 using ezSCORES.Services;
 using ezSCORES.Services.Auth;
+using ezSCORES.Services.CompetitionStatusStateMachine;
 using ezSCORES.Services.Database;
 using Mapster;
 using Microsoft.AspNetCore.Authentication;
@@ -36,7 +37,14 @@ builder.Services.AddTransient<ICompetitionTeamsService, CompetitionTeamsService>
 builder.Services.AddTransient<ICompetitionsRefereesMatchService, CompetitionsRefereesMatchService>();
 builder.Services.AddTransient<ICompetitionsTeamsPlayersService, CompetitionsTeamsPlayersService>();
 
-
+//StateMachine DependencyInjection
+builder.Services.AddTransient<BaseCompetitionState>();
+builder.Services.AddTransient<InitialCompetitionState>();
+builder.Services.AddTransient<PreparationCompetitionState>();
+builder.Services.AddTransient<ApplicationsOpenCompetitionState>();
+builder.Services.AddTransient<ApplicationsClosedCompetitionState>();
+builder.Services.AddTransient<UnderwayCompetitionState>();
+builder.Services.AddTransient<FinishedCompetitionState>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 //builder.Services.AddScoped<ICompetitionsService, CompetitionsService>();
 

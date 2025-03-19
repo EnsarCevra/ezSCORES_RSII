@@ -25,5 +25,30 @@ namespace ezSCORES.API.Controllers
 		{
 			return base.GetList(searchObject);
 		}
+		[HttpPut("{id}/preparation")]
+		public Competitions PreparationsState(int id)
+		{
+			return (_service as ICompetitionsService).PreparationState(id);
+		}
+		[HttpPut("{id}/applications-open")]
+		public Competitions OpenApplications(int id)
+		{
+			return (_service as ICompetitionsService).OpenAplications(id);
+		}
+		[HttpPut("{id}/applications-closed")]
+		public Competitions CloseApplications(int id)
+		{
+			return (_service as ICompetitionsService).CloseApplications(id);
+		}
+		[HttpPut("{id}/start-competition")]
+		public Competitions StartCompetition(int id)
+		{
+			return (_service as ICompetitionsService).StartCompetition(id);
+		}
+		[HttpPut("{id}/finish-competition")]
+		public Competitions FinishCompetition(int id)
+		{
+			return (_service as ICompetitionsService).FinishCompetition(id);
+		}
 	}
 }

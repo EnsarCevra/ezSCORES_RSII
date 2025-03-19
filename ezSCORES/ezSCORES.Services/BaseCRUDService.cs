@@ -21,7 +21,7 @@ namespace ezSCORES.Services
 			
 		}
 
-		public TModel Insert(TInsert request)
+		public virtual TModel Insert(TInsert request)
 		{
 			TDbEntity entity = Mapper.Map<TDbEntity>(request);
 			BeforeInsert(request, entity);
@@ -47,7 +47,7 @@ namespace ezSCORES.Services
 		}
 		public virtual void AfterInsert(TInsert request, TDbEntity entity)	{   }
 
-		public TModel Update(int id, TUpdate request)
+		public virtual TModel Update(int id, TUpdate request)
 		{
 			var set = Context.Set<TDbEntity>();
 
