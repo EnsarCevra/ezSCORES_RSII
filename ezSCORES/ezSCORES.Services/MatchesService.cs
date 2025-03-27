@@ -60,7 +60,7 @@ namespace ezSCORES.Services
 				throw new UserException($"Timovi ne pripadaju takmičenju: {string.Join(",", nonParticipatingTeamsIds)}");
 			}
 			var stadium = Context.Stadiums.Find(request.StadiumId);
-			if(stadium == null || stadium.IsDeleted)
+			if(stadium == null)
 			{
 				throw new UserException("Stadion koji ste odabrali ne postoji ili je izbrisan!");
 			}
@@ -84,7 +84,7 @@ namespace ezSCORES.Services
 			var match = Context.Matches.Find(id);
 			if(!Context.Fixtures.Where(x=>x.Id == match!.FixtureId).FirstOrDefault()!.IsActive)
 			{
-				throw new UserException("Ova utakmica nije dio trenutno aktivnog kola!");
+				throw new UserException("Ova utakmica nije dio trenutno aktivnog kola ili je izbrisana!");
 			}
 			match!.IsUnderway = true;
 			Context.SaveChanges();

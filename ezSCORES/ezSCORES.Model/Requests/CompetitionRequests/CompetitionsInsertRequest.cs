@@ -7,8 +7,6 @@ namespace ezSCORES.Model.Requests.CompetitionRequests
 {
     public class CompetitionsInsertRequest
     {
-        public int UserId { get; set; }
-
         public int SelectionId { get; set; }
 
         public string Season { get; set; } = null!;

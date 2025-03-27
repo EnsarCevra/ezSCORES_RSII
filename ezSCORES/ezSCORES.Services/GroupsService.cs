@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -104,9 +105,29 @@ namespace ezSCORES.Services
 					team.GoalDifference = team.GoalsScored - team.GoalsConceded;
 					team.Points = (team.Wins * 3) + team.Draws;
 				}
+				group.Standings = group.Standings.OrderByDescending(x => x.Points).ThenByDescending(x => x.GoalDifference).ToList();
 			}
-
+			groups = groups.OrderBy(x => x.GroupName).ToList();
 			return groups;
+		}
+
+		public override void Delete(int id)
+		{
+			var group = Context.Groups.Find(id);
+			if(group == null)
+			{
+				throw new UserException("Zapis nije pronađen");
+			}
+			var teamsInGroup = Context.CompetitionsTeams.Where(x => x.GroupId == id);
+			if(teamsInGroup.Count()>0)
+			{
+				foreach(var team in teamsInGroup)
+				{
+					team.GroupId = null;
+				}
+			}
+			group.IsDeleted = true;
+			Context.SaveChanges();
 		}
 	}
 }

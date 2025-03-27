@@ -18,8 +18,10 @@ namespace ezSCORES.Services
 {
     public class CompetitionTeamsService : BaseCRUDService<CompetitionsTeams, CompetitionTeamsSearchObject, CompetitionsTeam,CompetitionTeamInsertRequest, CompetitionTeamUpdateRequest>, ICompetitionTeamsService
 	{
-		public CompetitionTeamsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		private readonly IApplicationService _applicationService;
+		public CompetitionTeamsService(EzScoresdbRsiiContext context, IMapper mapper, IApplicationService applicationService) : base(context, mapper)
 		{
+			_applicationService = applicationService;
 		}
 
 		public override IQueryable<CompetitionsTeam> AddFilter(CompetitionTeamsSearchObject search, IQueryable<CompetitionsTeam> query)
@@ -59,7 +61,8 @@ namespace ezSCORES.Services
 		public override void BeforeInsert(CompetitionTeamInsertRequest request, CompetitionsTeam entity)
 		{
 			base.BeforeInsert(request, entity);
-			//this is being triggered when player is chosinh team and players for competition during application process
+			//don't know if this endpoint will ever be triggered since teams are added through apllications and not manually
+			_applicationService.ValidateTeam(request.TeamId, request.CompetitionId);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using ezSCORES.Model.ENUMs;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
+using ezSCORES.Services.Auth;
 using ezSCORES.Services.CompetitionStatusStateMachine;
 using ezSCORES.Services.Database;
 using MapsterMapper;
@@ -17,10 +18,12 @@ namespace ezSCORES.Services
 {
     public class CompetitionsService : BaseCRUDService<Competitions, CompetitionsSearchObject, Competition, CompetitionsInsertRequest, CompetitionsUpdateRequest>, ICompetitionsService
 	{
+		private readonly IActiveUserService _activeUserService;
 		public BaseCompetitionState BaseCompetitionState { get; set; }
-		public CompetitionsService(EzScoresdbRsiiContext context, IMapper mapper, BaseCompetitionState baseCompetitionState) : base(context, mapper)
+		public CompetitionsService(EzScoresdbRsiiContext context, IMapper mapper, BaseCompetitionState baseCompetitionState, IActiveUserService activeUserService) : base(context, mapper)
 		{
 			BaseCompetitionState = baseCompetitionState;
+			_activeUserService = activeUserService;
 		}
 		public override Competitions Insert(CompetitionsInsertRequest request)
 		{
@@ -86,7 +89,7 @@ namespace ezSCORES.Services
 		}
 		public override void BeforeInsert(CompetitionsInsertRequest request, Competition entity)
 		{
-			base.BeforeInsert(request, entity);
+			entity.UserId = _activeUserService.GetActiveUserId() ?? throw new InvalidOperationException("Authenticated user ID cannot be null.");
 		}
 
 		public override void BeforeUpdate(CompetitionsUpdateRequest request, Competition entity)

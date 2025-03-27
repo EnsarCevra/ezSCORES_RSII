@@ -28,9 +28,9 @@ namespace ezSCORES.Services
 			var fixture = Context.Fixtures.Find(fixtureId);
 			if (fixture == null)
 			{
-				throw new UserException("Odabrano kolo ne postoji!");//maybe I dont need this since middleware check wether entity exists
+				throw new UserException("Odabrano kolo ne postoji ili je izbrisano!");
 			}
-			var activeFixture = Context.Fixtures.FirstOrDefault(x => x.CompetitionId == fixture.CompetitionId && x.IsActive);
+			var activeFixture = Context.Fixtures.FirstOrDefault(x => x.CompetitionId == fixture.CompetitionId && x.IsCurrentlyActive);
 			if(activeFixture != null)
 			{
 				throw new UserException($"Već je aktivno drugo kolo: {activeFixture.Id}");
@@ -68,7 +68,7 @@ namespace ezSCORES.Services
 			if(entity.GameStage == Model.ENUMs.GameStage.GroupPhase || entity.GameStage == Model.ENUMs.GameStage.League)
 			{
 				//some tournamens have sequence numbers even on later stages but that won't be included for now
-				int previousMaxSequenceNumber = Context.Fixtures.Where(x => x.CompetitionId == entity.CompetitionId && !x.IsDeleted)
+				int previousMaxSequenceNumber = Context.Fixtures.Where(x => x.CompetitionId == entity.CompetitionId)
 				.OrderByDescending(x => x.SequenceNumber)
 				.Select(x => x.SequenceNumber)
 				.FirstOrDefault();
@@ -83,7 +83,7 @@ namespace ezSCORES.Services
 			var fixture = Context.Fixtures.Find(fixtureId);
 			if(fixture == null)
 			{
-				throw new UserException("Odabrano kolo ne postoji!");
+				throw new UserException("Odabrano kolo ne postoji ili je izbrisano!");
 			}
 			var unfinishedMatchesIds = Context.Matches.Where(x => x.FixtureId == fixture.Id && !x.IsCompleted).Select(x=>x.Id);
 			if(unfinishedMatchesIds.Any())
@@ -99,7 +99,7 @@ namespace ezSCORES.Services
 		{
 			var fixtures = Context.Fixtures
 							.AsSplitQuery() // ✅ Optimizes query execution
-							.Where(f => f.CompetitionId == request.competitionId && !f.IsDeleted
+							.Where(f => f.CompetitionId == request.competitionId
 							&&( (request.GetSchedule && !f.IsCompleted && !f.IsCurrentlyActive) || (!request.GetSchedule && (f.IsCompleted || f.IsCurrentlyActive) ) ))
 							.OrderByDescending(f => f.GameStage) // ✅ Latest game stages first
 							.ThenByDescending(f => f.SequenceNumber) // ✅ Latest sequence first
@@ -150,7 +150,7 @@ namespace ezSCORES.Services
 		public override void Delete(int id)
 		{
 			var fixtureToDelete = Context.Fixtures
-			.FirstOrDefault(f => f.Id == id && !f.IsDeleted);
+			.FirstOrDefault(f => f.Id == id);
 
 			if (fixtureToDelete != null)
 			{
@@ -161,8 +161,7 @@ namespace ezSCORES.Services
 					// Update sequence numbers for remaining fixtures
 					var fixturesToUpdate = Context.Fixtures
 						.Where(f => f.CompetitionId == fixtureToDelete.CompetitionId &&
-									f.SequenceNumber > sequenceNumberToDelete &&
-									!f.IsDeleted)
+									f.SequenceNumber > sequenceNumberToDelete)
 						.ToList();
 
 					foreach (var fixture in fixturesToUpdate)

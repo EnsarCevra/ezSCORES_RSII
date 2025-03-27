@@ -47,9 +47,12 @@ namespace ezSCORES.Services
 		}
 		public virtual IQueryable<TDbEntity> AddFilter(TSearch search, IQueryable<TDbEntity> query)
 		{
-			if(search.IsDeleted!=null)
+			if (search.IsDeleted != null)
 			{
-				query = query.Where(x => EF.Property<bool>(x, "IsDeleted") == search.IsDeleted);
+				if(search.IsDeleted == true)//this is only when user requests for deleted records since Context handles soft delete
+				{
+					query = query.IgnoreQueryFilters().Where(x => EF.Property<bool>(x, "IsDeleted") == search.IsDeleted);
+				}
 			}
 			if (!string.IsNullOrWhiteSpace(search.Name))
 			{

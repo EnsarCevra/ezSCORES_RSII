@@ -28,12 +28,12 @@ namespace ezSCORES.Services
 					.OrderBy(x=>x.SequenceNumber)
 					.Include(x=>x.CompetitionTeamPlayer).ThenInclude(x=>x.Player);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
 		public override void BeforeInsert(GoalInsertRequest request, Goal entity)
 		{
-			var match = Context.Matches.Where(x => x.Id == entity.MatchId).
-				Select(x => new
+			var match = Context.Matches.Where(x => x.Id == entity.MatchId)
+				.Select(x => new
 				{
 					Match = x,
 					MatchLength = x.Fixture.MatchLength 

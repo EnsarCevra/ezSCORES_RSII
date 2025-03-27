@@ -509,7 +509,29 @@ public partial class EzScoresdbRsiiContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FKUser349727");
         });
-
+        modelBuilder.Entity<Application>().HasQueryFilter(m => !m.IsDeleted);
+        modelBuilder.Entity<City>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<Competition>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<CompetitionsReferee>().HasQueryFilter(ct => !ct.IsDeleted);
+        modelBuilder.Entity<CompetitionsRefereesMatch>().HasQueryFilter(m => !m.IsDeleted);
+        modelBuilder.Entity<CompetitionsSponsor>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<CompetitionsTeam>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<CompetitionsTeamsPlayer>().HasQueryFilter(ct => !ct.IsDeleted);
+        modelBuilder.Entity<FavoriteCompetition>().HasQueryFilter(m => !m.IsDeleted);
+        modelBuilder.Entity<Fixture>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<Goal>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<Group>().HasQueryFilter(ct => !ct.IsDeleted);
+        modelBuilder.Entity<Match>().HasQueryFilter(m => !m.IsDeleted);
+        modelBuilder.Entity<Player>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<Referee>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<Review>().HasQueryFilter(ct => !ct.IsDeleted);
+        modelBuilder.Entity<Reward>().HasQueryFilter(ct => !ct.IsDeleted);
+		modelBuilder.Entity<Role>().HasQueryFilter(m => !m.IsDeleted);
+        modelBuilder.Entity<Selection>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<Sponsor>().HasQueryFilter(g => !g.IsDeleted);
+        modelBuilder.Entity<Stadium>().HasQueryFilter(ct => !ct.IsDeleted);
+        modelBuilder.Entity<Team>().HasQueryFilter(m => !m.IsDeleted);
+        modelBuilder.Entity<User>().HasQueryFilter(g => !g.IsDeleted);
         OnModelCreatingPartial(modelBuilder);
     }
 
