@@ -20,5 +20,7 @@ namespace ezSCORES.Model.DTOs
 		public string? Group { get; set; }
 		public int FixtureSequenceNumber { get; set; }
 		public GameStage GameStage{ get; set; }
+		public bool IsUnderway { get; set; }
+		public bool IsCompleted { get; set; }
 	}
 }

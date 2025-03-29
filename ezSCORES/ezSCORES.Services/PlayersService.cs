@@ -35,7 +35,7 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x=>x.BirthDate.Date == search.BirthDate.Value.Date);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
 
 		public override void BeforeInsert(PlayerUpsertRequest request, Player entity)

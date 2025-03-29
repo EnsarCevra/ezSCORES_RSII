@@ -14,6 +14,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {
@@ -33,16 +34,16 @@ namespace ezSCORES.Services
 			var activeFixture = Context.Fixtures.FirstOrDefault(x => x.CompetitionId == fixture.CompetitionId && x.IsCurrentlyActive);
 			if(activeFixture != null)
 			{
-				throw new UserException($"Već je aktivno drugo kolo: {activeFixture.Id}");
-			}
-			else
-			{
-				if(fixture.Id == fixtureId)
+				if(activeFixture.Id == fixtureId)
 				{
 					throw new UserException($"Ovo kolo je već aktivno!");
 				}
+				else
+				{
+					throw new UserException($"Već je aktivno drugo kolo: {activeFixture.Id}");
+				}
 			}
-			fixture.IsActive = true;
+			fixture.IsCurrentlyActive = true;
 			Context.SaveChanges();
 		}
 
@@ -55,7 +56,7 @@ namespace ezSCORES.Services
 					.OrderByDescending(x => x.GameStage)
 					.ThenByDescending(x => x.SequenceNumber);
 			}
-			return query;
+			return base.AddFilter(search, query);
 
 		}
 
@@ -90,7 +91,7 @@ namespace ezSCORES.Services
 			{
 				throw new UserException($"Nezavršeni susreti: {string.Join(",", unfinishedMatchesIds)}");
 			}
-			fixture.IsActive = false;
+			fixture.IsCurrentlyActive = false;
 			fixture.IsCompleted = true;
 			Context.SaveChanges();
 		}
@@ -114,12 +115,16 @@ namespace ezSCORES.Services
 								Id = f.Id,
 								GameStage = f.GameStage,
 								SequenceNumber = f.SequenceNumber,
+								IsCurrentlyActive = f.IsCurrentlyActive,
+								IsCompleted = f.IsCompleted,
 								Matches = f.Matches
 									.OrderByDescending(m => m.DateAndTime) // ✅ Latest matches first
 									.Select(m => new MatchDTO
 									{
 										MatchId = m.Id,
 										DateAndTime = m.DateAndTime,
+										IsCompleted = m.IsCompleted,
+										IsUnderway = m.IsUnderway,
 										HomeTeam = new TeamDTO
 										{
 											Id = m.HomeTeam.Team.Id,
@@ -140,21 +145,19 @@ namespace ezSCORES.Services
 
 			return fixtures;
 		}
-
-		protected override IQueryable<Fixture> ApplyIncludes(IQueryable<Fixture> query)
+		protected override Fixture? ApplyIncludes(int id, DbSet<Fixture> set)
 		{
-			return query.Include(x => x.Matches).ThenInclude(x => x.HomeTeam).ThenInclude(x => x.Team)
-							.Include(x => x.Matches).ThenInclude(x => x.AwayTeam).ThenInclude(x => x.Team);
+			return set.Where(x=>x.Id == id).Include(x => x.Matches).ThenInclude(x => x.HomeTeam).ThenInclude(x => x.Team)
+							.Include(x => x.Matches).ThenInclude(x => x.AwayTeam).ThenInclude(x => x.Team).FirstOrDefault();
 		}
-
-		public override void Delete(int id)
+		public override Fixture? BeforeDelete(int id, DbSet<Fixture> set)
 		{
-			var fixtureToDelete = Context.Fixtures
+			var fixtureToDelete = Context.Fixtures.Include(x => x.Matches).ThenInclude(x => x.Goals)
 			.FirstOrDefault(f => f.Id == id);
 
 			if (fixtureToDelete != null)
 			{
-				if(fixtureToDelete.GameStage == Model.ENUMs.GameStage.GroupPhase || fixtureToDelete.GameStage == Model.ENUMs.GameStage.League)
+				if (fixtureToDelete.GameStage == Model.ENUMs.GameStage.GroupPhase || fixtureToDelete.GameStage == Model.ENUMs.GameStage.League)
 				{
 					int sequenceNumberToDelete = fixtureToDelete.SequenceNumber;
 
@@ -170,13 +173,9 @@ namespace ezSCORES.Services
 					}
 				}
 				// Mark the fixture as deleted (soft delete)
-				fixtureToDelete.IsDeleted = true;
 				Context.SaveChanges();
 			}
-			else
-			{
-				throw new UserException("Odabrani zapis ne postoji!");
-			}
+			return fixtureToDelete;
 		}
 	}
 }

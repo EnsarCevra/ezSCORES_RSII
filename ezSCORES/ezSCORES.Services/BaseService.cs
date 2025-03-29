@@ -66,9 +66,8 @@ namespace ezSCORES.Services
 		}
 		public TModel GetById(int id)
 		{
-			var query = Context.Set<TDbEntity>().AsQueryable();
-			query = ApplyIncludes(query);
-			var entity = query.FirstOrDefault(e => EF.Property<int>(e, "Id") == id);
+			var set = Context.Set<TDbEntity>();
+			var entity = ApplyIncludes(id, set);
 			if (entity != null)
 			{
 				return Mapper.Map<TModel>(entity);
@@ -79,13 +78,12 @@ namespace ezSCORES.Services
 			}
 		}
 
-		protected virtual IQueryable<TDbEntity> ApplyIncludes(IQueryable<TDbEntity> query){ return query; }
+		protected virtual TDbEntity? ApplyIncludes(int id, DbSet<TDbEntity> set){ return set.Find(id); }
 
 		public async Task<TModel> GetByIdAsync(int id)
 		{
-			var query = Context.Set<TDbEntity>().AsQueryable();
-			query = ApplyIncludes(query);
-			var entity = await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+			var set = Context.Set<TDbEntity>();
+			var entity = ApplyIncludes(id, set);
 			if (entity != null)
 			{
 				return Mapper.Map<TModel>(entity);

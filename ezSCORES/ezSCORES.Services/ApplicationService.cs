@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ezSCORES.Services
@@ -33,18 +34,17 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x => x.Team).ThenInclude(x => x.User);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
-		protected override IQueryable<Database.Application> ApplyIncludes(IQueryable<Database.Application> query)
+		protected override Database.Application? ApplyIncludes(int id, DbSet<Database.Application> set)
 		{
-			return query.Include(x => x.Team)
+			return set.Where(x=>x.Id == id).Include(x => x.Team)
 							.ThenInclude(x => x.User)
 							.Include(x => x.Team)
 							.ThenInclude(x => x.CompetitionsTeams)
 							.ThenInclude(x => x.CompetitionsTeamsPlayers)
-							.ThenInclude(x=>x.Player);
+							.ThenInclude(x => x.Player).FirstOrDefault();
 		}
-
 		public override void BeforeInsert(ApplicationInsertRequest request, Database.Application entity)
 		{
 			base.BeforeInsert(request, entity);

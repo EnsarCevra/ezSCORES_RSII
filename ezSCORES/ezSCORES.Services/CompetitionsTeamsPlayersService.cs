@@ -13,6 +13,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {
@@ -34,14 +35,12 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.CompetitionsTeamsId == search.CompetitionTeamId).Include(x=>x.Player);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
-
-		protected override IQueryable<CompetitionsTeamsPlayer> ApplyIncludes(IQueryable<CompetitionsTeamsPlayer> query)
+		protected override CompetitionsTeamsPlayer? ApplyIncludes(int id, DbSet<CompetitionsTeamsPlayer> set)
 		{
-			return query.Include(x => x.Player);
+			return set.Where(x=>x.Id == id).Include(x => x.Player).FirstOrDefault();
 		}
-
 		public override void BeforeInsert(CompetitionTeamsPlayerUpsertRequest request, CompetitionsTeamsPlayer entity)
 		{
 			base.BeforeInsert(request, entity);

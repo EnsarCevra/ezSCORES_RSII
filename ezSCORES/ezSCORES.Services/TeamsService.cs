@@ -16,6 +16,7 @@ using System.Linq.Dynamic.Core;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {
@@ -29,7 +30,6 @@ namespace ezSCORES.Services
 
 		public override IQueryable<Team> AddFilter(TeamsSearchObject search, IQueryable<Team> query)
 		{
-			base.AddFilter(search, query);
 			if(search.SelectionId != null)
 			{
 				query = query.Where(x => x.SelectionId == search.SelectionId);
@@ -48,17 +48,16 @@ namespace ezSCORES.Services
 					}
 				}
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
 
 		public override void BeforeInsert(TeamsInsertRequest request, Team entity)
 		{
 			entity.UserId = _activeUserService.GetActiveUserId() ?? throw new InvalidOperationException("Authenticated user ID cannot be null.");
 		}
-		protected override IQueryable<Team> ApplyIncludes(IQueryable<Team> query)
+		protected override Team? ApplyIncludes(int id, DbSet<Team> set)
 		{
-			return query.Include(x => x.Selection);
-			
+			return set.Where(x=>x.Id == id).Include(x => x.Selection).FirstOrDefault();
 		}
 	}
 }

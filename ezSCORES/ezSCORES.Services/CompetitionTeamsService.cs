@@ -30,18 +30,30 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x=>x.Team);
 			}
-			if(search.isPlayersIncluded != null)
+			if (search.isEliminated != null)
+			{
+				query = query.Where(x => x.IsEliminated == search.isEliminated);
+			}
+			if (search.GroupId != null)
+			{
+				query = query.Where(x => x.GroupId == search.GroupId);
+			}
+			if (search.isPlayersIncluded != null)
 			{
 				query = query.Include(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
 
 		public void AddTeamsToGroup(AddTeamsToGroupRequest request)
 		{
+			var alreadyAssignedTeams = Context.CompetitionsTeams.Where(x => request.CompetitionTeamIds.Contains(x.Id) && x.GroupId == null).ToList();
+			if(alreadyAssignedTeams.Any())
+			{
+				throw new UserException($"Timovi već dodijeljeni u grupu: {alreadyAssignedTeams}");
+			}
 			var teams = Context.CompetitionsTeams.Where(x => request.CompetitionTeamIds.Contains(x.Id)
-														&& x.GroupId != request.GroupId 
-														&& !x.IsDeleted);// take only teams that are not already in this group
+														&& x.GroupId != request.GroupId);// take only teams that are not already in this group
 			// if I send non existant competitionTeamId it will ignore it
 			if(teams.Any() && teams.All(x=>x.CompetitionId == request.CompetitionId))
 			{

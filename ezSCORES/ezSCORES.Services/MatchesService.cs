@@ -39,7 +39,7 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.DateAndTime.Date == search.DateAndTime.Value.Date);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
 
 		public override void BeforeInsert(MatchInsertRequest request, Match entity)
@@ -53,7 +53,7 @@ namespace ezSCORES.Services
 			var nonParticipatingTeamsIds = new List<int> {request.HomeTeamId, request.AwayTeamId }
 								.Except(Context.CompetitionsTeams
 									.Where(ct => ct.CompetitionId == competitionId)
-									.Select(ct => ct.TeamId))
+									.Select(ct => ct.Id))
 								.ToList();
 			if(nonParticipatingTeamsIds.Count > 0)
 			{
@@ -78,11 +78,15 @@ namespace ezSCORES.Services
 				}
 			}
 		}
-
+		public override Match? BeforeDelete(int id, DbSet<Match> set)
+		{
+			var entity = set.Where(x => x.Id == id).Include(x => x.Goals).FirstOrDefault();
+			return entity;
+		}
 		public void StartMatch(int id)
 		{
 			var match = Context.Matches.Find(id);
-			if(!Context.Fixtures.Where(x=>x.Id == match!.FixtureId).FirstOrDefault()!.IsActive)
+			if(!Context.Fixtures.Where(x=>x.Id == match!.FixtureId).FirstOrDefault()!.IsCurrentlyActive)
 			{
 				throw new UserException("Ova utakmica nije dio trenutno aktivnog kola ili je izbrisana!");
 			}
@@ -109,7 +113,20 @@ namespace ezSCORES.Services
 			
 			Context.SaveChanges();
 		}
-
+		protected override Match? ApplyIncludes(int id, DbSet<Match> set)
+		{
+			return set.AsSplitQuery()
+						.Include(x => x.HomeTeam).ThenInclude(x => x.Team)
+						.Include(x => x.HomeTeam).ThenInclude(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player)
+						.Include(x => x.HomeTeam).ThenInclude(x => x.Group)
+						.Include(x => x.AwayTeam).ThenInclude(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player)
+						.Include(x => x.AwayTeam).ThenInclude(x => x.Team)
+						.Include(x => x.Stadium)
+						.Include(x => x.Goals).ThenInclude(x => x.CompetitionTeamPlayer).ThenInclude(x => x.Player)
+						.Include(x => x.CompetitionsRefereesMatches).ThenInclude(x => x.CompetitionsReferees).ThenInclude(x => x.Referee)
+						.Include(x => x.Fixture)
+						.Where(x => x.Id == id).FirstOrDefault();
+		}
 		public MatchDTO GetMatchDetails(int id)
 		{
 			var match = Context.Matches.AsSplitQuery()
@@ -155,8 +172,11 @@ namespace ezSCORES.Services
 							Goals = x.Goals.Select(g => new GoalDTO
 							{
 								Id = g.Id,
-								Scorer = g.CompetitionTeamPlayer != null ? g.CompetitionTeamPlayer.Player.FirstName + " " + g.CompetitionTeamPlayer.Player.LastName : null
-							}).ToList(),
+								Scorer = g.CompetitionTeamPlayer != null ? g.CompetitionTeamPlayer.Player.FirstName + " " + g.CompetitionTeamPlayer.Player.LastName : null,
+								ScoredAtMinute = g.ScoredAtMinute,
+								SequenceNumber = g.SequenceNumber,
+								IsHomeGoal = g.IsHomeGoal
+							}).OrderByDescending(g=>g.SequenceNumber).ToList(),
 						}).FirstOrDefault();
 			if (match == null)
 				throw new UserException("Odabrana utakmica ne postoji!");

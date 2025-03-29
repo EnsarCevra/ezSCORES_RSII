@@ -27,34 +27,34 @@ namespace ezSCORES.Services
 			var filteredQuery = base.AddFilter(search, query);
 			if (!string.IsNullOrWhiteSpace(search?.FirstNameGTE))
 			{
-				filteredQuery = filteredQuery.Where(x => x.FirstName.StartsWith(search.FirstNameGTE));
+				query = query.Where(x => x.FirstName.StartsWith(search.FirstNameGTE));
 			}
 			if (!string.IsNullOrWhiteSpace(search?.LastNameGTE))
 			{
-				filteredQuery = filteredQuery.Where(x => x.LastName.StartsWith(search.LastNameGTE));
+				query = query.Where(x => x.LastName.StartsWith(search.LastNameGTE));
 			}
 			if (!string.IsNullOrWhiteSpace(search?.Email))
 			{
-				filteredQuery = filteredQuery.Where(x => x.Email == search.Email);
+				query = query.Where(x => x.Email == search.Email);
 			}
 			if (!string.IsNullOrWhiteSpace(search?.UserName))
 			{
-				filteredQuery = filteredQuery.Where(x => x.UserName == search.UserName);
+				query = query.Where(x => x.UserName == search.UserName);
 			}
 			if (search.IsRolesIncluded == true)
 			{
-				filteredQuery = filteredQuery.Include(x => x.Role);
+				query = query.Include(x => x.Role);
 			}
-			int count = filteredQuery.Count();
+			int count = query.Count();
 			if (!string.IsNullOrWhiteSpace(search.OrderBy))
 			{
 				//query = query.OrderBy(searchObject.OrderBy);
 			}
 			if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
 			{
-				filteredQuery = filteredQuery.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
+				query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
 			}
-			return filteredQuery;
+			return base.AddFilter(search, query);
 		}
 		public override void BeforeInsert(UsersInsertRequests request, User entity)
 		{

@@ -27,7 +27,7 @@ namespace ezSCORES.Services
 				query = query.Where(x => (x.FirstName + " " + x.LastName).StartsWith(search.FirstNameLastNameGTE)
 					|| (x.LastName + " " + x.FirstName).StartsWith(search.FirstNameLastNameGTE));
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
 
 		public override void BeforeInsert(RefereeUpsertRequest request, Referee entity)

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {
@@ -75,17 +76,17 @@ namespace ezSCORES.Services
 			{
 				query = query.Include(x => x.Fixtures).ThenInclude(x => x.Matches.Where(x => x.DateAndTime.Date == search.MatchDay.Value.Date));
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
-		protected override IQueryable<Competition> ApplyIncludes(IQueryable<Competition> query)
+		protected override Competition? ApplyIncludes(int id, DbSet<Competition> set)
 		{
-			return query.Include(x => x.CompetitionsReferees)
+			return set.Where(x=>x.Id == id).Include(x => x.CompetitionsReferees)
 						.ThenInclude(x => x.Referee)
 						.Include(x => x.CompetitionsSponsors)
 						.ThenInclude(x => x.Sponsor)
 						.Include(x => x.Rewards)
 						.Include(x => x.City)
-						.Include(x => x.Selection);
+						.Include(x => x.Selection).FirstOrDefault();
 		}
 		public override void BeforeInsert(CompetitionsInsertRequest request, Competition entity)
 		{

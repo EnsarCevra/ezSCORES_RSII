@@ -71,23 +71,28 @@ namespace ezSCORES.Services
 		{
 			var set = Context.Set<TDbEntity>();
 
-			var entity = set.Find(id);
+			//var entity = set.Find(id);
+
+			var entity = BeforeDelete(id, set);
 
 			if(entity == null)
 			{
 				throw new Exception("Selected entity doesn't exist");
 			}
 
-			if(entity is ISoftDelete softDeleteEntity)
-			{
-				softDeleteEntity.IsDeleted = true;
-				softDeleteEntity.RemovedAt = DateTime.Now;
-				Context.Update(entity);
-			}
-			else
-			{
-				Context.Remove(entity);
-			}
+			//if(entity is ISoftDelete softDeleteEntity)
+			//{
+			//	softDeleteEntity.IsDeleted = true;
+			//	softDeleteEntity.RemovedAt = DateTime.Now;
+			//	Context.Update(entity);
+			//}
+			//else
+			//{
+			//	Context.Remove(entity);
+			//}
+
+			CascadeSoftDelete(entity);
+
 			Context.SaveChanges();
 		}
 		public virtual void BeforeUpdate(TUpdate request, TDbEntity entity)
@@ -102,5 +107,39 @@ namespace ezSCORES.Services
 			}
 		}
 		public virtual void AfterUpdate(TUpdate request, TDbEntity entity) { }
+		public virtual TDbEntity? BeforeDelete(int id, DbSet<TDbEntity> set) 
+		{
+			//if overriden it means there are related records in other tables and they have to be included so cascade delete can work
+			return set.Find(id);
+		}
+
+		private void CascadeSoftDelete(object entity)
+		{
+			if (entity is not ISoftDelete deletableEntity)
+				return; // Skip non-soft deletable entities
+
+			deletableEntity.IsDeleted = true;
+			deletableEntity.RemovedAt = DateTime.Now;
+
+			var entityType = Context.Model.FindEntityType(entity.GetType());
+
+			foreach (var navigation in entityType.GetNavigations())
+			{
+				if (navigation.IsCollection)
+				{
+					var relatedEntities = Context.Entry(entity)
+						.Collection(navigation.Name)
+						.CurrentValue as IEnumerable<object>;
+
+					if (relatedEntities != null)
+					{
+						foreach (var relatedEntity in relatedEntities)
+						{
+							CascadeSoftDelete(relatedEntity);
+						}
+					}
+				}
+			}
+		}
 	}
 }

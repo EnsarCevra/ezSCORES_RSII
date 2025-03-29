@@ -13,6 +13,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {
@@ -28,11 +29,11 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x=>x.CompetitionsTeams).ThenInclude(x=>x.Team);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
-		protected override IQueryable<Group> ApplyIncludes(IQueryable<Group> query)
+		protected override Group? ApplyIncludes(int id, DbSet<Group> set)
 		{
-			return query.Include(x => x.CompetitionsTeams).ThenInclude(x => x.Team);
+			return set.Where(x=>x.Id == id).Include(x => x.CompetitionsTeams).ThenInclude(x => x.Team).FirstOrDefault();
 		}
 		public override void BeforeInsert(GroupInsertRequest request, Group entity)
 		{

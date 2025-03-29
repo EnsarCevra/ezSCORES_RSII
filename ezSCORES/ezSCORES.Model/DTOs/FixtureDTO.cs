@@ -10,6 +10,8 @@ namespace ezSCORES.Model.DTOs
 		public int Id { get; set; }
 		public GameStage GameStage { get; set; }
 		public int SequenceNumber { get; set; }
+		public bool IsCurrentlyActive { get; set; }
+		public bool IsCompleted { get; set; }
 		public List<MatchDTO> Matches { get; set; }
 	}
 }

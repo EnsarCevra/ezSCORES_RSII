@@ -27,7 +27,7 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x=>x.Referee);
 			}
-			return query;
+			return base.AddFilter(search, query);
 		}
 	}
 }

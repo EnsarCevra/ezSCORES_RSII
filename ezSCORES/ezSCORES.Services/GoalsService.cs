@@ -52,6 +52,30 @@ namespace ezSCORES.Services
 					throw new UserException("Odabrani strijelac nije član ekipe koja je postigla pogodak!");
 				}
 			}
+			int previousMaxSequenceNumber = Context.Goals.Where(x => x.MatchId == entity.MatchId)
+			.OrderByDescending(x => x.SequenceNumber)
+			.Select(x => x.SequenceNumber)
+			.FirstOrDefault();
+			entity.SequenceNumber = previousMaxSequenceNumber + 1;
+		}
+		public override Goal? BeforeDelete(int id, DbSet<Goal> set)
+		{
+			var goalToDelete = Context.Goals
+			.FirstOrDefault(x => x.Id == id);
+			int sequenceNumberToDelete = goalToDelete.SequenceNumber;
+
+			// Update sequence numbers for remaining fixtures
+			var goalsToUpdate = Context.Goals
+				.Where(g => g.MatchId == goalToDelete.MatchId &&
+							g.SequenceNumber > sequenceNumberToDelete)
+				.ToList();
+
+			foreach (var goal in goalsToUpdate)
+			{
+				goal.SequenceNumber -= 1;
+			}
+			Context.SaveChanges();
+			return goalToDelete;
 		}
 	}
 }

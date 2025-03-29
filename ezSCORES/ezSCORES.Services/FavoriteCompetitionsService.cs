@@ -28,7 +28,7 @@ namespace ezSCORES.Services
 		public override IQueryable<FavoriteCompetition> AddFilter(BaseSearchObject search, IQueryable<FavoriteCompetition> query)
 		{
 			query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId());
-			return query;
+			return base.AddFilter(search, query);
 		}
 	}
 }
