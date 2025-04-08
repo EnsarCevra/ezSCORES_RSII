@@ -1,3 +1,6 @@
+import 'package:ezscores_desktop/providers/TeamProvider.dart';
+import 'package:ezscores_desktop/providers/auth_provider.dart';
+import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,7 +34,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 38, 208, 47)),
         useMaterial3: true,
       ),
-      home: const SearchExample(),
+      home: LoginPage(),
     );
   }
 }
@@ -73,8 +76,9 @@ class LayoutExample extends StatelessWidget{
 }
 class LoginPage extends StatelessWidget
 {
-  const LoginPage({super.key});
-
+  LoginPage({super.key});
+  TextEditingController _usernameController = new TextEditingController();
+  TextEditingController _passwordController  = new TextEditingController();
    @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -84,10 +88,11 @@ class LoginPage extends StatelessWidget
           child: Container(
             constraints: BoxConstraints(maxHeight: 400, maxWidth: 300),
             child: Card(
+              child: Padding(padding: EdgeInsets.all(10),
               child: Column(
                 children: [
                   SizedBox(height: 20,),
-                  Image.network("https://ezscores.ba/assets/ezLogo5.png", height: 100, width: 100,),
+                  Image.asset("assets/images/ezlogo5.png", height: 100, width: 100,),
                   SizedBox(height: 50,),
                   Container(
                     height: 200,
@@ -95,22 +100,39 @@ class LoginPage extends StatelessWidget
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextField(
-                          decoration: InputDecoration(
+                          controller: _usernameController,
+                          decoration: const InputDecoration(
                             labelText: "Korisničko ime",
                             prefixIcon: Icon(Icons.email)
                           ),
                         ),
                         TextField(
-                          decoration: InputDecoration(
+                          controller: _passwordController,
+                          decoration: const InputDecoration(
                             labelText: "Lozinka",
                             prefixIcon: Icon(Icons.password)
                           ),
                         ),
                         ElevatedButton(
-                          style: ButtonStyle(
+                          style: const ButtonStyle(
                           ),
-                        onPressed: (){
-                          print("Login attempt");
+                        onPressed: () async {
+                          TeamProvider provider = new TeamProvider();
+                          AuthProvider.username = _usernameController.text;
+                          AuthProvider.password = _passwordController.text;
+
+                          try{
+                            var data = await provider.Get();
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => TeamsListScreen()));
+                          }on Exception catch(exception)
+                          {
+                            showDialog(
+                              context: context, 
+                              builder: (context) => AlertDialog(
+                                title: Text("Error"), 
+                                actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
+                                content: Text(exception.toString()),));
+                          }
                         },
                          child: Text("Prijavi se"))
                       ],
@@ -118,6 +140,7 @@ class LoginPage extends StatelessWidget
                   )
                 ],
               ),
+              )
             ),
           ),
         ),)
