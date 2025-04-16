@@ -8,6 +8,7 @@ namespace ezSCORES.Services.Database
 {
 	public interface IHasName
 	{
+		public int Id { get; set; }
 		public string Name { get; set; }
 	}
 }

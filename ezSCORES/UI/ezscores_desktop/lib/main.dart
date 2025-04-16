@@ -1,10 +1,18 @@
+import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/TeamProvider.dart';
+import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => TeamProvider()),
+    ChangeNotifierProvider(create: (_) => SelectionProvider()),
+    ChangeNotifierProvider(create: (_) => UserProvider()),
+
+  ], child: const MyApp(),));
 }
 
 class MyApp extends StatelessWidget {
@@ -77,12 +85,12 @@ class LayoutExample extends StatelessWidget{
 class LoginPage extends StatelessWidget
 {
   LoginPage({super.key});
-  TextEditingController _usernameController = new TextEditingController();
-  TextEditingController _passwordController  = new TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController  = TextEditingController();
    @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(title: Text("ezSCORES"), backgroundColor: Colors.green,),
+      appBar: AppBar(title: const Text("ezSCORES"), backgroundColor: Colors.green,),
       body: Center(
         child: Center(
           child: Container(
@@ -117,19 +125,26 @@ class LoginPage extends StatelessWidget
                           style: const ButtonStyle(
                           ),
                         onPressed: () async {
-                          TeamProvider provider = new TeamProvider();
                           AuthProvider.username = _usernameController.text;
                           AuthProvider.password = _passwordController.text;
-
                           try{
-                            var data = await provider.Get();
+                            var userProvider = UserProvider();
+                            var user = await userProvider.login(AuthProvider.username, AuthProvider.password);
+                            AuthProvider.id = user.id;
+                            AuthProvider.firstName = user.firstName;
+                            AuthProvider.lastName = user.lastName;
+                            AuthProvider.userName = user.userName;
+                            AuthProvider.picture = user.picture;
+                            AuthProvider.email = user.email;
+                            AuthProvider.phoneNumber = user.phoneNumber;
+                            AuthProvider.orzanization = user.orzanization;
                             Navigator.of(context).push(MaterialPageRoute(builder: (context) => TeamsListScreen()));
                           }on Exception catch(exception)
                           {
                             showDialog(
                               context: context, 
                               builder: (context) => AlertDialog(
-                                title: Text("Error"), 
+                                title: Text("Greška prilikom prijave"), 
                                 actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
                                 content: Text(exception.toString()),));
                           }
@@ -146,40 +161,6 @@ class LoginPage extends StatelessWidget
         ),)
     );
   }
-}
-
-class SearchExample extends StatelessWidget{
-  const SearchExample({super.key});
-
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Pretraga"),),
-        body: Column(
-          children: [
-            _buildSearch(),
-            _buidlResultView()
-          ],
-        ),
-    );
- }
-}
-
-Widget _buildSearch()
-{
-  return Padding(
-    padding: EdgeInsets.all(8.0),
-    child: Row(
-    children: [
-      Expanded(child: TextField(decoration: InputDecoration(labelText: "Naziv"),))
-    ],
-  )
-  );
-}
-Widget _buidlResultView()
-{
-  return Placeholder();
 }
 
 class MyHomePage extends StatefulWidget {

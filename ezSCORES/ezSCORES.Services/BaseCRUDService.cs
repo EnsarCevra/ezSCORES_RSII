@@ -53,9 +53,9 @@ namespace ezSCORES.Services
 
 			var entity = set.Find(id);
 
-			BeforeUpdate(request, entity);
-
 			Mapper.Map(request, entity);
+
+			BeforeUpdate(request, entity);
 
 			if(entity is IModified modified)
 			{
@@ -100,7 +100,7 @@ namespace ezSCORES.Services
 			var property = typeof(TDbEntity).GetProperty("Name");
 			if (property != null && (entity is IHasName nameEntity))
 			{
-				if (Context.Set<TDbEntity>().Any(x => EF.Property<string>(x, "Name") == nameEntity.Name))
+				if (Context.Set<TDbEntity>().Any(x => EF.Property<string>(x, "Name") == nameEntity.Name && EF.Property<int>(x, "Id") != nameEntity.Id))
 				{
 					throw new UserException("Entitet sa ovim imenom već postoji!");
 				}
