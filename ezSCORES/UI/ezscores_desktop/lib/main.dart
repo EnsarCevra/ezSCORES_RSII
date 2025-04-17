@@ -46,42 +46,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-class LayoutExample extends StatelessWidget{
-  const LayoutExample({super.key});
-
-  @override
-  Widget build(BuildContext context){
-    return Column(
-      children: [
-        Container(
-          height: 150,
-          color: Colors.red,
-          child: Center(child:
-            Container(
-            height: 100,
-            color: Colors.blue
-          ),
-          )
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-       children: [
-        Text("1"),
-        Text("2"),
-        Text("3")
-       ], 
-      ),
-      Container(
-        height: 100,
-        color: Colors.blue,
-        padding: EdgeInsets.all(10),
-        child: Center(child: Text("Test", style: TextStyle(color: Colors.black),),)
-      )
-      ],
-    );
-  }
-}
 class LoginPage extends StatelessWidget
 {
   LoginPage({super.key});

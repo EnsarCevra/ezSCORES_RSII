@@ -17,3 +17,11 @@ Image imageFromString(String input)
 {
   return Image.memory(base64Decode(input));
 }
+
+String formatDate(String date) {
+  return DateFormat('dd.MM.yyyy').format(DateTime.parse(date).toLocal());
+}
+
+String formatDateTime(String date) {
+  return DateFormat('dd.MM.yyyy HH:mm').format(DateTime.parse(date).toLocal());
+}

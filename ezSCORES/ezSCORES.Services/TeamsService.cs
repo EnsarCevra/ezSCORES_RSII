@@ -30,6 +30,7 @@ namespace ezSCORES.Services
 
 		public override IQueryable<Team> AddFilter(TeamsSearchObject search, IQueryable<Team> query)
 		{
+			query = query.Include(x => x.Selection);
 			if(search.SelectionId != null)
 			{
 				query = query.Where(x => x.SelectionId == search.SelectionId);

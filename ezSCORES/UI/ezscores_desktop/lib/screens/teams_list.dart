@@ -4,9 +4,7 @@ import 'package:ezscores_desktop/models/teams.dart';
 import 'package:ezscores_desktop/providers/TeamProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/teams_details_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class TeamsListScreen extends StatefulWidget
@@ -53,8 +51,8 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
     ));
   }
 
-TextEditingController _ftsEditingController = TextEditingController();
-TextEditingController _ftsOrganizerController = TextEditingController();
+final TextEditingController _ftsEditingController = TextEditingController();
+final TextEditingController _ftsOrganizerController = TextEditingController();
 Widget _buildSearch()
 {
   return Padding(
@@ -138,7 +136,7 @@ Widget _buildResultView() {
               cells: [
               DataCell(Text(e.id.toString())),
               DataCell(Text(e.name ?? "")),
-              DataCell(Text(e.selectionId.toString())),
+              DataCell(Text(e.selection?.name ?? "")),
               DataCell(e.picture != null ? Container(width: 100, height: 100, child: imageFromString(e.picture!),): Text(""))
             ])
           ).toList().cast<DataRow>() ?? [],

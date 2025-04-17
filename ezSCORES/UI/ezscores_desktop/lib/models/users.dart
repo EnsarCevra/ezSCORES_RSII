@@ -1,3 +1,4 @@
+import 'package:ezscores_desktop/models/roles.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'users.g.dart';
 @JsonSerializable()
@@ -10,6 +11,7 @@ class Users{
   String? email;
   String? phoneNumber;
   String? orzanization;
+  Roles? role;
 
   Users();
 

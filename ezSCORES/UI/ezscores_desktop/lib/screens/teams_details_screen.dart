@@ -43,7 +43,8 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
     super.initState();
     _initialValue = {
       "name" : widget.team?.name,
-      "selectionId" : widget.team?.selectionId.toString()
+      "selectionId" : widget.team?.selection?.id.toString(),
+      "picture" : widget.team?.picture
     };
     initForm();
   }
@@ -51,6 +52,7 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
     var selectionData = await selectionProvider.get();
     setState(() {
       selectionResult = selectionData;
+      _base64Image = widget.team?.picture;
     });
    }
   @override
@@ -99,27 +101,59 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                     DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],
                     )),
               ],
-            ),
+            ), //----
             Row(
               children: [
                 Expanded(
-                  child: FormBuilderField(
+                  child: FormBuilderField<String>(
                     name: "imageId",
                     builder: (field) {
-                      return InputDecorator(
-                        decoration: InputDecoration(labelText: "Odaberite sliku"),
-                        child: ListTile(
-                          leading: Icon(Icons.image),
-                          title: Text("Select image"),
-                          trailing: Icon(Icons.file_upload),
-                          onTap: getImage,
-                        ),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InputDecorator(
+                            decoration: InputDecoration(
+                              labelText: "Odaberite sliku",
+                              errorText: field.errorText,
+                            ),
+                            child: Column(
+                              children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child:
+                                    _base64Image != null ?
+                                     Image.memory(
+                                      base64Decode(_base64Image!),
+                                      height: 150,
+                                      fit: BoxFit.cover,
+                                    ) :
+                                    Image.asset('assets/images/TeamPlaceholder.png', height: 150, fit: BoxFit.cover,),
+                                  ),
+                                ListTile(
+                                  leading: Icon(Icons.image),
+                                  title: Text(_base64Image == null ? "Select image" : "Change image"),
+                                  trailing: Icon(Icons.file_upload),
+                                  onTap: () async {
+                                    final result = await getImage(); // Your custom function
+                                    if (result != null) {
+                                      field.didChange(result); // Update FormBuilder value3,
+                                      setState(() {
+                                        _base64Image = result;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       );
                     },
-                  )
+                  ),
                 )
               ],
             )
+
           ],
         ),
       ),
@@ -169,13 +203,16 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
     }
     File? _image;
     String? _base64Image;
-     void getImage() async{
+     Future<String?> getImage() async{
         var result = await FilePicker.platform.pickFiles(type: FileType.image);
 
         if(result != null && result.files.single.path != null)
         {
           _image = File(result.files.single.path!);
           _base64Image = base64Encode(_image!.readAsBytesSync());
+          return _base64Image;
         }
+
+        return null;
       }
 }
