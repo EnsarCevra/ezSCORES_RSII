@@ -2,6 +2,7 @@ import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/TeamProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
+import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -103,14 +104,14 @@ class LoginPage extends StatelessWidget
                             AuthProvider.phoneNumber = user.phoneNumber;
                             AuthProvider.orzanization = user.orzanization;
                             Navigator.of(context).push(MaterialPageRoute(builder: (context) => TeamsListScreen()));
-                          }on Exception catch(exception)
+                          }on UserException catch(exception)
                           {
                             showDialog(
                               context: context, 
                               builder: (context) => AlertDialog(
                                 title: Text("Greška prilikom prijave"), 
-                                actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
-                                content: Text(exception.toString()),));
+                                actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("OK"))], 
+                                content: Text(exception.exMessage),));
                           }
                         },
                          child: Text("Prijavi se"))

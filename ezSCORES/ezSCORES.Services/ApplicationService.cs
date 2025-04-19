@@ -62,7 +62,7 @@ namespace ezSCORES.Services
 				{
 					throw new UserException("Ovaj tim je već prijavljen na takmičenje!");
 				}
-				if (Context.CompetitionsTeams.Where(x => x.CompetitionId == competition.Id).Count() > competition.MaxTeamCount)
+				if (Context.CompetitionsTeams.Where(x => x.CompetitionId == competition.Id).Count() >= competition.MaxTeamCount)
 				{
 					throw new UserException("Kapacitet ekipa dostignut, prijavu nije moguće izvršiti!");
 				}

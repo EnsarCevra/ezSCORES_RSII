@@ -24,20 +24,20 @@ class UserProvider extends BaseProvider<Users>
     http.Response response;
     try {
       response = await http.post(uri, headers: headers);
-    } on Exception catch (e) {
-      throw Exception("Greška prilikom prijave.");
+    } on UserException catch (e) {
+      throw UserException("Greška prilikom prijave.");
     }
     if (username.isEmpty || password.isEmpty) {
-      throw Exception("Molimo unesite korisničko ime i lozinku.");
+      throw UserException("Molimo unesite korisničko ime i lozinku.");
     }
     if (response.body == "") {
-      throw Exception("Pogrešno korisničko ime ili lozinka.");
+      throw UserException("Pogrešno korisničko ime ili lozinka.");
     }
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
       return fromJson(data);
     } else {
-      throw Exception("Unknown error.");
+      throw UserException("Unknown error.");
     }
   }
 }

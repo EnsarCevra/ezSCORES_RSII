@@ -15,36 +15,67 @@ class MasterScreen extends StatefulWidget
 
 class _MasterScreenState extends State<MasterScreen>
 {
-  @override
-   Widget build(BuildContext context)
-  {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title),),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text("Zatvori"),
-              onTap: () => {
-                Navigator.pop(context)
-              },
-            ),
-            ListTile(
-              title: Text("Timovi"),
-              onTap: () => {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TeamsListScreen()))
-              },
-            ),
-            ListTile(
-              title: Text("Korisnici"),
-              onTap: () => {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=> UsersListScreen()))
-              },
-            ),
-          ],
+     @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Row(
+      children: [
+        // Sidebar
+        Container(
+          width: 200, // Adjust width as needed
+          color: Colors.greenAccent[900],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                color: Colors.blue,
+                child: const Text(
+                  "Navigacija",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ),
+              ListTile(
+                title: const Text("Timovi", style: TextStyle(color: Colors.blue)),
+                leading: const Icon(Icons.group, color: Colors.white),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => TeamsListScreen()));
+                },
+              ),
+              ListTile(
+                title: const Text("Korisnici", style: TextStyle(color: Colors.blue)),
+                leading: const Icon(Icons.person, color: Colors.white),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => UsersListScreen()));
+                },
+              ),
+              const Spacer(),
+              ListTile(
+                title: const Text("Zatvori", style: TextStyle(color: Colors.blue)),
+                leading: const Icon(Icons.close, color: Colors.white),
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      body: widget.child,
-    );
-  }
+
+        // Main content
+        Expanded(
+          child: Column(
+            children: [
+              AppBar(
+                title: Text(widget.title),
+                automaticallyImplyLeading: false, // hides the hamburger icon
+              ),
+              Expanded(child: widget.child),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 }

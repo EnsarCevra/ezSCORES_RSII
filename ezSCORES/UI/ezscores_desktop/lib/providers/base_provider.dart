@@ -88,10 +88,30 @@ abstract class BaseProvider<T> with ChangeNotifier {
     if (response.statusCode < 299) {
       return true;
     } else if (response.statusCode == 401) {
-      throw new Exception("Unauthorized");
+      throw UserException("Unauthorized");
     } else {
-      print(response.body);
-      throw new Exception("Something bad happened please try again");
+      try
+      {
+        final errorResponse = jsonDecode(response.body);
+
+        if(errorResponse is Map<String, dynamic> && errorResponse['errors'] != null && errorResponse['errorrs']['userError'] != null)
+        {
+          throw UserException(errorResponse['errorrs']['userError'].join(', '));
+        }
+        else
+        {
+          throw UserException("Something bad happened, please try again");
+        }
+
+      } catch(e)
+      {
+        if (e is UserException)
+        {
+          throw e;
+        }
+        throw UserException("Something bad happened, please try again");
+      }
+      
     }
   }
 
@@ -143,4 +163,13 @@ abstract class BaseProvider<T> with ChangeNotifier {
     });
     return query;
   }
+}
+
+class UserException implements Exception {
+  final String exMessage;
+
+  UserException(this.exMessage);
+
+  @override
+  String toString() => exMessage;
 }
