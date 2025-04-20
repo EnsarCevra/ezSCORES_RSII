@@ -1,9 +1,9 @@
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:flutter/material.dart';
 
-class UsersListScreen extends StatelessWidget
+class AdminDashboardScreen extends StatelessWidget
 {
-  const UsersListScreen({super.key});
+  const AdminDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context)
@@ -15,6 +15,6 @@ class UsersListScreen extends StatelessWidget
     //     ElevatedButton(onPressed: (){Navigator.pop(context);}, child: Text("Back"))
     //   ],
     // ));
-    return MasterScreen("Lista korisnika", Placeholder(), selectedIndex: 4,);
+    return MasterScreen("Dashboard", Placeholder(), selectedIndex: 0,);
   }
 }

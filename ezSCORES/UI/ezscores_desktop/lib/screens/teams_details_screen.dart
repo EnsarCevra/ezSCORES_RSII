@@ -57,7 +57,7 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
    }
   @override
    Widget build(BuildContext context) {
-    return MasterScreen("Detalji", 
+    return MasterScreen("Detalji", selectedIndex: 2,
     Column(
       children: [
         _buildForm(),

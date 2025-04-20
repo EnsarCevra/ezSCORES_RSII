@@ -3,6 +3,7 @@ import 'package:ezscores_desktop/providers/TeamProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
+import 'package:ezscores_desktop/screens/admin_dashboard_screen.dart';
 import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -103,7 +104,7 @@ class LoginPage extends StatelessWidget
                             AuthProvider.email = user.email;
                             AuthProvider.phoneNumber = user.phoneNumber;
                             AuthProvider.orzanization = user.orzanization;
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => TeamsListScreen()));
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => AdminDashboardScreen()));
                           }on UserException catch(exception)
                           {
                             showDialog(

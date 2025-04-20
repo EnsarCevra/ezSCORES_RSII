@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 
 class TeamsListScreen extends StatefulWidget
 {
-  const TeamsListScreen({super.key});
+  final int selectedIndex;
+  const TeamsListScreen({super.key, required this.selectedIndex});
 
   @override
   State<TeamsListScreen> createState() => _TeamsListScreenState();
@@ -40,7 +41,7 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   @override
   Widget build(BuildContext context)
   {
-    return MasterScreen("Lista timova", 
+    return MasterScreen("Lista timova", selectedIndex: widget.selectedIndex,
     Container(
       child: Column(
         children: [
@@ -74,7 +75,15 @@ Widget _buildSearch()
       }, child: Text("Pretraga")),
        SizedBox(width: 8,),
        ElevatedButton(onPressed: () async{
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => TeamsDetailsScreen()));
+        Navigator.of(context).push(PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+            },
+          ));
       }, child: Text("Dodaj"))
     ],
   )
@@ -129,7 +138,15 @@ Widget _buildResultView() {
               onSelectChanged: (isItemSelected) {
                 if(isItemSelected == true)
                 {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => TeamsDetailsScreen(team: e,)));
+                   Navigator.of(context).push(PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(team: e,),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                        },
+                      ));
                 }
                 
               },
