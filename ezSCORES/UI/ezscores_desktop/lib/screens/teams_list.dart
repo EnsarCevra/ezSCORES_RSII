@@ -1,10 +1,13 @@
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
+import 'package:ezscores_desktop/models/selections.dart';
 import 'package:ezscores_desktop/models/teams.dart';
+import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/TeamProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/teams_details_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
 class TeamsListScreen extends StatefulWidget
@@ -18,6 +21,9 @@ class TeamsListScreen extends StatefulWidget
 
 class _TeamsListScreenState extends State<TeamsListScreen> {
   late TeamProvider teamProvider;
+  late SelectionProvider selectionProvider;
+  SearchResult<Selections>? selectionResult = null;
+  SearchResult<Teams>? teamsResult = null; 
    @override
   void didChangeDependencies()
   {
@@ -28,16 +34,18 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   void initState() {
     // TODO: implement initState
     teamProvider = context.read<TeamProvider>();
+    selectionProvider = context.read<SelectionProvider>();
     super.initState();
     initForm();
   }
   Future initForm() async{
-    var data = await teamProvider.get();
+    var teamData = await teamProvider.get();
+    var selectionData = await selectionProvider.get(); 
     setState(() {
-      result = data;
+      teamsResult = teamData;
+      selectionResult = selectionData;
     });
    }
-  SearchResult<Teams>? result = null; 
   @override
   Widget build(BuildContext context)
   {
@@ -53,29 +61,48 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   }
 
 final TextEditingController _ftsEditingController = TextEditingController();
-final TextEditingController _ftsOrganizerController = TextEditingController();
+String? selectedSelectionID;
 Widget _buildSearch()
 {
-  return Padding(
+  return selectionResult == null ? const SizedBox.shrink() : Padding(
     padding: const EdgeInsets.all(15),
     child: Row(
     children: [
       Expanded(child: TextField(controller: _ftsEditingController,decoration: InputDecoration(labelText: "Naziv"),)),
       SizedBox(width: 8,),
-      Expanded(child: TextField(controller: _ftsOrganizerController,decoration: InputDecoration(labelText: "Organizator"),)),
+      Expanded(
+                  child: FormBuilderDropdown(
+                    name: "selectionId",
+                    decoration: InputDecoration(
+                      labelText: "Selekcija",
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      )
+                    ),
+                    focusColor: Colors.transparent,
+                    items: [DropdownMenuItem(value: "all", child: Text("Sve"),), ...selectionResult?.result.map((item) => 
+                    DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],],
+                    onChanged: (value){
+                      setState(() {
+                        value == "all" ? selectedSelectionID = null : selectedSelectionID = value.toString();
+                      });
+                    },
+                    )
+                  ),
 
       ElevatedButton(onPressed: () async{
         var filter = {
-          "name" : _ftsEditingController.text
+          "name" : _ftsEditingController.text,
+          "selectionId" : selectedSelectionID
         };
         var data = await teamProvider.get(filter: filter);
         setState(() {
-          result = data;
+          teamsResult = data;
         });
       }, child: Text("Pretraga")),
        SizedBox(width: 8,),
        ElevatedButton(onPressed: () async{
-        Navigator.of(context).push(PageRouteBuilder(
+       final actionResult = await Navigator.of(context).push(PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
@@ -84,13 +111,17 @@ Widget _buildSearch()
           );
             },
           ));
+          if(actionResult == true)
+          {
+            initForm();
+          }
       }, child: Text("Dodaj"))
     ],
   )
   );
 }
 Widget _buildResultView() {
-  if(result != null)
+  if(teamsResult != null)
   {
     return Expanded(
     child: SingleChildScrollView(
@@ -101,60 +132,47 @@ Widget _buildResultView() {
           columnSpacing: 16.0,
           columns: const [
             DataColumn(
-              label: Expanded(
-                child: Text(
-                  "Id",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Align(
+                  alignment: Alignment.center,
+                  child: Text(textAlign: TextAlign.center,
+                    "Naziv",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-            ),
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  "Naziv",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
             ),
              DataColumn(
-              label: Expanded(
-                child: Text(
-                  "Selekcija",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
+                  label: Center(
+                    child: Text(
+                      "Selekcija",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
             ),
             DataColumn(
-              label: Expanded(
-                child: Text(
-                  "Slika",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
+                  label: Center(
+                    child: Text(textAlign: TextAlign.center,
+                      "Slika",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
             ),
           ],
-          rows: result?.result.map((e)=>
+          rows: teamsResult?.result.map((e)=>
             DataRow(
-              onSelectChanged: (isItemSelected) {
-                if(isItemSelected == true)
-                {
-                   Navigator.of(context).push(PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(team: e,),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                        },
-                      ));
-                }
-                
-              },
               cells: [
-              DataCell(Text(e.id.toString())),
-              DataCell(Text(e.name ?? "")),
-              DataCell(Text(e.selection?.name ?? "")),
-              DataCell(e.picture != null ? Container(width: 100, height: 100, child: imageFromString(e.picture!),): Text(""))
+              DataCell(Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: Text(e.name ?? ""),),
+              ), onTap: () => _handleRowTap(e)),
+              DataCell(Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: Text(e.selection?.name ?? "")),
+              ), onTap: () => _handleRowTap(e)),
+              DataCell(e.picture != null ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: Container(width: 100, height: 100, child: imageFromString(e.picture!),)),
+              ): Center(child: Container(child: Image.asset('assets/images/TeamPlaceholder.png', fit: BoxFit.cover,))), onTap: () => _handleRowTap(e))
             ])
           ).toList().cast<DataRow>() ?? [],
         ),
@@ -164,9 +182,23 @@ Widget _buildResultView() {
   }
   else
   {
-    return const Center(child: CircularProgressIndicator());
+    return Expanded(child: Align(alignment: Alignment.center, child: CircularProgressIndicator(),),);
   }
 }
 
+  _handleRowTap(Teams e) async{
+    final actionResult = await Navigator.of(context).push(
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(team: e),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+    ),
+  );
+
+  if (actionResult == true) {
+    initForm();
+  }
+  }
 }
 

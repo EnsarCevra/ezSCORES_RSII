@@ -7,6 +7,7 @@ import 'package:ezscores_desktop/models/selections.dart';
 import 'package:ezscores_desktop/models/teams.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/TeamProvider.dart';
+import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -69,100 +70,99 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
    Widget _buildForm() {
     if(selectionResult != null)
     {
-      return FormBuilder(key: _formKey, initialValue: _initialValue,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: FormBuilderTextField(decoration: InputDecoration(labelText: "Naziv"), name: 'name'),
-                  ),
-                  SizedBox(width: 10,),
-                // Expanded(
-                //   child: FormBuilderTextField(
-                //     decoration: InputDecoration(labelText: "SelekcijaId"),
-                //      name: 'selectionId',
-                //     //  validator: FormBuilderValidators.compose([
-                //     //   FormBuilderValidators.required(),
-                //     //   FormBuilderValidators.email(),
-                //      ),
-                //   ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: FormBuilderDropdown(
-                    name: "selectionId",
-                    decoration: InputDecoration(labelText: "Selekcija"),
-                    items: selectionResult?.result.map((item) => 
-                    DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],
-                    )),
-              ],
-            ), //----
-            Row(
-              children: [
-                Expanded(
-                  child: FormBuilderField<String>(
-                    name: "imageId",
-                    builder: (field) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InputDecorator(
-                            decoration: InputDecoration(
-                              labelText: "Odaberite sliku",
-                              errorText: field.errorText,
-                            ),
-                            child: Column(
-                              children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child:
-                                    _base64Image != null ?
-                                     Image.memory(
-                                      base64Decode(_base64Image!),
-                                      height: 150,
-                                      fit: BoxFit.cover,
-                                    ) :
-                                    Image.asset('assets/images/TeamPlaceholder.png', height: 150, fit: BoxFit.cover,),
+      return Padding(
+        padding: const EdgeInsets.all(25.0),
+        child: FormBuilder(key: _formKey, initialValue: _initialValue,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: FormBuilderField<String>(
+                      name: "imageId",
+                      builder: (field) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InputDecorator(
+                              decoration: InputDecoration(
+                                labelText: "Odaberite sliku",
+                                errorText: field.errorText,
+                              ),
+                              child: Column(
+                                children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8.0),
+                                      child:
+                                      _base64Image != null ?
+                                       Image.memory(
+                                        base64Decode(_base64Image!),
+                                        height: 150,
+                                        fit: BoxFit.cover,
+                                      ) :
+                                      Image.asset('assets/images/TeamPlaceholder.png', height: 150, fit: BoxFit.cover,),
+                                    ),
+                                  ListTile(
+                                    leading: Icon(Icons.image),
+                                    title: Text(_base64Image == null ? "Odaberi sliku" : "Promijeni sliku"),
+                                    trailing: Icon(Icons.file_upload),
+                                    onTap: () async {
+                                      final result = await getImage(); // Your custom function
+                                      if (result != null) {
+                                        field.didChange(result); // Update FormBuilder value3,
+                                        setState(() {
+                                          _base64Image = result;
+                                        });
+                                      }
+                                    },
                                   ),
-                                ListTile(
-                                  leading: Icon(Icons.image),
-                                  title: Text(_base64Image == null ? "Select image" : "Change image"),
-                                  trailing: Icon(Icons.file_upload),
-                                  onTap: () async {
-                                    final result = await getImage(); // Your custom function
-                                    if (result != null) {
-                                      field.didChange(result); // Update FormBuilder value3,
-                                      setState(() {
-                                        _base64Image = result;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                )
-              ],
-            )
-
-          ],
+                          ],
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: FormBuilderTextField(decoration: InputDecoration(labelText: "Naziv"), name: 'name'),
+                    ),
+                    SizedBox(width: 10,),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: FormBuilderDropdown(
+                      name: "selectionId",
+                      decoration: InputDecoration(
+                        labelText: "Selekcija",
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        )
+                      ),
+                      focusColor: Colors.transparent,
+                      items: selectionResult?.result.map((item) => 
+                      DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],
+                      )),
+                ],
+              ), //----
+        
+            ],
+          ),
         ),
-      ),
-     );
+             ),
+      );
     }
     else
     {
-    return const Center(child: CircularProgressIndicator());
-
+      return Expanded(child: Align(alignment: Alignment.center, child: CircularProgressIndicator(),),);
     }
       
     }
@@ -186,6 +186,11 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                 else
                 {
                   await teamProvider.update(widget.team!.id!, request);
+                }
+                if(context.mounted)
+                {
+                  widget.team == null ? showSuccessSnackBar(context, 'Ekipa uspješno kreirana.') : showSuccessSnackBar(context, 'Ekipa uspješno ažurirana.');
+                  Navigator.pop(context, true);
                 }
               }on Exception catch(exception)
               {

@@ -1,9 +1,11 @@
 ﻿using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ezSCORES.API.Controllers
 {
+	[Authorize]
 	public class BaseCRUDController<TModel, TSearch, TInsert, TUpdate> : BaseController<TModel, TSearch> where TSearch : BaseSearchObject where TModel : class
 	{
 		protected new ICRUDService<TModel, TSearch, TInsert, TUpdate> _service;

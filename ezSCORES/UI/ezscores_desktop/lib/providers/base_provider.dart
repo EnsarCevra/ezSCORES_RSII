@@ -89,14 +89,16 @@ abstract class BaseProvider<T> with ChangeNotifier {
       return true;
     } else if (response.statusCode == 401) {
       throw UserException("Unauthorized");
+    } else if(response.statusCode == 403){
+      throw UserException(response.body);
     } else {
       try
       {
         final errorResponse = jsonDecode(response.body);
 
-        if(errorResponse is Map<String, dynamic> && errorResponse['errors'] != null && errorResponse['errorrs']['userError'] != null)
+        if(errorResponse is Map<String, dynamic> && errorResponse['errors'] != null && errorResponse['errors']['userError'] != null)
         {
-          throw UserException(errorResponse['errorrs']['userError'].join(', '));
+          throw UserException(errorResponse['errors']['userError'].join(', '));
         }
         else
         {
