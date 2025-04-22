@@ -75,9 +75,6 @@ Widget _buildSearch()
                     name: "selectionId",
                     decoration: InputDecoration(
                       labelText: "Selekcija",
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
-                      )
                     ),
                     focusColor: Colors.transparent,
                     items: [DropdownMenuItem(value: "all", child: Text("Sve"),), ...selectionResult?.result.map((item) => 
@@ -172,7 +169,7 @@ Widget _buildResultView() {
               DataCell(e.picture != null ? Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Container(width: 100, height: 100, child: imageFromString(e.picture!),)),
-              ): Center(child: Container(child: Image.asset('assets/images/TeamPlaceholder.png', fit: BoxFit.cover,))), onTap: () => _handleRowTap(e))
+              ): Center(child: Container(child: Image.asset('assets/images/team_placeholder.png', fit: BoxFit.cover,))), onTap: () => _handleRowTap(e))
             ])
           ).toList().cast<DataRow>() ?? [],
         ),

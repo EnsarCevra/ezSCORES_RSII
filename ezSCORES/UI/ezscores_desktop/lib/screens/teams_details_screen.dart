@@ -12,6 +12,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 
@@ -102,7 +103,7 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                                         height: 150,
                                         fit: BoxFit.cover,
                                       ) :
-                                      Image.asset('assets/images/TeamPlaceholder.png', height: 150, fit: BoxFit.cover,),
+                                      Image.asset('assets/images/team_placeholder.png', height: 150, fit: BoxFit.cover,),
                                     ),
                                   ListTile(
                                     leading: Icon(Icons.image),
@@ -131,7 +132,16 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: FormBuilderTextField(decoration: InputDecoration(labelText: "Naziv"), name: 'name'),
+                    child: FormBuilderTextField(
+                      decoration: InputDecoration(labelText: "Naziv"),
+                       name: 'name',
+                       autovalidateMode: AutovalidateMode.onUserInteraction,
+                       validator: FormBuilderValidators.compose(
+                        [
+                          FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
+                          FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 2 slova'),
+                        ]
+                       ),),
                     ),
                     SizedBox(width: 10,),
                 ],
@@ -143,9 +153,11 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                       name: "selectionId",
                       decoration: InputDecoration(
                         labelText: "Selekcija",
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        )
+                      ),
+                      validator: FormBuilderValidators.compose(
+                        [
+                          FormBuilderValidators.required(errorText: 'Selekcija je obavezna'),
+                        ]
                       ),
                       focusColor: Colors.transparent,
                       items: selectionResult?.result.map((item) => 
@@ -174,11 +186,14 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             ElevatedButton(onPressed: () async {
-              _formKey.currentState?.saveAndValidate();
-              debugPrint(_formKey.currentState?.value.toString());
-              var request = Map.from(_formKey.currentState!.value);
-              request["picture"] = _base64Image;
-              try{
+              final isValid = _formKey.currentState?.saveAndValidate();
+              if(isValid == true)
+              {
+                debugPrint(_formKey.currentState?.value.toString());
+                var request = Map.from(_formKey.currentState!.value);
+                request["picture"] = _base64Image; 
+
+                try{
                 if(widget.team == null)
                 {
                   await teamProvider.insert(request);
@@ -200,6 +215,7 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                                         title: Text("Error"), 
                                         actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
                                         content: Text(exception.toString()),));
+              }
               }
             }, child: Text("Sačuvaj"))
           ],
