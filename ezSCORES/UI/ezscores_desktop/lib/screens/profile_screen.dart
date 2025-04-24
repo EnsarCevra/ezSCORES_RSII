@@ -15,6 +15,6 @@ class ProfileScreen extends StatelessWidget
     //     ElevatedButton(onPressed: (){Navigator.pop(context);}, child: Text("Back"))
     //   ],
     // ));
-    return MasterScreen("Korisnički profil", Placeholder(), selectedIndex: 5,);
+    return MasterScreen("Korisnički profil", Placeholder(), selectedIndex: 6,);
   }
 }

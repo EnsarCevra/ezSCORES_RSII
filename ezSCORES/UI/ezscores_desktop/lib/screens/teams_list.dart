@@ -86,7 +86,7 @@ Widget _buildSearch()
                     },
                     )
                   ),
-
+      SizedBox(width: 8,),            
       ElevatedButton(onPressed: () async{
         var filter = {
           "name" : _ftsEditingController.text,
@@ -96,8 +96,8 @@ Widget _buildSearch()
         setState(() {
           teamsResult = data;
         });
-      }, child: Text("Pretraga")),
-       SizedBox(width: 8,),
+      }, child: Icon(Icons.search)),
+      SizedBox(width: 8,),
        ElevatedButton(onPressed: () async{
        final actionResult = await Navigator.of(context).push(PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(),
@@ -120,13 +120,14 @@ Widget _buildSearch()
 Widget _buildResultView() {
   if(teamsResult != null)
   {
-    return Expanded(
+    return teamsResult!.count != 0 ? Expanded(
     child: SingleChildScrollView(
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(8.0),
         child: DataTable(
           columnSpacing: 16.0,
+          showCheckboxColumn: false,
           columns: const [
             DataColumn(
                 label: Align(
@@ -157,25 +158,26 @@ Widget _buildResultView() {
           ],
           rows: teamsResult?.result.map((e)=>
             DataRow(
+              onSelectChanged: (_) => _handleRowTap(e),
               cells: [
               DataCell(Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text(e.name ?? ""),),
-              ), onTap: () => _handleRowTap(e)),
+              ),),
               DataCell(Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text(e.selection?.name ?? "")),
-              ), onTap: () => _handleRowTap(e)),
+              ),),
               DataCell(e.picture != null ? Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Container(width: 100, height: 100, child: imageFromString(e.picture!),)),
-              ): Center(child: Container(child: Image.asset('assets/images/team_placeholder.png', fit: BoxFit.cover,))), onTap: () => _handleRowTap(e))
+              ): Center(child: Container(child: Image.asset('assets/images/team_placeholder.png',))),)
             ])
           ).toList().cast<DataRow>() ?? [],
         ),
       ),
     ),
-  );
+  ) : Expanded(child: Align(alignment: Alignment.center, child: Text('Nema podataka'),),);;
   }
   else
   {
@@ -183,10 +185,10 @@ Widget _buildResultView() {
   }
 }
 
-  _handleRowTap(Teams e) async{
+  _handleRowTap(Teams selectedTeam) async{
     final actionResult = await Navigator.of(context).push(
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(team: e),
+      pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(team: selectedTeam),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(opacity: animation, child: child);
       },

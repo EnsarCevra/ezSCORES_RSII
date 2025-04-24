@@ -2,36 +2,43 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:ezscores_desktop/layouts/master_screen.dart';
-import 'package:ezscores_desktop/models/search_result.dart';
-import 'package:ezscores_desktop/models/selections.dart';
-import 'package:ezscores_desktop/models/teams.dart';
-import 'package:ezscores_desktop/providers/SelectionProvider.dart';
-import 'package:ezscores_desktop/providers/TeamProvider.dart';
+import 'package:ezscores_desktop/models/players.dart';
+import 'package:ezscores_desktop/providers/PlayersProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-
-class TeamsDetailsScreen extends StatefulWidget
+class PlayersDetailsScreen extends StatefulWidget
 {
-  Teams? team;
-  TeamsDetailsScreen({super.key, this.team});
+  Players? player;
+  PlayersDetailsScreen({super.key, this.player});
 
-   @override
-    State<TeamsDetailsScreen> createState() => _TeamDetailsScreenState();
-   
+  @override
+  Widget build(BuildContext context)
+  {
+    // return MasterScreen("Lista korisnika", Column(
+    //   children: [
+    //     Text("Lista korisnika placeholder"),
+    //     SizedBox(height: 10,),
+    //     ElevatedButton(onPressed: (){Navigator.pop(context);}, child: Text("Back"))
+    //   ],
+    // ));
+    return MasterScreen("Igrac - detalji", Placeholder(), selectedIndex: 3,);
+  }
+  
+  @override
+  State<StatefulWidget> createState() => _PlayerDetailsScreenState();
 }
-class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
-  final _formKey = GlobalKey<FormBuilderState>();
+
+class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
+  late PlayerProvider playerProvider;
+  String? _base64Image;
   Map<String, dynamic> _initialValue = {};
-  late TeamProvider teamProvider;
-  late SelectionProvider selectionProvider;
-  SearchResult<Selections>? selectionResult = null;
-  bool isLoading = true;
+  final _formKey = GlobalKey<FormBuilderState>();
   @override
   void didChangeDependencies()
   {
@@ -40,38 +47,34 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    teamProvider = context.read<TeamProvider>();
-    selectionProvider = context.read<SelectionProvider>();
+    playerProvider = context.read<PlayerProvider>();
     super.initState();
     _initialValue = {
-      "name" : widget.team?.name,
-      "selectionId" : widget.team?.selection?.id.toString(),
-      "picture" : widget.team?.picture
+      "firstName" : widget.player?.firstName,
+      "lastName" : widget.player?.lastName,
+      "birthDate" : widget.player?.birthDate,
+      "picture" : widget.player?.picture
     };
     initForm();
   }
-   Future initForm() async{
-    var selectionData = await selectionProvider.get();
+  Future initForm() async{
     setState(() {
-      selectionResult = selectionData;
-      _base64Image = widget.team?.picture;
+      _base64Image = widget.player?.picture;
     });
    }
   @override
-   Widget build(BuildContext context) {
-    return MasterScreen("Detalji", selectedIndex: 2,
+  Widget build(BuildContext context) {
+    return MasterScreen("Detalji", selectedIndex: 3,
     Column(
       children: [
         _buildForm(),
         _saveRow()
       ],
     ));
-   }
-
-   Widget _buildForm() {
-    if(selectionResult != null)
-    {
-      return Padding(
+  }
+  
+  _buildForm() {
+    return Padding(
         padding: const EdgeInsets.all(25.0),
         child: FormBuilder(key: _formKey, initialValue: _initialValue,
         child: Padding(
@@ -96,23 +99,25 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                                 children: [
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 8.0),
-                                      child:
-                                      _base64Image != null ?
+                                      child: ClipOval(
+                                        child: _base64Image != null ?
                                        Image.memory(
                                         base64Decode(_base64Image!),
-                                        height: 150,
+                                        width: 200,
+                                        height: 200,
                                         fit: BoxFit.cover,
                                       ) :
-                                      Image.asset('assets/images/team_placeholder.png', height: 150, fit: BoxFit.cover,),
-                                    ),
+                                      Image.asset('assets/images/default_profile_image.jpg', height: 150, fit: BoxFit.cover,),
+                                    ),),
+                                      
                                   ListTile(
                                     leading: Icon(Icons.image),
                                     title: Text(_base64Image == null ? "Odaberi sliku" : "Promijeni sliku"),
                                     trailing: Icon(Icons.file_upload),
                                     onTap: () async {
-                                      final result = await getImage(); // Your custom function
+                                      final result = await getImage(); 
                                       if (result != null) {
-                                        field.didChange(result); // Update FormBuilder value3,
+                                        field.didChange(result);
                                         setState(() {
                                           _base64Image = result;
                                         });
@@ -134,13 +139,17 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
-                      decoration: InputDecoration(labelText: "Naziv"),
-                       name: 'name',
+                      decoration: InputDecoration(labelText: "Ime"),
+                       name: 'firstName',
                        autovalidateMode: AutovalidateMode.onUserInteraction,
                        validator: FormBuilderValidators.compose(
                         [
-                          FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
-                          FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 2 slova'),
+                          FormBuilderValidators.required(errorText: 'Ime je obavezno'),
+                          FormBuilderValidators.minLength(3, errorText: 'Ime mora imati barem 3 slova'),
+                          FormBuilderValidators.match(
+                            r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
+                            errorText: 'Prezime mora početi velikim slovom i sadržavati samo slova'
+                          )
                         ]
                        ),),
                     ),
@@ -150,38 +159,54 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: FormBuilderDropdown(
-                      name: "selectionId",
-                      decoration: InputDecoration(
-                        labelText: "Selekcija",
-                      ),
-                      validator: FormBuilderValidators.compose(
+                    child: FormBuilderTextField(
+                      decoration: InputDecoration(labelText: "Prezime"),
+                       name: 'lastName',
+                       autovalidateMode: AutovalidateMode.onUserInteraction,
+                       validator: FormBuilderValidators.compose(
                         [
-                          FormBuilderValidators.required(errorText: 'Selekcija je obavezna'),
+                          FormBuilderValidators.required(errorText: 'Prezime je obavezno'),
+                          FormBuilderValidators.minLength(3, errorText: 'Prezime mora imati barem 3 slova'),
+                          FormBuilderValidators.match(
+                            r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
+                            errorText: 'Prezime mora početi velikim slovom i sadržavati samo slova'
+                          )
                         ]
-                      ),
-                      focusColor: Colors.transparent,
-                      items: selectionResult?.result.map((item) => 
-                      DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],
-                      )),
+                       ),),
+                    ),
                 ],
-              ), //----
-        
+              ),
+              SizedBox(width: 30,),
+              Row(
+                children: [
+                  Expanded(
+                      child: FormBuilderDateTimePicker(
+                      name: 'birthDate',
+                      format: DateFormat('dd.MM.yyyy'),
+                      inputType: InputType.date,
+                      decoration: InputDecoration(
+                        labelText: 'Datum rođenja',
+                        suffixIcon: Icon(Icons.calendar_today),
+                      ),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                      initialEntryMode: DatePickerEntryMode.calendar,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(errorText: "Datum je obavezan"),
+                      ]),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),
              ),
       );
-    }
-    else
-    {
-      return Expanded(child: Align(alignment: Alignment.center, child: CircularProgressIndicator(),),);
-    }
-      
-}
-    
-    Widget _saveRow() {
-      return Padding(
+  }
+  
+  _saveRow() {
+     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -190,22 +215,26 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
               final isValid = _formKey.currentState?.saveAndValidate();
               if(isValid == true)
               {
-                debugPrint(_formKey.currentState?.value.toString());
-                var request = Map.from(_formKey.currentState!.value);
+                final originalFormData = _formKey.currentState?.value;
+                final formData = Map<String, dynamic>.from(originalFormData!);
+                DateTime birthDate = formData['birthDate'];
+                formData['birthDate'] = birthDate.toUtc().toIso8601String();
+
+                var request = Map.from(formData);
                 request["picture"] = _base64Image; 
 
                 try{
-                if(widget.team == null)
+                if(widget.player == null)
                 {
-                  await teamProvider.insert(request);
+                  await playerProvider.insert(request);
                 }
                 else
                 {
-                  await teamProvider.update(widget.team!.id!, request);
+                  await playerProvider.update(widget.player!.id!, request);
                 }
                 if(context.mounted)
                 {
-                  widget.team == null ? showSuccessSnackBar(context, 'Ekipa uspješno kreirana.') : showSuccessSnackBar(context, 'Ekipa uspješno ažurirana.');
+                  widget.player == null ? showSuccessSnackBar(context, 'Igrač uspješno dodan.') : showSuccessSnackBar(context, 'Igrač uspješno ažuriran.');
                   Navigator.pop(context, true);
                 }
               }on Exception catch(exception)
@@ -222,10 +251,10 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
           ],
         ),
       );
-    }
-    File? _image;
-    String? _base64Image;
-     Future<String?> getImage() async{
+  }
+
+  File? _image;
+  Future<String?> getImage() async{
         var result = await FilePicker.platform.pickFiles(type: FileType.image);
 
         if(result != null && result.files.single.path != null)

@@ -37,8 +37,8 @@ class _MasterScreenState extends State<MasterScreen> {
      case 0: screenToPush = AdminDashboardScreen();
      case 1: screenToPush = CompetitionsListScreen();
     case 2: screenToPush = TeamsListScreen(selectedIndex: index);
-    case 3: screenToPush = PlayersListScreen();
-    case 4: screenToPush = AdminSettingsScreen();
+    case 3: screenToPush = PlayersListScreen(selectedIndex: index,);
+    case 4: screenToPush = AdminSettingsScreen(selectedIndex: index,);
     case 5:  screenToPush = UsersListScreen();
     case 6:  screenToPush = ProfileScreen();
       break;
@@ -222,7 +222,7 @@ class _SidebarItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: isSelected
           ? BoxDecoration(
-              color: const Color(0xFF28A745),
+              color: Colors.blue,
               borderRadius: BorderRadius.circular(8),
             )
           : null,

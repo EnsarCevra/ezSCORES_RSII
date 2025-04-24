@@ -22,10 +22,15 @@ String formatDate(String date) {
   return DateFormat('dd.MM.yyyy').format(DateTime.parse(date).toLocal());
 }
 
-String formatDateTime(String date) {
-  return DateFormat('dd.MM.yyyy HH:mm').format(DateTime.parse(date).toLocal());
+String formatDateTime(DateTime? date) {
+  if (date == null) return "-";
+  return DateFormat('dd.MM.yyyy HH:mm').format(date.toLocal());
 }
 
+String formatDateOnly(DateTime? date) {
+  if (date == null) return "-";
+  return DateFormat('dd.MM.yyyy').format(date.toLocal());
+}
 
 void showSuccessSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(

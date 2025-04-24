@@ -15,6 +15,6 @@ class UsersListScreen extends StatelessWidget
     //     ElevatedButton(onPressed: (){Navigator.pop(context);}, child: Text("Back"))
     //   ],
     // ));
-    return MasterScreen("Lista korisnika", Placeholder(), selectedIndex: 4,);
+    return MasterScreen("Lista korisnika", Placeholder(), selectedIndex: 5,);
   }
 }

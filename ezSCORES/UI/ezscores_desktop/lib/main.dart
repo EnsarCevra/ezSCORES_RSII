@@ -1,3 +1,4 @@
+import 'package:ezscores_desktop/providers/PlayersProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/TeamProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
@@ -13,6 +14,7 @@ void main() {
     ChangeNotifierProvider(create: (_) => TeamProvider()),
     ChangeNotifierProvider(create: (_) => SelectionProvider()),
     ChangeNotifierProvider(create: (_) => UserProvider()),
+    ChangeNotifierProvider(create: (_) => PlayerProvider()),
 
   ], child: const MyApp(),));
 }
@@ -41,6 +43,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white
+          )),
         colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 38, 208, 47)),
         useMaterial3: true,
       ),
