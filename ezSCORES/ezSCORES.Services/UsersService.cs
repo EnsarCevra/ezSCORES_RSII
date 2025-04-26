@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Dynamic;
 using ezSCORES.Model.Requests.UserRequests;
+using System.IO.Pipelines;
 
 namespace ezSCORES.Services
 {
@@ -39,7 +40,7 @@ namespace ezSCORES.Services
 			}
 			if (!string.IsNullOrWhiteSpace(search?.UserName))
 			{
-				query = query.Where(x => x.UserName == search.UserName);
+				query = query.Where(x => x.UserName.StartsWith(search.UserName));
 			}
 			if (search.IsRolesIncluded == true)
 			{
@@ -73,11 +74,15 @@ namespace ezSCORES.Services
 		public override void BeforeUpdate(UsersUpdateRequest request, User entity)
 		{
 
-			if (request.Password != null)
+			if (request.Password != null && request.PasswordConfirmation != null && request.OldPassword != null)
 			{
+				if(!Context.Users.Where(x => x.PasswordHash == GenerateHash(entity.PasswordSalt, request.OldPassword) && x.Id == entity.Id ).Any())
+				{
+					throw new UserException("Stara lozinka nije ispravna!");
+				}
 				if (request.Password != request.PasswordConfirmation)
 				{
-					throw new Exception("Lozinke se ne podudaraju!");
+					throw new UserException("Lozinke se ne podudaraju!");
 				}
 				entity.PasswordSalt = GenerateSalt();
 				entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);

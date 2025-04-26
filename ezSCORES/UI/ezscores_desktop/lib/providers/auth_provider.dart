@@ -9,5 +9,8 @@ class AuthProvider
   static String? picture;
   static String? email;
   static String? phoneNumber;
-  static String? orzanization;
+  static String? organization;
+  static int? roleID;
+  static String? roleName;
+  static String? roleDecription;
 }

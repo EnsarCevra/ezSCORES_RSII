@@ -10,7 +10,7 @@ class Users{
   String? picture;
   String? email;
   String? phoneNumber;
-  String? orzanization;
+  String? organization;
   Roles? role;
 
   Users();

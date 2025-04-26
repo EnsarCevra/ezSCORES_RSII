@@ -151,36 +151,43 @@ class _PlayerListScreen extends State<PlayersListScreen>
           showCheckboxColumn: false,
           columns: const [
             DataColumn(
-                label: Center(
-                  child: Text(textAlign: TextAlign.center,
-                    "Slika",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                label: Flexible(
+                  child: Center(
+                    child: Text(textAlign: TextAlign.center,
+                      "Slika",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
             ),
             DataColumn(
-                label: Align(
-                  alignment: Alignment.center,
-                  child: Text(textAlign: TextAlign.center,
-                    "Ime",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                label: Flexible(
+                  child: Center(
+                    child: Text(textAlign: TextAlign.center,
+                      "Ime",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
             ),
              DataColumn(
-                  label: Center(
-                    child: Text(
-                      "Prezime",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
+                  label: Flexible(
+                    child: Center(
+                      child: Text(
+                        "Prezime",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
             ),
             DataColumn(
-                  label: Center(
-                    child: Text(textAlign: TextAlign.center,
-                      "Datum rođenja",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  label: Flexible(
+                    child: Center(
+                      child: Text(textAlign: TextAlign.center,
+                        "Datum rođenja",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
             ),
@@ -206,7 +213,6 @@ class _PlayerListScreen extends State<PlayersListScreen>
                         ),
                       ),
                     ),
-
               DataCell(Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text(e.firstName ?? ""),),

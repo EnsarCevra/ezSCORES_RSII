@@ -130,28 +130,33 @@ Widget _buildResultView() {
           showCheckboxColumn: false,
           columns: const [
             DataColumn(
-                label: Align(
-                  alignment: Alignment.center,
-                  child: Text(textAlign: TextAlign.center,
-                    "Naziv",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-            ),
-             DataColumn(
-                  label: Center(
-                    child: Text(
-                      "Selekcija",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
+                  label: Flexible(
+                    child: Center(
+                      child: Text(textAlign: TextAlign.center,
+                        "Slika",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
             ),
             DataColumn(
-                  label: Center(
+                label: Flexible(
+                  child: Center(
                     child: Text(textAlign: TextAlign.center,
-                      "Slika",
+                      "Naziv",
                       style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+            ),
+             DataColumn(
+                  label: Flexible(
+                    child: Center(
+                      child: Text(
+                        "Selekcija",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
             ),
@@ -160,6 +165,10 @@ Widget _buildResultView() {
             DataRow(
               onSelectChanged: (_) => _handleRowTap(e),
               cells: [
+                DataCell(e.picture != null ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: SizedBox(width: 50, height: 50, child: imageFromString(e.picture!),)),
+              ): Center(child: Container(child: Image.asset('assets/images/team_placeholder.png',))),),
               DataCell(Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text(e.name ?? ""),),
@@ -168,10 +177,6 @@ Widget _buildResultView() {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text(e.selection?.name ?? "")),
               ),),
-              DataCell(e.picture != null ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Container(width: 100, height: 100, child: imageFromString(e.picture!),)),
-              ): Center(child: Container(child: Image.asset('assets/images/team_placeholder.png',))),)
             ])
           ).toList().cast<DataRow>() ?? [],
         ),

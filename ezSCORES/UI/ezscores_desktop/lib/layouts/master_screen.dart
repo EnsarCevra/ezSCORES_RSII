@@ -39,7 +39,7 @@ class _MasterScreenState extends State<MasterScreen> {
     case 2: screenToPush = TeamsListScreen(selectedIndex: index);
     case 3: screenToPush = PlayersListScreen(selectedIndex: index,);
     case 4: screenToPush = AdminSettingsScreen(selectedIndex: index,);
-    case 5:  screenToPush = UsersListScreen();
+    case 5:  screenToPush = UsersListScreen(selectedIndex: index,);
     case 6:  screenToPush = ProfileScreen();
       break;
     default:
@@ -105,21 +105,21 @@ Widget build(BuildContext context) {
                   ),
                   _SidebarItem(
                     index: 1,
-                    icon: Icons.bar_chart,
+                    icon: Icons.event,
                     title: "Upravljaj takmičenjima",
                     isSelected: widget.selectedIndex == 1,
                     onTap: () => onSidebarItemTapped(1),
                   ),
                   _SidebarItem(
                     index: 2,
-                    icon: Icons.assignment,
+                    icon: Icons.group,
                     title: "Upravljaj ekipama",
                     isSelected: widget.selectedIndex == 2,
                     onTap: () => onSidebarItemTapped(2),
                   ),
                   _SidebarItem(
                     index: 3,
-                    icon: Icons.groups,
+                    icon: Icons.person,
                     title: "Upravljaj igračima",
                     isSelected: widget.selectedIndex == 3,
                     onTap: () => onSidebarItemTapped(3),
@@ -133,12 +133,12 @@ Widget build(BuildContext context) {
                   ),
                   _SidebarItem(
                     index: 5,
-                    icon: Icons.calendar_today,
+                    icon: Icons.supervised_user_circle_sharp,
                     title: "Korisnici",
                     isSelected: widget.selectedIndex == 5,
                     onTap: () => onSidebarItemTapped(5),
                   ),
-                  const Divider(height: 40),
+                  const Divider(height: 20),
                   _SidebarItem(
                     index: 6,
                     icon: Icons.person_outline,
@@ -195,7 +195,7 @@ Widget build(BuildContext context) {
     AuthProvider.picture = null;
     AuthProvider.email = null;
     AuthProvider.phoneNumber = null;                            
-    AuthProvider.orzanization= null;                                
+    AuthProvider.organization= null;                                
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyApp()));
     setState(() {});                                                       
   }
