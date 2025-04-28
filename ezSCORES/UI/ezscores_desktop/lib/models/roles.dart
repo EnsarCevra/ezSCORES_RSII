@@ -8,7 +8,11 @@ class Roles {
 	String? name;
 	String? description;
 
-	Roles();
+	Roles({
+    this.id,
+    this.name,
+    this.description,
+  });
 
 	factory Roles.fromJson(Map<String, dynamic> json) => _$RolesFromJson(json);
 

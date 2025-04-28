@@ -1,4 +1,5 @@
 import 'package:ezscores_desktop/main.dart';
+import 'package:ezscores_desktop/models/users.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/screens/admin_dashboard_screen.dart';
 import 'package:ezscores_desktop/screens/admin_setting_screen.dart';
@@ -40,7 +41,7 @@ class _MasterScreenState extends State<MasterScreen> {
     case 3: screenToPush = PlayersListScreen(selectedIndex: index,);
     case 4: screenToPush = AdminSettingsScreen(selectedIndex: index,);
     case 5:  screenToPush = UsersListScreen(selectedIndex: index,);
-    case 6:  screenToPush = ProfileScreen();
+    case 6:  screenToPush = ProfileScreen(selectedIndex: index,);
       break;
     default:
       return;

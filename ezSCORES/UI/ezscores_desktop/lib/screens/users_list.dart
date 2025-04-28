@@ -1,8 +1,11 @@
 import 'package:ezscores_desktop/layouts/master_screen.dart';
+import 'package:ezscores_desktop/models/roles.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/users.dart';
+import 'package:ezscores_desktop/providers/RolesProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
+import 'package:ezscores_desktop/screens/profile_screen.dart';
 import 'package:ezscores_desktop/screens/users_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -18,17 +21,22 @@ class UsersListScreen extends StatefulWidget {
 
 class _UsersListScreenState extends State<UsersListScreen> {
   late UserProvider userProvider;
+  late RolesProvider roleProvider;
   SearchResult<Users>? usersResult = null;
+  SearchResult<Roles>? rolesResult = null;
+  String? selectedRoleID;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     userProvider = context.read<UserProvider>();
+    roleProvider = context.read<RolesProvider>();
   }
 
   @override
   void initState() {
     userProvider = context.read<UserProvider>();
+    roleProvider = context.read<RolesProvider>();
     super.initState();
     initForm();
   }
@@ -39,8 +47,10 @@ class _UsersListScreenState extends State<UsersListScreen> {
       "isRolesIncluded": true
     };
     var userData = await userProvider.get(filter: filter);
+    var roleData = await roleProvider.get();
     setState(() {
       usersResult = userData;
+      rolesResult = roleData;
     });
   }
 
@@ -82,11 +92,30 @@ class _UsersListScreenState extends State<UsersListScreen> {
             ),
           ),
           SizedBox(width: 8),
+          Container(
+            width: 150,
+            child: FormBuilderDropdown(
+              name: "roleId",
+              decoration: InputDecoration(
+                labelText: "Selekcija",
+              ),
+              focusColor: Colors.transparent,
+              items: [DropdownMenuItem(value: "all", child: Text("Sve"),), ...rolesResult?.result.map((item) => 
+              DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],],
+              onChanged: (value){
+                setState(() {
+                  value == "all" ? selectedRoleID = null : selectedRoleID = value.toString();
+                });
+              },
+              )
+            ),
+          SizedBox(width: 8),
           ElevatedButton(
             onPressed: () async {
               var filter = {
                 "firstNameGTE" : _gteFirstLastNameEditingController.text,
                 "userName" : _ftsUsernameEditingController.text,
+                "roleId" : selectedRoleID,
                 "isRolesIncluded": true,
               };
               var data = await userProvider.get(filter: filter);
@@ -95,23 +124,6 @@ class _UsersListScreenState extends State<UsersListScreen> {
               });
             },
             child: Icon(Icons.search),
-          ),
-          SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () async {
-              final actionResult = await Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) => UsersDetailsScreen(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-                ),
-              );
-              if (actionResult == true) {
-                initForm();
-              }
-            },
-            child: Text("Dodaj"),
           ),
         ],
       ),
@@ -257,7 +269,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
   _handleRowTap(Users selectedUser) async {
     final actionResult = await Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => UsersDetailsScreen(user: selectedUser),
+        pageBuilder: (context, animation, secondaryAnimation) => ProfileScreen(user: selectedUser, selectedIndex: widget.selectedIndex,),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },

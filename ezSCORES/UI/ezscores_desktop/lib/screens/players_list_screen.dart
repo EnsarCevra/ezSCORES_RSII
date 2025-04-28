@@ -45,7 +45,6 @@ class _PlayerListScreen extends State<PlayersListScreen>
     var playerData = await playerProvider.get();
     setState(() {
       playerResult = playerData;
-      print(playerResult);
     });
    }
 

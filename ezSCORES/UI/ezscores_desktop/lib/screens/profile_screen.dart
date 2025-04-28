@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:ezscores_desktop/layouts/master_screen.dart';
+import 'package:ezscores_desktop/models/roles.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
@@ -11,9 +12,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
+import 'package:ezscores_desktop/models/users.dart';
+
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  int selectedIndex;
+  Users? user;
+  ProfileScreen({this.user, required this.selectedIndex});
 
   @override
   State<StatefulWidget> createState() => _ProfileSettingsScreenState();
@@ -30,15 +35,30 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
   void initState() {
     userProvider = context.read<UserProvider>();
     super.initState();
+    widget.user ??= Users(
+        id : AuthProvider.id,
+        firstName : AuthProvider.firstName,
+        lastName : AuthProvider.lastName,
+        userName : AuthProvider.userName,
+        email : AuthProvider.email,
+        phoneNumber : AuthProvider.phoneNumber,
+        organization : AuthProvider.organization,
+        picture : AuthProvider.picture,
+        role : Roles(
+          id : AuthProvider.roleID,
+          name : AuthProvider.roleName,
+          description : AuthProvider.roleDecription,
+        )
+      );
     _initialValue = {
-      "id" : AuthProvider.id,
-      "firstName": AuthProvider.firstName,
-      "lastName": AuthProvider.lastName,
-      "userName": AuthProvider.userName,
-      "email": AuthProvider.email,
-      "phoneNumber": AuthProvider.phoneNumber,
-      "organization": AuthProvider.organization,
-      "picture": AuthProvider.picture,
+      "id" : widget.user?.id,
+      "firstName": widget.user?.firstName,
+      "lastName": widget.user?.lastName,
+      "userName": widget.user?.userName,
+      "email": widget.user?.email,
+      "phoneNumber": widget.user?.phoneNumber,
+      "organization": widget.user?.organization,
+      "picture": widget.user?.picture,
     };
     _base64Image = _initialValue['picture'];
   }
@@ -55,7 +75,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-      selectedIndex: 6,
+      selectedIndex: widget.selectedIndex,
     );
   }
 
@@ -316,7 +336,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                 }
                 request["picture"] = _base64Image;
                 try {
-                  var userId = AuthProvider.id;
+                  var userId = widget.user?.id;
                   if(userId != null)
                   {
                     await userProvider.update(userId, request);

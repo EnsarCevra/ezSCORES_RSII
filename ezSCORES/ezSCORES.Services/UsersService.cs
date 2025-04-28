@@ -34,6 +34,10 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.LastName.StartsWith(search.LastNameGTE));
 			}
+			if (search?.RoleId != null)
+			{
+				query = query.Where(x => x.RoleId == search.RoleId);
+			}
 			if (!string.IsNullOrWhiteSpace(search?.Email))
 			{
 				query = query.Where(x => x.Email == search.Email);
