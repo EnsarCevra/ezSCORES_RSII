@@ -6,7 +6,7 @@ class Selections{
   String? name;
   int? ageMax;
 
-  Selections();
+  Selections({this.id, this.name, this.ageMax});
    factory Selections.fromJson(Map<String, dynamic> json) => _$SelectionsFromJson(json);
   Map<String, dynamic> toJson() => _$SelectionsToJson(this);
 }

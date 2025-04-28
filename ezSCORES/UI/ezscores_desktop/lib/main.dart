@@ -1,3 +1,4 @@
+import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/PlayersProvider.dart';
 import 'package:ezscores_desktop/providers/RolesProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
@@ -16,6 +17,8 @@ void main() {
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => PlayerProvider()),
     ChangeNotifierProvider(create: (_) => RolesProvider()),
+    ChangeNotifierProvider(create: (_) => CityProvider()),
+
 
 
   ], child: const MyApp(),));

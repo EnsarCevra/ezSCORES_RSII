@@ -1,4 +1,6 @@
 import 'package:ezscores_desktop/layouts/master_screen.dart';
+import 'package:ezscores_desktop/screens/cities_list_screen.dart';
+import 'package:ezscores_desktop/screens/selections_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
@@ -8,7 +10,14 @@ class AdminSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<_AdminCardItem> cardItems = [
       _AdminCardItem("Upravljaj selekcijama", Icons.group_add, () {
-        // Navigate to add selection screen
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => SelectionsListScreen(selectedIndex: selectedIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
       }),
       _AdminCardItem("Upravljaj stadionima", Icons.stadium, () {
         // Navigate to player management
@@ -17,7 +26,14 @@ class AdminSettingsScreen extends StatelessWidget {
         // Navigate to tournament management
       }),
       _AdminCardItem("Upravljaj gradovima", Icons.location_city, () {
-        // View tournament applications or requests
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => CitiesListScreen(selectedIndex: selectedIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
       }),
     ];
 

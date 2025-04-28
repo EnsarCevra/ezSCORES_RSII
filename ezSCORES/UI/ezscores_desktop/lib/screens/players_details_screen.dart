@@ -16,19 +16,6 @@ class PlayersDetailsScreen extends StatefulWidget
 {
   Players? player;
   PlayersDetailsScreen({super.key, this.player});
-
-  @override
-  Widget build(BuildContext context)
-  {
-    // return MasterScreen("Lista korisnika", Column(
-    //   children: [
-    //     Text("Lista korisnika placeholder"),
-    //     SizedBox(height: 10,),
-    //     ElevatedButton(onPressed: (){Navigator.pop(context);}, child: Text("Back"))
-    //   ],
-    // ));
-    return MasterScreen("Igrac - detalji", Placeholder(), selectedIndex: 3,);
-  }
   
   @override
   State<StatefulWidget> createState() => _PlayerDetailsScreenState();
