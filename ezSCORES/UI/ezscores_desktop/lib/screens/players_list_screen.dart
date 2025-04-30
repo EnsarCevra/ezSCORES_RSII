@@ -5,6 +5,7 @@ import 'package:ezscores_desktop/providers/PlayersProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/players_details_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -12,19 +13,6 @@ class PlayersListScreen extends StatefulWidget
 {
   final int selectedIndex;
   const PlayersListScreen({super.key, required this.selectedIndex});
-
-  @override
-  Widget build(BuildContext context)
-  {
-    // return MasterScreen("Lista korisnika", Column(
-    //   children: [
-    //     Text("Lista korisnika placeholder"),
-    //     SizedBox(height: 10,),
-    //     ElevatedButton(onPressed: (){Navigator.pop(context);}, child: Text("Back"))
-    //   ],
-    // ));
-    return MasterScreen("Lista igrača", Placeholder(), selectedIndex: 3,);
-  }
   
   @override
   State<StatefulWidget> createState() => _PlayerListScreen();
@@ -34,6 +22,7 @@ class _PlayerListScreen extends State<PlayersListScreen>
   late PlayerProvider playerProvider;
   DateTime? _selectedDate;
   SearchResult<Players>? playerResult = null; 
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     playerProvider = context.read<PlayerProvider>();
@@ -68,73 +57,82 @@ class _PlayerListScreen extends State<PlayersListScreen>
   _buildSearch() {
     return Padding(
     padding: const EdgeInsets.all(15),
-    child: Row(
-    children: [
-      Expanded(child: TextField(controller: _gteFirstLastNameEditingController, decoration: InputDecoration(labelText: "Ime/prezime"),)),
-      SizedBox(width: 8,),
-      SizedBox(
-        width: 150,
-        child: TextField(
-          controller: _birthYearEditingController,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: 'Godina rođenja',
-            hintText: 'npr. 2002',
+    child: Form(
+      key: _formKey,
+      child: Row(
+      children: [
+        Expanded(child: TextField(controller: _gteFirstLastNameEditingController, decoration: InputDecoration(labelText: "Ime/prezime"),)),
+        SizedBox(width: 8,),
+        SizedBox(
+          width: 150,
+          child: TextFormField(
+            controller: _birthYearEditingController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Godina rođenja',
+              hintText: 'npr. 2002',
+            ),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.integer(errorText: 'Unesite ispravnu godinu'),
+              FormBuilderValidators.min(1950, errorText: 'Godina mora biti nakon 1950.'),
+              FormBuilderValidators.max(DateTime.now().year, errorText: 'Godina ne može biti veća od trenutne (${DateTime.now().year})'),
+            ]),
           ),
         ),
-      ),
-      SizedBox(width: 8,),
-      SizedBox(
-        width: 200,
-        child: TextField(
-          controller: _dateController,
-          readOnly: true,
-          decoration: InputDecoration(
-            labelText: 'Datum rođenja',
-            suffixIcon: _selectedDate != null ? IconButton(
-              onPressed: (){
-                setState(() {
-                  _selectedDate = null;
-                   _dateController.clear();
-                });
-              }, 
-              icon: Icon(Icons.clear)
-              ) : null,
+        SizedBox(width: 8,),
+        SizedBox(
+          width: 200,
+          child: TextField(
+            controller: _dateController,
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: 'Datum rođenja',
+              suffixIcon: _selectedDate != null ? IconButton(
+                onPressed: (){
+                  setState(() {
+                    _selectedDate = null;
+                     _dateController.clear();
+                  });
+                }, 
+                icon: Icon(Icons.clear)
+                ) : null,
+            ),
+            onTap: () => _pickDate(context),
           ),
-          onTap: () => _pickDate(context),
         ),
-      ),
-      SizedBox(width: 8,),
-      ElevatedButton(onPressed: () async{
-        var filter = {
-          "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
-          "birthDate" : _selectedDate,
-          "year" : _birthYearEditingController.text
-        };
-        var data = await playerProvider.get(filter: filter);
-        setState(() {
-          playerResult = data;
-        });
-      }, child: Icon(Icons.search)),
-       SizedBox(width: 8,),
-       ElevatedButton(onPressed: () async{
-       final actionResult = await Navigator.of(context).push(PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-            },
-          ));
-          if(actionResult == true)
-          {
-            initForm();
-          }
-      }, child: Text("Dodaj"))
-    ],
-  )
-  );
+        SizedBox(width: 8,),
+        ElevatedButton(onPressed: () async{
+          var filter = {
+            "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
+            "birthDate" : _selectedDate,
+            "year" : _birthYearEditingController.text
+          };
+          var data = await playerProvider.get(filter: filter);
+          setState(() {
+            playerResult = data;
+          });
+        }, child: Icon(Icons.search)),
+         SizedBox(width: 8,),
+         ElevatedButton(onPressed: () async{
+            final actionResult = await Navigator.of(context).push(PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+                  },
+                ));
+                if(actionResult == true)
+                {
+                  initForm();
+                }
+            }, child: Text("Dodaj"))
+          ],
+        ),
+    )
+    );
   }
   
   _buildResultView() {

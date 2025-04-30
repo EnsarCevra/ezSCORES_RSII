@@ -6,7 +6,6 @@ import 'package:ezscores_desktop/providers/RolesProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/profile_screen.dart';
-import 'package:ezscores_desktop/screens/users_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -97,7 +96,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
             child: FormBuilderDropdown(
               name: "roleId",
               decoration: InputDecoration(
-                labelText: "Selekcija",
+                labelText: "Uloga",
               ),
               focusColor: Colors.transparent,
               items: [DropdownMenuItem(value: "all", child: Text("Sve"),), ...rolesResult?.result.map((item) => 

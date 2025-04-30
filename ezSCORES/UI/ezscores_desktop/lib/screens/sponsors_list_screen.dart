@@ -1,51 +1,51 @@
-import 'package:ezscores_desktop/dialogs/city_dialog.dart';
+import 'package:ezscores_desktop/dialogs/sponsor_dialog.dart';
+import 'package:ezscores_desktop/dialogs/stadium_dialog.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
+import 'package:ezscores_desktop/models/sponsors.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
-import 'package:ezscores_desktop/models/cities.dart';
-import 'package:ezscores_desktop/providers/CitiesProvider.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:ezscores_desktop/providers/SponsorsProvider.dart';
+import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-class CitiesListScreen extends StatefulWidget {
+class SponsorsListScreen extends StatefulWidget {
   final int selectedIndex;
-  const CitiesListScreen({super.key, required this.selectedIndex});
+  const SponsorsListScreen({super.key, required this.selectedIndex});
 
   @override
-  State<CitiesListScreen> createState() => _CitiesListScreenState();
+  State<SponsorsListScreen> createState() => _SponsorsListScreenState();
 }
 
-class _CitiesListScreenState extends State<CitiesListScreen> {
-  late CityProvider cityProvider;
-  SearchResult<Cities>? cityResult;
-
-  final TextEditingController _ftsEditingController = TextEditingController();
+class _SponsorsListScreenState extends State<SponsorsListScreen> {
+  late SponsorProvider sponsorProvider;
+  SearchResult<Sponsors>? sponsorResult;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    cityProvider = context.read<CityProvider>();
+    sponsorProvider = context.read<SponsorProvider>();
   }
 
   @override
   void initState() {
     super.initState();
-    cityProvider = context.read<CityProvider>();
+    sponsorProvider = context.read<SponsorProvider>();
     initForm();
   }
 
   Future initForm() async {
-    var cityData = await cityProvider.get();
+    var data = await sponsorProvider.get();
     setState(() {
-      cityResult = cityData;
+      sponsorResult = data;
     });
   }
+
+  final TextEditingController _ftsEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-      "Lista gradova",
+      "Lista sponzora",
       selectedIndex: widget.selectedIndex,
       Container(
         child: Column(
@@ -75,9 +75,9 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
               var filter = {
                 "name": _ftsEditingController.text,
               };
-              var data = await cityProvider.get(filter: filter);
+              var data = await sponsorProvider.get(filter: filter);
               setState(() {
-                cityResult = data;
+                sponsorResult = data;
               });
             },
             child: const Icon(Icons.search),
@@ -87,8 +87,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
             onPressed: () async {
               final actionResult = await showDialog<bool>(
                 context: context,
-                builder: (context) => CityDialog(),
-              );
+                builder: (context) => StadiumDialog());
               if (actionResult == true) {
                 initForm();
               }
@@ -101,8 +100,8 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   }
 
   Widget _buildResultView() {
-    if (cityResult != null) {
-      return cityResult!.count != 0
+    if (sponsorResult != null) {
+      return sponsorResult!.count != 0
           ? Expanded(
               child: SingleChildScrollView(
                 child: Container(
@@ -113,48 +112,44 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                     showCheckboxColumn: false,
                     columns: [
                       DataColumn(
-                        label: SizedBox(
-                          width: 30,
-                          child: Text(
-                            "#",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
+                          label: SizedBox(
+                            child: Text(
+                              "Slika",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
                       ),
                       DataColumn(
-                        label: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: Text(
-                            "Naziv",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          label: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Text(
+                              "Naziv",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
                       ),
                     ],
-                    rows: List<DataRow>.generate(
-                      cityResult!.result.length,
-                      (index) {
-                        final city = cityResult!.result[index];
-                        return DataRow(
-                          onSelectChanged: (_) => _handleRowTap(city),
+                    rows: sponsorResult?.result.map((e) => DataRow(
+                          onSelectChanged: (_) => _handleRowTap(e),
                           cells: [
                             DataCell(
-                              SizedBox(
-                                width: 30,
-                                child: Center(child: Text((index + 1).toString())),
-                              ),
+                                SizedBox(
+                                  width: 30,
+                                  child: e.picture != null ? imageFromString(e.picture!)
+                                   : Icon(Icons.handshake)),
                             ),
                             DataCell(
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text(city.name ?? ""),
+                                child: Center(child: Text(e.name ?? "")),
                               ),
                             ),
                           ],
-                        );
-                      },
-                    ),
+                        ))
+                        .toList()
+                        .cast<DataRow>() ?? [],
                   ),
                 ),
               ),
@@ -175,11 +170,10 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
     }
   }
 
-
-  _handleRowTap(Cities selectedCity) async {
+  _handleRowTap(Sponsors selectedSponsor) async {
     final shouldReload = await showDialog<bool>(
       context: context,
-      builder: (context) => CityDialog(city: selectedCity),
+      builder: (context) => SponsorDialog(sponsor: selectedSponsor),
     );
 
     if (shouldReload == true) {

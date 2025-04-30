@@ -1,6 +1,8 @@
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/screens/cities_list_screen.dart';
 import 'package:ezscores_desktop/screens/selections_list_screen.dart';
+import 'package:ezscores_desktop/screens/sponsors_list_screen.dart';
+import 'package:ezscores_desktop/screens/stadiums_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
@@ -20,10 +22,24 @@ class AdminSettingsScreen extends StatelessWidget {
         );
       }),
       _AdminCardItem("Upravljaj stadionima", Icons.stadium, () {
-        // Navigate to player management
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => StadiumsListScreen(selectedIndex: selectedIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
       }),
-      _AdminCardItem("Upravljaj sponzorima", Icons.monetization_on, () {
-        // Navigate to tournament management
+      _AdminCardItem("Upravljaj sponzorima", Icons.handshake, () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => SponsorsListScreen(selectedIndex: selectedIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
       }),
       _AdminCardItem("Upravljaj gradovima", Icons.location_city, () {
         Navigator.of(context).push(

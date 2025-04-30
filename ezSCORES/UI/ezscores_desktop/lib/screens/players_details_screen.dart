@@ -152,12 +152,12 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
                        autovalidateMode: AutovalidateMode.onUserInteraction,
                        validator: FormBuilderValidators.compose(
                         [
-                          FormBuilderValidators.required(errorText: 'Prezime je obavezno'),
-                          FormBuilderValidators.minLength(3, errorText: 'Prezime mora imati barem 3 slova'),
                           FormBuilderValidators.match(
                             r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
                             errorText: 'Prezime mora početi velikim slovom i sadržavati samo slova'
-                          )
+                          ),
+                          FormBuilderValidators.required(errorText: 'Prezime je obavezno'),
+                          FormBuilderValidators.minLength(3, errorText: 'Prezime mora imati barem 3 slova'),
                         ]
                        ),),
                     ),

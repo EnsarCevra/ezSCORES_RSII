@@ -1,51 +1,50 @@
-import 'package:ezscores_desktop/dialogs/city_dialog.dart';
+import 'package:ezscores_desktop/dialogs/stadium_dialog.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
+import 'package:ezscores_desktop/models/stadiums.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
-import 'package:ezscores_desktop/models/cities.dart';
-import 'package:ezscores_desktop/providers/CitiesProvider.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:ezscores_desktop/providers/StadiumsProvider.dart';
+import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-class CitiesListScreen extends StatefulWidget {
+class StadiumsListScreen extends StatefulWidget {
   final int selectedIndex;
-  const CitiesListScreen({super.key, required this.selectedIndex});
+  const StadiumsListScreen({super.key, required this.selectedIndex});
 
   @override
-  State<CitiesListScreen> createState() => _CitiesListScreenState();
+  State<StadiumsListScreen> createState() => _StadiumsListScreenState();
 }
 
-class _CitiesListScreenState extends State<CitiesListScreen> {
-  late CityProvider cityProvider;
-  SearchResult<Cities>? cityResult;
-
-  final TextEditingController _ftsEditingController = TextEditingController();
+class _StadiumsListScreenState extends State<StadiumsListScreen> {
+  late StadiumProvider stadiumProvider;
+  SearchResult<Stadiums>? stadiumResult;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    cityProvider = context.read<CityProvider>();
+    stadiumProvider = context.read<StadiumProvider>();
   }
 
   @override
   void initState() {
     super.initState();
-    cityProvider = context.read<CityProvider>();
+    stadiumProvider = context.read<StadiumProvider>();
     initForm();
   }
 
   Future initForm() async {
-    var cityData = await cityProvider.get();
+    var stadiumData = await stadiumProvider.get();
     setState(() {
-      cityResult = cityData;
+      stadiumResult = stadiumData;
     });
   }
+
+  final TextEditingController _ftsEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-      "Lista gradova",
+      "Lista stadiona",
       selectedIndex: widget.selectedIndex,
       Container(
         child: Column(
@@ -75,9 +74,9 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
               var filter = {
                 "name": _ftsEditingController.text,
               };
-              var data = await cityProvider.get(filter: filter);
+              var data = await stadiumProvider.get(filter: filter);
               setState(() {
-                cityResult = data;
+                stadiumResult = data;
               });
             },
             child: const Icon(Icons.search),
@@ -87,8 +86,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
             onPressed: () async {
               final actionResult = await showDialog<bool>(
                 context: context,
-                builder: (context) => CityDialog(),
-              );
+                builder: (context) => StadiumDialog());
               if (actionResult == true) {
                 initForm();
               }
@@ -101,8 +99,8 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   }
 
   Widget _buildResultView() {
-    if (cityResult != null) {
-      return cityResult!.count != 0
+    if (stadiumResult != null) {
+      return stadiumResult!.count != 0
           ? Expanded(
               child: SingleChildScrollView(
                 child: Container(
@@ -113,48 +111,44 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                     showCheckboxColumn: false,
                     columns: [
                       DataColumn(
-                        label: SizedBox(
-                          width: 30,
-                          child: Text(
-                            "#",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
+                          label: SizedBox(
+                            child: Text(
+                              "Slika",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
                       ),
                       DataColumn(
-                        label: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: Text(
-                            "Naziv",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          label: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Text(
+                              "Naziv",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
                       ),
                     ],
-                    rows: List<DataRow>.generate(
-                      cityResult!.result.length,
-                      (index) {
-                        final city = cityResult!.result[index];
-                        return DataRow(
-                          onSelectChanged: (_) => _handleRowTap(city),
+                    rows: stadiumResult?.result.map((e) => DataRow(
+                          onSelectChanged: (_) => _handleRowTap(e),
                           cells: [
                             DataCell(
-                              SizedBox(
-                                width: 30,
-                                child: Center(child: Text((index + 1).toString())),
-                              ),
+                                SizedBox(
+                                  width: 30,
+                                  child: e.picture != null ? imageFromString(e.picture!)
+                                   : Icon(Icons.stadium)),
                             ),
                             DataCell(
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text(city.name ?? ""),
+                                child: Center(child: Text(e.name ?? "")),
                               ),
                             ),
                           ],
-                        );
-                      },
-                    ),
+                        ))
+                        .toList()
+                        .cast<DataRow>() ?? [],
                   ),
                 ),
               ),
@@ -175,11 +169,10 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
     }
   }
 
-
-  _handleRowTap(Cities selectedCity) async {
+  _handleRowTap(Stadiums selectedStadium) async {
     final shouldReload = await showDialog<bool>(
       context: context,
-      builder: (context) => CityDialog(city: selectedCity),
+      builder: (context) => StadiumDialog(stadium: selectedStadium),
     );
 
     if (shouldReload == true) {

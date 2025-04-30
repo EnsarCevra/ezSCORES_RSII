@@ -1,5 +1,4 @@
 import 'package:ezscores_desktop/main.dart';
-import 'package:ezscores_desktop/models/users.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/screens/admin_dashboard_screen.dart';
 import 'package:ezscores_desktop/screens/admin_setting_screen.dart';
@@ -8,7 +7,6 @@ import 'package:ezscores_desktop/screens/players_list_screen.dart';
 import 'package:ezscores_desktop/screens/profile_screen.dart';
 import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:ezscores_desktop/screens/users_list.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MasterScreen extends StatefulWidget {
@@ -35,8 +33,8 @@ class _MasterScreenState extends State<MasterScreen> {
 
   Widget? screenToPush;
   switch (index) {
-     case 0: screenToPush = AdminDashboardScreen();
-     case 1: screenToPush = CompetitionsListScreen();
+     case 0: screenToPush = const AdminDashboardScreen();
+     case 1: screenToPush = const CompetitionsListScreen();
     case 2: screenToPush = TeamsListScreen(selectedIndex: index);
     case 3: screenToPush = PlayersListScreen(selectedIndex: index,);
     case 4: screenToPush = AdminSettingsScreen(selectedIndex: index,);
@@ -47,8 +45,7 @@ class _MasterScreenState extends State<MasterScreen> {
       return;
   }
 
-  if (screenToPush != null) {
-    final result = await Navigator.of(context).push<int>(
+  final result = await Navigator.of(context).push<int>(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => screenToPush!,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -63,7 +60,6 @@ class _MasterScreenState extends State<MasterScreen> {
         _currentIndex = result;
       });
     }
-  }
 }
 
   @override
@@ -197,7 +193,7 @@ Widget build(BuildContext context) {
     AuthProvider.email = null;
     AuthProvider.phoneNumber = null;                            
     AuthProvider.organization= null;                                
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyApp()));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MyApp()));
     setState(() {});                                                       
   }
 }

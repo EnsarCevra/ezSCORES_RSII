@@ -4,6 +4,7 @@ import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 class SelectionDialog extends StatefulWidget {
@@ -29,7 +30,7 @@ class _SelectionDialogState extends State<SelectionDialog> {
     return AlertDialog(
       title: Text(widget.selection == null ? "Dodaj selekciju" : "Uredi selekciju"),
       content: SizedBox(
-        width: 300,
+        width: 350,
         child: FormBuilder(
           key: _formKey,
           child: Column(
@@ -39,12 +40,16 @@ class _SelectionDialogState extends State<SelectionDialog> {
                 name: "name",
                 initialValue: widget.selection?.name ?? "",
                 decoration: const InputDecoration(labelText: "Naziv"),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Unesite naziv";
-                  }
-                  return null;
-                },
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator:  FormBuilderValidators.compose(
+                  [
+                    FormBuilderValidators.match(
+                      r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
+                      errorText: 'Naziv mora početi velikim slovom i sadržavati samo slova'
+                    ),
+                    FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
+                    FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 3 slova'),
+                  ]),
               ),
               const SizedBox(height: 16),
               FormBuilderTextField(
