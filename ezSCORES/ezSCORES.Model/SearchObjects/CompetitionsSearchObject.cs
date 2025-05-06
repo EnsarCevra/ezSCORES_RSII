@@ -7,6 +7,7 @@ namespace ezSCORES.Model.SearchObjects
 {
 	public class CompetitionsSearchObject : BaseSearchObject
 	{
+		public bool IsSelectionIncluded {  get; set; }
 		public int? SelectionId { get; set; }
 
 		public string? Season { get; set; } = null!;

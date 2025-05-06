@@ -1,4 +1,5 @@
 import 'package:ezscores_desktop/providers/CitiesProvider.dart';
+import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/PlayersProvider.dart';
 import 'package:ezscores_desktop/providers/RolesProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
@@ -14,6 +15,7 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => CompetitionProvider()),
     ChangeNotifierProvider(create: (_) => TeamProvider()),
     ChangeNotifierProvider(create: (_) => SelectionProvider()),
     ChangeNotifierProvider(create: (_) => UserProvider()),

@@ -24,10 +24,10 @@ Competitions _$CompetitionsFromJson(Map<String, dynamic> json) => Competitions()
       : DateTime.parse(json['applicationEndDate'] as String)
   ..fee = (json['fee'] as num?)?.toInt()
   ..maxPlayersPerTeam = (json['maxPlayersPerTeam'] as num?)?.toInt()
-  ..competitionType =
-      $enumDecodeNullable(_$CompetitionTypeEnumMap, json['competitionType'])
-  ..competitionStatus =
-      $enumDecodeNullable(_$CompetitionStatusEnumMap, json['competitionStatus'])
+  ..competitionType = const CompetitionTypeConverter()
+      .fromJson((json['competitionType'] as num?)?.toInt())
+  ..status = const CompetitionStatusConverter()
+      .fromJson((json['status'] as num?)?.toInt())
   ..city = json['city'] == null
       ? null
       : Cities.fromJson(json['city'] as Map<String, dynamic>)
@@ -59,9 +59,9 @@ Map<String, dynamic> _$CompetitionsToJson(Competitions instance) =>
       'applicationEndDate': instance.applicationEndDate?.toIso8601String(),
       'fee': instance.fee,
       'maxPlayersPerTeam': instance.maxPlayersPerTeam,
-      'competitionType': _$CompetitionTypeEnumMap[instance.competitionType],
-      'competitionStatus':
-          _$CompetitionStatusEnumMap[instance.competitionStatus],
+      'competitionType':
+          const CompetitionTypeConverter().toJson(instance.competitionType),
+      'status': const CompetitionStatusConverter().toJson(instance.status),
       'city': instance.city?.toJson(),
       'selection': instance.selection?.toJson(),
       'competitionsReferees':
@@ -70,18 +70,3 @@ Map<String, dynamic> _$CompetitionsToJson(Competitions instance) =>
           instance.competitionsSponsors?.map((e) => e.toJson()).toList(),
       'rewards': instance.rewards?.map((e) => e.toJson()).toList(),
     };
-
-const _$CompetitionTypeEnumMap = {
-  CompetitionType.tournamentKnockOutOnly: 'tournamentKnockOutOnly',
-  CompetitionType.tournament: 'tournament',
-  CompetitionType.league: 'league',
-};
-
-const _$CompetitionStatusEnumMap = {
-  CompetitionStatus.initial: 'initial',
-  CompetitionStatus.preparation: 'preparation',
-  CompetitionStatus.applicationsOpen: 'applicationsOpen',
-  CompetitionStatus.applicationsClosed: 'applicationsClosed',
-  CompetitionStatus.underway: 'underway',
-  CompetitionStatus.finished: 'finished',
-};
