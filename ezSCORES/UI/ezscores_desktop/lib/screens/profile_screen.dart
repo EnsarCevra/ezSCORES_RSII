@@ -252,7 +252,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
 
               if (_showPasswordFields) ...[
                 SizedBox(height: 10),
-                Row(
+                if(widget.user?.id == AuthProvider.id) Row(
                   children: [
                     Expanded(
                       child: FormBuilderTextField(
@@ -319,9 +319,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                 var request = <String, dynamic>{};
                 final originalForm = _formKey.currentState?.value;
                 final formData = Map<String, dynamic>.from(originalForm!);
-                if ((formData['oldPassword']?.isNotEmpty ?? false) &&
-                    (formData['password']?.isNotEmpty ?? false) &&
-                    (formData['passwordConfirmation']?.isNotEmpty ?? false)) 
+                if ((formData['password']?.isNotEmpty ?? false) && (formData['passwordConfirmation']?.isNotEmpty ?? false)) //don't need to check old pass because validation will handle that
                 {
                   request = Map.from(_formKey.currentState!.value);
                 }

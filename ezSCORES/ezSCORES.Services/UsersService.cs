@@ -14,13 +14,16 @@ using System.Threading.Tasks;
 using System.Linq.Dynamic;
 using ezSCORES.Model.Requests.UserRequests;
 using System.IO.Pipelines;
+using ezSCORES.Services.Auth;
 
 namespace ezSCORES.Services
 {
     public class UsersService : BaseCRUDService<Users, UserSearchObject, User, UsersInsertRequests, UsersUpdateRequest>, IUsersService
 	{
-		public UsersService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		private readonly IActiveUserService _activeUserService;
+		public UsersService(EzScoresdbRsiiContext context, IMapper mapper, IActiveUserService userService) : base(context, mapper)
 		{
+			_activeUserService = userService;
 		}
 
 		public override IQueryable<User> AddFilter(UserSearchObject search, IQueryable<User> query)
@@ -78,11 +81,20 @@ namespace ezSCORES.Services
 		public override void BeforeUpdate(UsersUpdateRequest request, User entity)
 		{
 
-			if (request.Password != null && request.PasswordConfirmation != null && request.OldPassword != null)
+			if (request.Password != null && request.PasswordConfirmation != null)
 			{
-				if(!Context.Users.Where(x => x.PasswordHash == GenerateHash(entity.PasswordSalt, request.OldPassword) && x.Id == entity.Id ).Any())
+				//if no oldPasword is sent admin is chaning another users pass
+				if(request.OldPassword == null)//check wether current user is requesting his own pass change
 				{
-					throw new UserException("Stara lozinka nije ispravna!");
+					if (_activeUserService.GetActiveUserId() == entity.Id)
+						throw new UserException("Stara lozinka nije unesena!");
+				}
+				else
+				{
+					if (!Context.Users.Where(x => x.PasswordHash == GenerateHash(entity.PasswordSalt, request.OldPassword) && x.Id == entity.Id).Any())
+					{
+						throw new UserException("Stara lozinka nije ispravna!");
+					}
 				}
 				if (request.Password != request.PasswordConfirmation)
 				{

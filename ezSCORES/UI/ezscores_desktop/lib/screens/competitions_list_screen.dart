@@ -9,7 +9,6 @@ import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
-import 'package:ezscores_desktop/screens/tabs/competition_info_tab.dart';
 import 'package:ezscores_desktop/screens/tournament_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

@@ -110,28 +110,28 @@ Widget build(BuildContext context) {
                             isSelected: widget.selectedIndex == 1,
                             onTap: () => onSidebarItemTapped(1),
                           ),
-                          _SidebarItem(
+                          if(AuthProvider.roleID == 3) _SidebarItem(
                             index: 2,
                             icon: Icons.group,
                             title: "Upravljaj ekipama",
                             isSelected: widget.selectedIndex == 2,
                             onTap: () => onSidebarItemTapped(2),
                           ),
-                          _SidebarItem(
+                          if(AuthProvider.roleID == 3) _SidebarItem(
                             index: 3,
                             icon: Icons.person,
                             title: "Upravljaj igračima",
                             isSelected: widget.selectedIndex == 3,
                             onTap: () => onSidebarItemTapped(3),
                           ),
-                          _SidebarItem(
+                          if(AuthProvider.roleID == 3) _SidebarItem(
                             index: 4,
                             icon: Icons.settings_applications_outlined,
                             title: "Admin postavke",
                             isSelected: widget.selectedIndex == 4,
                             onTap: () => onSidebarItemTapped(4),
                           ),
-                          _SidebarItem(
+                          if(AuthProvider.roleID == 3) _SidebarItem(
                             index: 5,
                             icon: Icons.supervised_user_circle_sharp,
                             title: "Korisnici",
