@@ -62,124 +62,137 @@ class _MasterScreenState extends State<MasterScreen> {
     }
 }
 
-  @override
+@override
+@override
 Widget build(BuildContext context) {
-    
-    return Scaffold(
-      body: Row(
-        children: [
-          // Sidebar
-          SingleChildScrollView(
-            child: Container(
-              width: 250,
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+  return Scaffold(
+    body: Row(
+      children: [
+        Container(
+          width: 250,
+          color: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Column(
                 children: [
-                  Row(
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Image.asset("assets/images/ezlogo5.png", height: 75, width: 75),
+                              const SizedBox(width: 12),
+                              const Text(
+                                "EZSCORES",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 40),
+
+                          _SidebarItem(
+                            index: 0,
+                            icon: Icons.dashboard,
+                            title: "Dashboard",
+                            isSelected: widget.selectedIndex == 0,
+                            onTap: () => onSidebarItemTapped(0),
+                          ),
+                          _SidebarItem(
+                            index: 1,
+                            icon: Icons.event,
+                            title: "Upravljaj takmičenjima",
+                            isSelected: widget.selectedIndex == 1,
+                            onTap: () => onSidebarItemTapped(1),
+                          ),
+                          _SidebarItem(
+                            index: 2,
+                            icon: Icons.group,
+                            title: "Upravljaj ekipama",
+                            isSelected: widget.selectedIndex == 2,
+                            onTap: () => onSidebarItemTapped(2),
+                          ),
+                          _SidebarItem(
+                            index: 3,
+                            icon: Icons.person,
+                            title: "Upravljaj igračima",
+                            isSelected: widget.selectedIndex == 3,
+                            onTap: () => onSidebarItemTapped(3),
+                          ),
+                          _SidebarItem(
+                            index: 4,
+                            icon: Icons.settings_applications_outlined,
+                            title: "Admin postavke",
+                            isSelected: widget.selectedIndex == 4,
+                            onTap: () => onSidebarItemTapped(4),
+                          ),
+                          _SidebarItem(
+                            index: 5,
+                            icon: Icons.supervised_user_circle_sharp,
+                            title: "Korisnici",
+                            isSelected: widget.selectedIndex == 5,
+                            onTap: () => onSidebarItemTapped(5),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Column(
                     children: [
-                      Image.asset("assets/images/ezlogo5.png", height: 75, width: 75,),
-                      const SizedBox(width: 12),
-                      const Text(
-                        "EZSCORES",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      const Divider(height: 20),
+                      _SidebarItem(
+                        index: 6,
+                        icon: Icons.person_outline,
+                        title: "Profil",
+                        isSelected: widget.selectedIndex == 6,
+                        onTap: () => onSidebarItemTapped(6),
+                      ),
+                      _SidebarItem(
+                        index: 7,
+                        icon: Icons.logout,
+                        title: "Odjavi se",
+                        isSelected: widget.selectedIndex == 7,
+                        onTap: () => logOut(),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
-            
-                  // Sidebar Items
-                  _SidebarItem(
-                    index: 0,
-                    icon: Icons.dashboard,
-                    title: "Dashboard",
-                    isSelected: widget.selectedIndex == 0,
-                    onTap: () => onSidebarItemTapped(0),
-                  ),
-                  _SidebarItem(
-                    index: 1,
-                    icon: Icons.event,
-                    title: "Upravljaj takmičenjima",
-                    isSelected: widget.selectedIndex == 1,
-                    onTap: () => onSidebarItemTapped(1),
-                  ),
-                  _SidebarItem(
-                    index: 2,
-                    icon: Icons.group,
-                    title: "Upravljaj ekipama",
-                    isSelected: widget.selectedIndex == 2,
-                    onTap: () => onSidebarItemTapped(2),
-                  ),
-                  _SidebarItem(
-                    index: 3,
-                    icon: Icons.person,
-                    title: "Upravljaj igračima",
-                    isSelected: widget.selectedIndex == 3,
-                    onTap: () => onSidebarItemTapped(3),
-                  ),
-                  _SidebarItem(
-                    index: 4,
-                    icon: Icons.settings_applications_outlined,
-                    title: "Admin postavke",
-                    isSelected: widget.selectedIndex == 4,
-                    onTap: () => onSidebarItemTapped(4),
-                  ),
-                  _SidebarItem(
-                    index: 5,
-                    icon: Icons.supervised_user_circle_sharp,
-                    title: "Korisnici",
-                    isSelected: widget.selectedIndex == 5,
-                    onTap: () => onSidebarItemTapped(5),
-                  ),
-                  const Divider(height: 20),
-                  _SidebarItem(
-                    index: 6,
-                    icon: Icons.person_outline,
-                    title: "Profil",
-                    isSelected: widget.selectedIndex == 6,
-                    onTap: () => onSidebarItemTapped(6),
-                  ),
-                  _SidebarItem(
-                    index: 7,
-                    icon: Icons.logout,
-                    title: "Odjavi se",
-                    isSelected: widget.selectedIndex == 7,
-                    onTap: () => logOut(),
-                  ),
                 ],
-              ),
-            ),
+              );
+            },
           ),
+        ),
 
-          // Main content area
-          Expanded(
-            child: Column(
-              children: [
-                AppBar(
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      if(Navigator.of(context).canPop())
-                      {
-                       Navigator.of(context).pop(_currentIndex);
-                      }
-                    },
-                  ),
-                  title: Text(widget.title),
-                  automaticallyImplyLeading: false,
+        Expanded(
+          child: Column(
+            children: [
+              AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop(_currentIndex);
+                    }
+                  },
                 ),
-                Expanded(child: widget.child)
-              ],
-            ),
+                title: Text(widget.title),
+                automaticallyImplyLeading: false,
+              ),
+              Expanded(child: widget.child),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+
 
   
   logOut() {

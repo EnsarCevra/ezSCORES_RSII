@@ -9,7 +9,8 @@ import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
-import 'package:ezscores_desktop/screens/players_details_screen.dart';
+import 'package:ezscores_desktop/screens/tabs/competition_info_tab.dart';
+import 'package:ezscores_desktop/screens/tournament_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -22,9 +23,9 @@ class CompetitionsListScreen extends StatefulWidget
   const CompetitionsListScreen({super.key, required this.selectedIndex});
   
   @override
-  State<StatefulWidget> createState() => _CompetitionListScreen();
+  State<StatefulWidget> createState() => _CompetitionListScreenState();
 }
-class _CompetitionListScreen extends State<CompetitionsListScreen>
+class _CompetitionListScreenState extends State<CompetitionsListScreen>
 {
   late CompetitionProvider competitionProvider;
   late CityProvider cityProvider;
@@ -55,7 +56,8 @@ class _CompetitionListScreen extends State<CompetitionsListScreen>
       }
     });
     initForm();
-  } 
+  }
+ 
 
   Future initForm() async{
     var filter = {"isSelectionIncluded" : true};
@@ -66,7 +68,11 @@ class _CompetitionListScreen extends State<CompetitionsListScreen>
       selectionResult = selectionData;
     });
    }
-
+   @override
+    void dispose() {
+      _horizontalScrollController.dispose();
+      super.dispose();
+    }
 
    @override
   Widget build(BuildContext context)
@@ -165,10 +171,10 @@ Widget _buildSearch() {
                             icon: Icon(Icons.clear),
                             onPressed: () {
                               setState(() {
-                                selectedSelectionID = null;
                                 _formKey.currentState
                                     ?.fields['selectionId']
                                     ?.reset();
+                                selectedSelectionID = null;
                               });
                             },
                           )
@@ -287,14 +293,9 @@ Widget _buildSearch() {
                 onPressed: () async {
                   final actionResult = await Navigator.of(context).push(
                     PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          PlayersDetailsScreen(),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
+                      pageBuilder: (context, animation, secondaryAnimation) => CompetitionsDetailsScreen(selectedIndex: widget.selectedIndex),
+                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
                       },
                     ),
                   );
@@ -312,17 +313,16 @@ Widget _buildSearch() {
   );
 }
 
-  
+final ScrollController _horizontalScrollController = ScrollController();
  Widget _buildResultView() {
   if (competitionResult != null) {
     if (competitionResult!.count != 0) {
-      return Expanded(
-        child: Container(
+      return Container(
           width: double.infinity,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
+            child: Scrollbar(
+              controller: _horizontalScrollController,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                 child: DataTable(
@@ -406,8 +406,7 @@ Widget _buildSearch() {
               ),
             ),
           ),
-        ),
-      );
+        );
     } else {
       return Expanded(
         child: Align(
@@ -430,7 +429,7 @@ Widget _buildSearch() {
   _handleRowTap(Competitions selectedCompetition) async{
     final actionResult = await Navigator.of(context).push(
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(),
+      pageBuilder: (context, animation, secondaryAnimation) => CompetitionsDetailsScreen(selectedIndex: widget.selectedIndex, competition: selectedCompetition,),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(opacity: animation, child: child);
       },
