@@ -8,6 +8,7 @@ import 'package:ezscores_desktop/models/selections.dart';
 import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
+import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/tournament_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,10 @@ class _CompetitionListScreenState extends State<CompetitionsListScreen>
 
   Future initForm() async{
     var filter = {"isSelectionIncluded" : true};
+    if(AuthProvider.roleID == 1)
+    {
+      filter['onlyUserCompettions'] = true;
+    }
     var playerData = await competitionProvider.get(filter: filter);
     var selectionData = await selectionProvider.get();
     setState(() {

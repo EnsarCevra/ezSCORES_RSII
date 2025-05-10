@@ -17,8 +17,8 @@ namespace ezSCORES.Model.Requests.UserRequests
 
         public string? PhoneNumber { get; set; }
 
-
-        public string? Organization { get; set; }
+		public byte[]? Picture { get; set; }
+		public string? Organization { get; set; }
         public string Password { get; set; }
         public string PasswordConfirmation { get; set; }
     }

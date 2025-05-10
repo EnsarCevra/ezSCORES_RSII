@@ -76,6 +76,10 @@ namespace ezSCORES.Services
 			{
 				query = query.Include(x => x.CompetitionsReferees).ThenInclude(x=>x.Referee);
 			}
+			if(search.OnlyUserCompettions != null && search.OnlyUserCompettions == true)
+			{
+				query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId());
+			}
 			if(search.MatchDay  != null)
 			{
 				query = query.Include(x => x.Fixtures).ThenInclude(x => x.Matches.Where(x => x.DateAndTime.Date == search.MatchDay.Value.Date));

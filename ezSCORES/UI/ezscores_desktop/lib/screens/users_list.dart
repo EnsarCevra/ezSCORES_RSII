@@ -212,7 +212,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
                                     borderRadius: BorderRadius.circular(25),
                                     child: e.picture != null
                                         ? imageFromString(e.picture!)
-                                        : Image.asset('assets/images/default_profile_image.jpg', fit: BoxFit.cover),
+                                        : Icon(Icons.no_accounts),
                                   ),
                                 ),
                               ),

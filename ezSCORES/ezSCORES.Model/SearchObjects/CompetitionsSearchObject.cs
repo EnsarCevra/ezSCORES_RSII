@@ -20,5 +20,6 @@ namespace ezSCORES.Model.SearchObjects
 		public DateTime? MatchDay { get; set; }
 		public CompetitionStatus? Status { get; set; }
 		public bool? IsCompetitionRefereesIncluded { get; set; }
+		public bool? OnlyUserCompettions { get; set; }
 	}
 }

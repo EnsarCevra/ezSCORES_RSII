@@ -10,7 +10,9 @@ import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/screens/admin_dashboard_screen.dart';
+import 'package:ezscores_desktop/screens/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -34,7 +36,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -68,11 +69,17 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-class LoginPage extends StatelessWidget
-{
+class LoginPage extends StatefulWidget{
   LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+class _LoginPageState extends State<LoginPage>
+{
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController  = TextEditingController();
+  bool _obscurePassword = true;
    @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -97,14 +104,39 @@ class LoginPage extends StatelessWidget
                           controller: _usernameController,
                           decoration: const InputDecoration(
                             labelText: "Korisničko ime",
-                            prefixIcon: Icon(Icons.email)
+                            prefixIcon: Icon(Icons.supervised_user_circle)
                           ),
                         ),
                         TextField(
                           controller: _passwordController,
-                          decoration: const InputDecoration(
+                          obscureText: _obscurePassword,
+                          decoration: InputDecoration(
                             labelText: "Lozinka",
-                            prefixIcon: Icon(Icons.password)
+                            prefixIcon: Icon(Icons.password),
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                              icon: _obscurePassword ? const Icon(Icons.visibility_outlined) : const Icon(Icons.visibility_off_outlined)),
+                          ),
+                        ),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                              );
+                            },
+                            child: const Text(
+                              "Nemate račun? Kreirajte ga ovdje!",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
                           ),
                         ),
                         ElevatedButton(
