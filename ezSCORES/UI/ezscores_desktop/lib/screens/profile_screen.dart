@@ -152,7 +152,6 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
               ),
               SizedBox(height: 10),
 
-              // FirstName + LastName
               Row(
                 children: [
                   Expanded(
@@ -189,10 +188,6 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                       decoration: InputDecoration(labelText: "Email"),
                       name: 'email',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: 'Email je obavezan'),
-                        FormBuilderValidators.email(errorText: 'Neispravan email format'),
-                      ]),
                     ),
                   ),
                   SizedBox(width: 16),
@@ -202,7 +197,14 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                       decoration: InputDecoration(labelText: "Korisničko ime"),
                       name: 'userName',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: FormBuilderValidators.required(errorText: 'Korisničko ime je obavezno'),
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(errorText: 'Korisničko ime je obavezno'),
+                        FormBuilderValidators.minLength(3, errorText: 'Prekratko korisničko ime'),
+                        FormBuilderValidators.match(
+                          r'^[a-zA-Z0-9_]+$',
+                          errorText: 'Korisničko ime smije sadržavati samo slova,\n brojeve i donje crte (_)',
+                        ),
+                      ]),
                     ),
                   ),
                 ],
@@ -216,6 +218,22 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                     child: FormBuilderTextField(
                       decoration: InputDecoration(labelText: "Organizacija"),
                       name: 'organization',
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value)
+                      {
+                        if (value == null || value.isEmpty) return null; // Allow empty
+
+                        if (value.length < 3) {
+                          return 'Prekratko ime organizacije';
+                        }
+
+                        final regex = RegExp(r'^[a-zA-ZčćžšđČĆŽŠĐ]+$');
+                        if (!regex.hasMatch(value)) {
+                          return 'Ime organizacije smije sadržavati samo slova.';
+                        }
+
+                        return null;
+                      }
                     ),
                   ),
                   SizedBox(width: 16),
@@ -224,6 +242,13 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                       decoration: InputDecoration(labelText: "Telefon"),
                       name: 'phoneNumber',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(errorText: 'Broj telefona je obavezan'),
+                        FormBuilderValidators.match(
+                          r'^\+?[0-9]+([ -]?[0-9]+)*$',
+                          errorText: 'Unesite ispravan broj \n(razmaci i crtice moraju biti pojedinačni i između brojeva)',
+                        ),
+                      ]),
                     ),
                   ),
                 ],
@@ -342,7 +367,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                   
                 if(context.mounted)
                 {
-                  showSuccessSnackBar(context, 'Profil uspješno ažuriran.');
+                  showBottomRightNotification(context, 'Profil uspješno ažuriran.');
                   AuthProvider.firstName = request['firstName'];
                   AuthProvider.lastName = request['lastName'];
                   AuthProvider.userName = request['userName'];

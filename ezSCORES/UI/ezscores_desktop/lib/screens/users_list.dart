@@ -6,6 +6,7 @@ import 'package:ezscores_desktop/providers/RolesProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/profile_screen.dart';
+import 'package:ezscores_desktop/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -124,6 +125,22 @@ class _UsersListScreenState extends State<UsersListScreen> {
             },
             child: Icon(Icons.search),
           ),
+          SizedBox(width: 8),
+          ElevatedButton(onPressed: () async{
+            final actionResult = await Navigator.of(context).push(PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => RegisterScreen(selectedIndex: widget.selectedIndex,),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+                  },
+                ));
+                if(actionResult == true)
+                {
+                  initForm();
+                }
+            }, child: Text("Dodaj"))
         ],
       ),
     );

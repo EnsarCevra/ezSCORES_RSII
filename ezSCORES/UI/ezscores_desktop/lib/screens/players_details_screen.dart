@@ -135,7 +135,7 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
                           FormBuilderValidators.minLength(3, errorText: 'Ime mora imati barem 3 slova'),
                           FormBuilderValidators.match(
                             r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
-                            errorText: 'Prezime mora početi velikim slovom i sadržavati samo slova'
+                            errorText: 'Ime mora početi velikim slovom i sadržavati samo slova'
                           )
                         ]
                        ),),
@@ -221,7 +221,7 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
                 }
                 if(context.mounted)
                 {
-                  widget.player == null ? showSuccessSnackBar(context, 'Igrač uspješno dodan.') : showSuccessSnackBar(context, 'Igrač uspješno ažuriran.');
+                  widget.player == null ? showBottomRightNotification(context, 'Igrač uspješno dodan.') : showBottomRightNotification(context, 'Igrač uspješno ažuriran.');
                   Navigator.pop(context, true);
                 }
               }on Exception catch(exception)

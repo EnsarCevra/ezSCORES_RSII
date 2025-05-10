@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/main.dart';
 import 'package:ezscores_desktop/models/roles.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/providers/RolesProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
+import 'package:ezscores_desktop/providers/auth_provider.dart';
+import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -13,7 +16,8 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  int? selectedIndex;
+  RegisterScreen({super.key, this.selectedIndex});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -38,68 +42,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     var roleData = await roleProvider.get();
     setState(() {
       roleResult = roleData;
-      roleResult?.result.where((role) => role.id == 1 || role.id ==3).toList();
     });
    }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AuthProvider.roleID == 3 ? 
+    MasterScreen("Registracija korisnika", _buildContent(), selectedIndex: widget.selectedIndex!) : Scaffold(
       appBar: AppBar(title: const Text("Registracija")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Center(
-          child: Container(
-            width: 800,
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 12,
-                  offset: Offset(0, 6),
-                )
-              ],
-            ),
-            child: FormBuilder(
-              key: _formKey,
-              child: Column(
-                children: [
-                  _buildImagePicker(),
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 20,
-                    runSpacing: 20,
-                    children: [
-                      _buildTextField('firstName', 'Ime', true),
-                      _buildTextField('lastName', 'Prezime', true),
-                      _buildTextField('email', 'Email', true),
-                      _buildTextField('userName', 'Korisničko ime', true),
-                      
-                      _buildTextField('organization', 'Organizacija'),
-                      _buildTextField('phoneNumber', 'Telefon', true),
-                      _buildTextField('password', 'Unesi lozinku', true, true),
-                      _buildTextField('passwordConfirmation', 'Potvrdi lozinku', true, true),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: _register,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12),
-                        child: Text("Registruj se"),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      body: _buildContent()
     );
   }
   Widget _buildTextField(String name, String label,
@@ -194,14 +144,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     var request = Map.from(_formKey.currentState!.value);
     request['picture'] = _base64Image;
-    request['roleId'] = 1; //when registering on desktop user can only create "organizer" account while admin can add new admin account
+    request['roleId'] = AuthProvider.roleID == 3 ? _formKey.currentState?.fields['roleId']?.value : 1; //when registering on desktop user can only create "organizer" account while admin can add new admin account
 
     try {
       final userProvider = context.read<UserProvider>();
       await userProvider.insert(request);
-
-      
-      await showDialog(
+      if(AuthProvider.roleID == 3)
+      {
+        showBottomRightNotification(context, "Uspješno registrovan novi korisnik");
+        Navigator.of(context).pop();
+      }
+      else
+      {
+        await showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: const Text("Registracija uspješna"),
@@ -210,7 +165,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                //Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MyApp()));
               },
               child: const Text("Idi na prijavu"),
             ),
@@ -221,6 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MyApp()));
         }
       });
+      }
     } catch (e) {
       if (!mounted) return;
       showDialog(
@@ -284,14 +239,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         break;
 
       case 'organization':
-        validators.addAll([
-          FormBuilderValidators.minLength(3, errorText: 'Prekratko ime organizacije'),
-          FormBuilderValidators.match(
-            r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
-            errorText: 'Ime organizacije mora početi velikim slovom.\n Sadržava samo slova',
-          ),
-        ]);
-        break;
+        if (value == null || value.isEmpty) return null;
+
+        if (value.length < 3) {
+          return 'Prekratko ime organizacije';
+        }
+
+        final regex = RegExp(r'^[a-zA-ZčćžšđČĆŽŠĐ]+$');
+        if (!regex.hasMatch(value)) {
+          return 'Ime organizacije smije sadržavati samo slova.';
+        }
+
+        return null;
 
       case 'phoneNumber':
         validators.addAll([
@@ -323,6 +282,99 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     // Run composed validators and return the result
     return FormBuilderValidators.compose(validators)(value);
+  }
+  
+  Widget _buildContent() {
+    return SingleChildScrollView(
+        padding: const EdgeInsets.all(32),
+        child: Center(
+          child: Container(
+            width: 800,
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 12,
+                  offset: Offset(0, 6),
+                )
+              ],
+            ),
+            child: FormBuilder(
+              key: _formKey,
+              child: Column(
+                children: [
+                  _buildImagePicker(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderDropdown(
+                          name: "roleId",
+                          decoration: InputDecoration(
+                            errorStyle: const TextStyle(fontSize: 12),
+                            label: RichText(
+                              text: const TextSpan(
+                                text: 'Uloga/Vrsta korisnika',
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: ' *',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          validator: FormBuilderValidators.compose([
+                            FormBuilderValidators.required(errorText: 'Uloga je obavezna'),
+                          ]),
+                          focusColor: Colors.transparent,
+                          items: roleResult?.result.map(
+                                (item) => DropdownMenuItem(
+                                  value: item.id.toString(),
+                                  child: Text(item.name ?? ""),
+                                ),
+                              ).toList() ??
+                              [],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: [
+                      _buildTextField('firstName', 'Ime', true),
+                      _buildTextField('lastName', 'Prezime', true),
+                      _buildTextField('email', 'Email', true),
+                      _buildTextField('userName', 'Korisničko ime', true),
+                      
+                      _buildTextField('organization', 'Organizacija'),
+                      _buildTextField('phoneNumber', 'Telefon', true),
+                      _buildTextField('password', 'Unesi lozinku', true, true),
+                      _buildTextField('passwordConfirmation', 'Potvrdi lozinku', true, true),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: _register,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12),
+                        child: AuthProvider.roleID == 3 ? Text("Registracija korisnika") : Text("Registruj se"),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
   }
 
 }

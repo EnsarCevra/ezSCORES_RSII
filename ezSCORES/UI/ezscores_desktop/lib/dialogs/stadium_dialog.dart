@@ -156,8 +156,8 @@ class _StadiumDialogState extends State<StadiumDialog> {
               }
               if (context.mounted) {
                 widget.stadium == null
-                    ? showSuccessSnackBar(context, 'Stadion uspješno dodan.')
-                    : showSuccessSnackBar(context, 'Stadion uspješno ažuriran.');
+                    ? showBottomRightNotification(context, 'Stadion uspješno dodan.')
+                    : showBottomRightNotification(context, 'Stadion uspješno ažuriran.');
                 Navigator.pop(context, true);
               }
             }

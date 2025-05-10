@@ -205,7 +205,7 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                 }
                 if(context.mounted)
                 {
-                  widget.team == null ? showSuccessSnackBar(context, 'Ekipa uspješno kreirana.') : showSuccessSnackBar(context, 'Ekipa uspješno ažurirana.');
+                  widget.team == null ? showBottomRightNotification(context, 'Ekipa uspješno kreirana.') : showBottomRightNotification(context, 'Ekipa uspješno ažurirana.');
                   Navigator.pop(context, true);
                 }
               }on Exception catch(exception)

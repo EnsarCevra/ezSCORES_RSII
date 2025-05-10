@@ -101,7 +101,7 @@ class _SelectionDialogState extends State<SelectionDialog> {
               }
               if(context.mounted)
               {
-                widget.selection == null ? showSuccessSnackBar(context, 'Selekcija uspješno dodana.') : showSuccessSnackBar(context, 'Selekcija uspješno ažurirana.');
+                widget.selection == null ? showBottomRightNotification(context, 'Selekcija uspješno dodana.') : showBottomRightNotification(context, 'Selekcija uspješno ažurirana.');
                 Navigator.pop(context, true); 
               }
             }

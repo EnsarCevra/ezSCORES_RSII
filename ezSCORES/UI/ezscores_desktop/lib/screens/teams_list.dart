@@ -98,7 +98,7 @@ Widget _buildSearch()
         });
       }, child: Icon(Icons.search)),
       SizedBox(width: 8,),
-       ElevatedButton(onPressed: () async{
+      ElevatedButton(onPressed: () async{
        final actionResult = await Navigator.of(context).push(PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {

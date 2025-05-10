@@ -130,7 +130,7 @@ class _SponsorDialogState extends State<SponsorDialog> {
                   await sponsorProvider.update(widget.sponsor!.id!, request);
                 }
                 if (context.mounted) {
-                  showSuccessSnackBar(context, 'Sponzor uspješno spremljen.');
+                  showBottomRightNotification(context, 'Sponzor uspješno spremljen.');
                   Navigator.pop(context, true);
                 }
               } on UserException catch (e) {
