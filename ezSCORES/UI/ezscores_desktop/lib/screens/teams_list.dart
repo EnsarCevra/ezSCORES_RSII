@@ -177,7 +177,7 @@ Widget _buildResultView() {
         ),
       ),
     ),
-  ) : Expanded(child: Align(alignment: Alignment.center, child: Text('Nema podataka'),),);;
+  ) : const Expanded(child: Align(alignment: Alignment.center, child: Text('Nema podataka'),),);
   }
   else
   {

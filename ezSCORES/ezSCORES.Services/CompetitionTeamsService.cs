@@ -30,6 +30,10 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x=>x.Team);
 			}
+			if(search.TeamId != null)
+			{
+				query = query.Where(x => x.TeamId == search.TeamId).Include(x => x.Team);
+			}
 			if (search.isEliminated != null)
 			{
 				query = query.Where(x => x.IsEliminated == search.isEliminated);

@@ -1,7 +1,12 @@
 import 'dart:convert';
+import 'package:ezscores_desktop/models/cities.dart';
+import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 String formatNumber(dynamic)
 {
@@ -115,4 +120,79 @@ void showErrorBottomNotification(BuildContext context, String message) {
     overlayEntry.remove();
   });
 }
+
+Widget buildCityTypeAheadField({
+  required BuildContext context,
+  required String name,
+  required TextEditingController controller,
+  required Cities? selectedCity,
+  required ValueChanged<Cities?> onChanged,
+  AxisDirection direction = AxisDirection.down,
+  bool isRequired = false,
+}) {
+  final cityProvider = Provider.of<CityProvider>(context, listen: false);
+
+  return FormBuilderField<Cities>(
+    name: name,
+    initialValue: selectedCity,
+    validator: (value) {
+      if (isRequired && value == null) {
+        return 'Grad je obavezan';
+      }
+      return null;
+    },
+    builder: (FormFieldState<Cities?> field) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TypeAheadFormField<Cities>(
+            suggestionsBoxDecoration: const SuggestionsBoxDecoration(
+              constraints: BoxConstraints(maxHeight: 200),
+            ),
+            validator: (value) {
+              if(value != null && value.isNotEmpty && selectedCity == null)
+              {
+                return 'Odaberite grad iz ponuđene liste';
+              }
+              return null;
+            },
+            suggestionsBoxVerticalOffset: -0.5,
+            direction: direction,
+            textFieldConfiguration: TextFieldConfiguration(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: 'Grad',
+                errorText: field.errorText,
+                suffixIcon: selectedCity != null
+                    ? IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          controller.clear();
+                          onChanged(null);
+                          field.didChange(null);
+                        },
+                      )
+                    : null,
+              ),
+            ),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            minCharsForSuggestions: 2,
+            suggestionsCallback: (pattern) async {
+              final data = await cityProvider.get(filter: {"name": pattern});
+              return data.result;
+            },
+            itemBuilder: (context, city) =>
+                ListTile(title: Text(city.name ?? '')),
+            onSuggestionSelected: (city) {
+              controller.text = city.name ?? '';
+              onChanged(city);
+              field.didChange(city); // Notify FormBuilder
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 

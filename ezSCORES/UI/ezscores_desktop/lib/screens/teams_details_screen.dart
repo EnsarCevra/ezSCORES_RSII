@@ -110,9 +110,9 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
                                     title: Text(_base64Image == null ? "Odaberi sliku" : "Promijeni sliku"),
                                     trailing: Icon(Icons.file_upload),
                                     onTap: () async {
-                                      final result = await getImage(); // Your custom function
+                                      final result = await getImage(); 
                                       if (result != null) {
-                                        field.didChange(result); // Update FormBuilder value3,
+                                        field.didChange(result);
                                         setState(() {
                                           _base64Image = result;
                                         });

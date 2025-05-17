@@ -1,4 +1,6 @@
+import 'package:ezscores_desktop/providers/ApplicationsProvider.dart';
 import 'package:ezscores_desktop/providers/CitiesProvider.dart';
+import 'package:ezscores_desktop/providers/CompetitionTeamsProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/PlayersProvider.dart';
 import 'package:ezscores_desktop/providers/RolesProvider.dart';
@@ -6,6 +8,7 @@ import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/SponsorsProvider.dart';
 import 'package:ezscores_desktop/providers/StadiumsProvider.dart';
 import 'package:ezscores_desktop/providers/TeamProvider.dart';
+import 'package:ezscores_desktop/providers/GroupsProvider.dart';
 import 'package:ezscores_desktop/providers/UserProvider.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
@@ -26,6 +29,10 @@ void main() {
     ChangeNotifierProvider(create: (_) => CityProvider()),
     ChangeNotifierProvider(create: (_) => StadiumProvider()),
     ChangeNotifierProvider(create: (_) => SponsorProvider()),
+    ChangeNotifierProvider(create: (_) => ApplicationProvider()),
+    ChangeNotifierProvider(create: (_) => CompetitionTeamsProvider()),
+    ChangeNotifierProvider(create: (_) => GroupProvider()),
+
 
 
 

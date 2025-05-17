@@ -29,6 +29,7 @@ namespace ezSCORES.Services
 
 		public override IQueryable<Database.Application> AddFilter(ApplicationSearchObject search, IQueryable<Database.Application> query)
 		{
+			query = query.Include(x => x.Team);
 			//filter by status?
 			if(search.CompetitionId != null)
 			{
@@ -203,7 +204,7 @@ namespace ezSCORES.Services
 				}
 				else
 				{
-					throw new UserException($"Igrači ne može igrati na takmičenju zbog dobnih restrikcija: {ageRestrictedPlayers[0]}");
+					throw new UserException($"Igrač ne može igrati na takmičenju zbog dobnih restrikcija: {ageRestrictedPlayers[0]}");
 				}
 			}
 		}

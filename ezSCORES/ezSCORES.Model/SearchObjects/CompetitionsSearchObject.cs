@@ -11,7 +11,7 @@ namespace ezSCORES.Model.SearchObjects
 		public int? SelectionId { get; set; }
 
 		public string? Season { get; set; } = null!;
-
+		public bool IsCityIncluded { get; set; }
 		public int? CityId { get; set; }
 		public CompetitionType? CompetitionType { get; set; }
 		public DateTime? StartDate { get; set; }

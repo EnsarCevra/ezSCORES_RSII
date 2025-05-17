@@ -1,5 +1,9 @@
 import 'package:ezscores_desktop/models/competitions.dart';
 import 'package:ezscores_desktop/models/enums/competitionStatus.dart';
+import 'package:ezscores_desktop/models/enums/competitionType.dart';
+import 'package:ezscores_desktop/screens/tabs/applications_tab.dart';
+import 'package:ezscores_desktop/screens/tabs/competition_details_info_tab.dart';
+import 'package:ezscores_desktop/screens/tabs/standings_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 
@@ -85,7 +89,7 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
       Column(
         children: [
           if (widget.competition != null) _buildNavbar(),
-          Expanded(child: _buildTabContent()),
+          _buildTabContent(),
         ],
       ),
     );
@@ -95,8 +99,8 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
     switch (index) {
     case 0: return true; 
     case 1: return widget.competition!.status! == CompetitionStatus.applicationsOpen || widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished;
+    case 2: return (widget.competition!.competitionType == CompetitionType.league || widget.competition!.competitionType == CompetitionType.tournament) && (widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished);
     case 3: return widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished;
-    case 2: return widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished;
     default:
       return false;
   }
@@ -104,15 +108,15 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
 
   Widget _buildInfoContent()
   {
-    return Center(child: Text('Informacije tab content'));
+    return CompetitionDetailsTab(competition: widget.competition,);
   }
   Widget _buildApplicationsContent()
   {
-    return Center(child: Text('Prijave tab content'));
+    return ApplicationsTab(competitionId: widget.competition!.id!);
   }
   Widget _buildStandingsContent()
   {
-    return Center(child: Text('Poredak tab content'));
+    return StandingsTab(competitionId: widget.competition!.id!, isLeague: widget.competition?.competitionType == CompetitionType.league ? true : false);
   }
   Widget _buildMatchesContent()
   {

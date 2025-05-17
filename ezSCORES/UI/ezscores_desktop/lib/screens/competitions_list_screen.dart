@@ -12,9 +12,7 @@ import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/tournament_details_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 
 class CompetitionsListScreen extends StatefulWidget
@@ -60,7 +58,7 @@ class _CompetitionListScreenState extends State<CompetitionsListScreen>
  
 
   Future initForm() async{
-    var filter = {"isSelectionIncluded" : true};
+    var filter = {"isSelectionIncluded" : true, "isCityIncluded" : true};
     if(AuthProvider.roleID == 1)
     {
       filter['onlyUserCompettions'] = true;
@@ -112,52 +110,18 @@ Widget _buildSearch() {
               ),
               SizedBox(width: 8),
               Expanded(
-                child: TypeAheadFormField(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    decoration: InputDecoration(
-                      labelText: 'Grad',
-                      suffixIcon: _selectedCity != null
-                          ? IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _selectedCity = null;
-                                  _cityController.clear();
-                                });
-                              },
-                              icon: Icon(Icons.clear),
-                            )
-                          : null,
-                    ),
-                    controller: _cityController,
-                  ),
-                  validator: (value) {
-                    if (value != null &&
-                        value.isNotEmpty &&
-                        _selectedCity == null) {
-                      return 'Odaberite grad iz ponuđene liste';
-                    }
-                    return null;
-                  },
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  minCharsForSuggestions: 2,
-                  suggestionsCallback: (pattern) async {
-                    var filter = {"name": pattern};
-                    var data = await cityProvider.get(filter: filter);
-                    return data.result;
-                  },
-                  itemBuilder: (context, Cities city) {
-                    return ListTile(
-                      title: Text(city.name ?? ''),
-                    );
-                  },
-                  onSuggestionSelected: (Cities selectedCity) {
-                    setState(() {
-                      _selectedCity = selectedCity;
-                      _lastSelectedCityName = selectedCity.name;
-                      _cityController.text = selectedCity.name ?? '';
-                    });
-                  },
-                ),
+                child: buildCityTypeAheadField(
+                context: context,
+                name: "city",
+                controller: _cityController,
+                selectedCity: _selectedCity,
+                isRequired: false,
+                onChanged: (city) {
+                  setState(() {
+                    _selectedCity = city;
+                  });
+                },
+              ),
               ),
             ],
           ),
@@ -318,83 +282,49 @@ Widget _buildSearch() {
 }
 
 final ScrollController _horizontalScrollController = ScrollController();
- Widget _buildResultView() {
+Widget _buildResultView() {
   if (competitionResult != null) {
     if (competitionResult!.count != 0) {
-      return Container(
-          width: double.infinity,
+      return Expanded( // This allows vertical scrolling within available space
+        child: Scrollbar(
+          controller: _horizontalScrollController,
+          thumbVisibility: true,
           child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Scrollbar(
-              controller: _horizontalScrollController,
+            controller: _horizontalScrollController,
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
               child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width,
+                ),
                 child: DataTable(
                   columnSpacing: 16.0,
                   showCheckboxColumn: false,
                   columns: const [
-                    DataColumn(
-                      label: Flexible(
-                        child: Center(
-                          child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Flexible(
-                        child: Center(
-                          child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Flexible(
-                        child: Center(
-                          child: Text("Tip", style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Flexible(
-                        child: Center(
-                          child: Text("Status", style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Flexible(
-                        child: Center(
-                          child: Text("Selekcija/uzrast", style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Flexible(
-                        child: Center(
-                          child: Text("Prijave do", style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Flexible(
-                        child: Center(
-                          child: Text("Početak takmičenja", style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        ),
-                      ),
-                    ),
+                    DataColumn(label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold))))),
+                    DataColumn(label: Flexible(child: Center(child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold))))),
+                    DataColumn(label: Flexible(child: Center(child: Text("Tip", style: TextStyle(fontWeight: FontWeight.bold))))),
+                    DataColumn(label: Flexible(child: Center(child: Text("Status", style: TextStyle(fontWeight: FontWeight.bold))))),
+                    DataColumn(label: Flexible(child: Center(child: Text("Selekcija/uzrast", style: TextStyle(fontWeight: FontWeight.bold))))),
+                    DataColumn(label: Flexible(child: Center(child: Text("Prijave do", style: TextStyle(fontWeight: FontWeight.bold))))),
+                    DataColumn(label: Flexible(child: Center(child: Text("Početak takmičenja", style: TextStyle(fontWeight: FontWeight.bold))))),
                   ],
                   rows: competitionResult?.result.map((e) => DataRow(
                     onSelectChanged: (_) => _handleRowTap(e),
                     cells: [
-                      DataCell(Center(
-                        child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
-                            child: e.picture != null
-                                ? imageFromString(e.picture!)
-                                : Icon(Icons.sports_soccer),
+                      DataCell(Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(25),
+                              child: e.picture != null
+                                  ? imageFromString(e.picture!)
+                                  : Icon(Icons.sports_soccer),
+                            ),
                           ),
                         ),
                       )),
@@ -410,9 +340,10 @@ final ScrollController _horizontalScrollController = ScrollController();
               ),
             ),
           ),
-        );
+        ),
+      );
     } else {
-      return Expanded(
+      return const Expanded(
         child: Align(
           alignment: Alignment.center,
           child: Text('Nema podataka'),
@@ -420,7 +351,7 @@ final ScrollController _horizontalScrollController = ScrollController();
       );
     }
   } else {
-    return Expanded(
+    return const Expanded(
       child: Align(
         alignment: Alignment.center,
         child: CircularProgressIndicator(),
@@ -428,6 +359,7 @@ final ScrollController _horizontalScrollController = ScrollController();
     );
   }
 }
+
 
   
   _handleRowTap(Competitions selectedCompetition) async{

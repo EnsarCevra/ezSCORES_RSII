@@ -1,5 +1,4 @@
 import 'package:ezscores_desktop/models/cities.dart';
-import 'package:ezscores_desktop/models/players.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 
 class CityProvider extends BaseProvider<Cities>
