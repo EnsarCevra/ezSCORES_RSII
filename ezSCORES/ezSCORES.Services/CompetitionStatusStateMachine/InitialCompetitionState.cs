@@ -35,5 +35,13 @@ namespace ezSCORES.Services.CompetitionStatusStateMachine
 
 			return Mapper.Map<Competitions>(entity);
 		}
+		public override Competitions Peparation(int id)
+		{
+			var set = Context.Set<Competition>();
+			var entity = set.Find(id);
+			entity.Status = Model.ENUMs.CompetitionStatus.Preparation;
+			Context.SaveChanges();
+			return Mapper.Map<Competitions>(entity);
+		}
 	}
 }

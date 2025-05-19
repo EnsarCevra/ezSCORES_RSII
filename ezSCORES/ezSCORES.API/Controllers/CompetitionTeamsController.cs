@@ -19,7 +19,7 @@ namespace ezSCORES.API.Controllers
 		public CompetitionTeamsController(ICompetitionTeamsService service) : base (service)
 		{
 		}
-		[HttpPatch("/assign-group")]
+		[HttpPatch("assign-group")]
 		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		public void AddTeamsToGroup(AddTeamsToGroupRequest request)
 		{

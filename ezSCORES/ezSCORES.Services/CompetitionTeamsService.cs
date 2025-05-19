@@ -38,9 +38,16 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.IsEliminated == search.isEliminated);
 			}
-			if (search.GroupId != null)
+			if (search.GroupId != null && search.OnlyNullAndCurrentGroup == null)
 			{
 				query = query.Where(x => x.GroupId == search.GroupId);
+			}
+			if(search.OnlyNullAndCurrentGroup != null && search.GroupId != null)
+			{
+				if(search.OnlyNullAndCurrentGroup == true)
+				{
+					query = query.Where(x => x.GroupId == null || x.GroupId == search.GroupId);
+				}
 			}
 			if (search.isPlayersIncluded != null)
 			{
@@ -51,27 +58,35 @@ namespace ezSCORES.Services
 
 		public void AddTeamsToGroup(AddTeamsToGroupRequest request)
 		{
-			var alreadyAssignedTeams = Context.CompetitionsTeams.Where(x => request.CompetitionTeamIds.Contains(x.Id) && x.GroupId == null).ToList();
-			if(alreadyAssignedTeams.Any())
+			var currentlyInGroup = Context.CompetitionsTeams
+				.Where(x => x.GroupId == request.GroupId && x.CompetitionId == request.CompetitionId)
+				.ToList();
+
+			//if there are teams in database that were previously assigned but user didn't assign them in newest post they need to be removed
+			var toUnassign = currentlyInGroup
+				.Where(x => !request.CompetitionTeamIds.Contains(x.Id))
+				.ToList();
+
+			foreach (var team in toUnassign)
 			{
-				throw new UserException($"Timovi već dodijeljeni u grupu: {alreadyAssignedTeams}");
+				team.GroupId = null;
 			}
-			var teams = Context.CompetitionsTeams.Where(x => request.CompetitionTeamIds.Contains(x.Id)
-														&& x.GroupId != request.GroupId);// take only teams that are not already in this group
-			// if I send non existant competitionTeamId it will ignore it
-			if(teams.Any() && teams.All(x=>x.CompetitionId == request.CompetitionId))
+
+			var toAssign = Context.CompetitionsTeams
+				.Where(x => request.CompetitionTeamIds.Contains(x.Id) && x.CompetitionId == request.CompetitionId)
+				.ToList();
+
+			if (toAssign.Any(x => x.CompetitionId != request.CompetitionId))
 			{
-				foreach (var team in teams)
-				{
-					team.GroupId = request.GroupId;
-				}
-				Context.SaveChanges();
+				throw new UserException("Jedan ili više timova ne pripada ovom takmičenju.");
 			}
-			else
+
+			foreach (var team in toAssign)
 			{
-				throw new UserException("Dodavanje nije moguće - jedan ili više odabranih timova ne pripada takmičenju");
+				team.GroupId = request.GroupId;
 			}
-			
+
+			Context.SaveChanges();
 		}
 
 		public override void BeforeInsert(CompetitionTeamInsertRequest request, CompetitionsTeam entity)

@@ -195,4 +195,29 @@ Widget buildCityTypeAheadField({
   );
 }
 
+Future<bool> showConfirmDeleteDialog(BuildContext context, {String? title, String? content}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title ?? 'Upozorenje'),
+      content: Text(content ?? 'Jeste li sigurni da želite izbrisati ovaj zapis?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Odustani'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+          ),
+          child: const Text('Izbriši'),
+        ),
+      ],
+    ),
+  );
+
+  return result ?? false;
+}
+
 

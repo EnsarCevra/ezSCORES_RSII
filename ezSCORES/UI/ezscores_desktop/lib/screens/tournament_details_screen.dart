@@ -116,7 +116,7 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
   }
   Widget _buildStandingsContent()
   {
-    return StandingsTab(competitionId: widget.competition!.id!, isLeague: widget.competition?.competitionType == CompetitionType.league ? true : false);
+    return Expanded(child: StandingsTab(competitionId: widget.competition!.id!, isLeague: widget.competition?.competitionType == CompetitionType.league ? true : false));
   }
   Widget _buildMatchesContent()
   {

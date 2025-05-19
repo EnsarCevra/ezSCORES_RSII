@@ -1,4 +1,6 @@
+import 'package:ezscores_desktop/dialogs/add_teams_to_group_dialog.dart';
 import 'package:ezscores_desktop/providers/GroupsProvider.dart';
+import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:ezscores_desktop/models/DTOs/groupStandingsDto.dart';
 import 'package:ezscores_desktop/models/DTOs/teamStandingsDto.dart';
@@ -77,65 +79,105 @@ class _StandingsTabState extends State<StandingsTab> {
     );
   }
 
-  Widget _buildTournamentGroups(List<GroupStandingsDTO> groups) {
+Widget _buildTournamentGroups(List<GroupStandingsDTO> groups) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GridView.builder(
-          shrinkWrap: true, // Important!
-          physics: const NeverScrollableScrollPhysics(), // Prevent double scroll
-          itemCount: groups.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1.3,
+      Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              _showAddGroupDialog(context, groups.length, null);
+            },
+            icon: const Icon(Icons.add),
+            label: const Text("Dodaj grupu"),
           ),
-          itemBuilder: (context, index) {
-            final group = groups[index];
-            return Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      group.groupName ?? "Grupa ${group.groupId}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 220, // Set a fixed height for the table
-                      child: SingleChildScrollView(
-                        child: _buildStandingsTable(null, group.standings ?? []),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
         ),
         const SizedBox(height: 20),
-        ElevatedButton.icon(
-          onPressed: () {
-            // show add group dialog
-          },
-          icon: const Icon(Icons.add),
-          label: const Text("Dodaj grupu"),
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: double.infinity),
+            child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: groups.map((group) {
+              return SizedBox(
+                width: 400, // control card width manually
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              group.groupName ?? "Grupa ${group.groupId}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.add, color: Colors.grey),
+                                  onPressed: () async {
+                                    final shouldReload = await showDialog<bool>(
+                                      context: context,
+                                      builder: (context) => AddTeamsToGroupDialog(competitionId: widget.competitionId, groupId: group.groupId!,),
+                                    );
+
+                                    if (shouldReload == true) {
+                                      _loadGroups();
+                                    }
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  onPressed: () {
+                                     _showAddGroupDialog(context, null, group);
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_forever_outlined, color: Colors.red),
+                                  onPressed: () {
+                                    _deleteGroup(group.groupId!);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 220,
+                          child: SingleChildScrollView(
+                            child: _buildStandingsTable(null, group.standings ?? []),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          ),
         ),
       ],
     ),
   );
 }
+
 
 
   Widget _buildStandingsTable(String? title, List<TeamStandingsDTO> standings) {
@@ -167,10 +209,115 @@ class _StandingsTabState extends State<StandingsTab> {
             DataCell(Text(team.goalDifference != null ? "${team.goalsScored}" ":" "${team.goalsConceded}": "")),
             DataCell(Text("${team.points ?? 0}")),
           ]);
-        }).toList(),
+          }).toList(),
+        ),
       ),
-    ),
-  );
-}
-// "${applicant?.firstName ?? '-'} ${applicant?.lastName ?? '-'}"),
+    );
+  }
+    void _showAddGroupDialog(BuildContext context, int? indeks, GroupStandingsDTO? selectedGroup) {
+    final TextEditingController _controller = TextEditingController();
+    String? errorText;
+    if(selectedGroup == null)
+    {
+      _controller.text = 'Grupa ${String.fromCharCode(65+indeks!)}';
+    }
+    else
+    {
+      _controller.text = selectedGroup.groupName!;
+    }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(selectedGroup == null ? "Dodaj novu grupu" : "Uredi grupu"),
+              content: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  labelText: "Naziv grupe",
+                  errorText: errorText,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Otkaži"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final name = _controller.text.trim();
+                    final regex = RegExp(r'^[a-zA-ZčćžšđČĆŽŠĐ\s]+$');
+                    if (name.isEmpty) {
+                      setState(() {
+                        errorText = "Naziv grupe je obavezan.";
+                      });
+                      return;
+                    }
+                    if (!regex.hasMatch(name)) {
+                      setState(() {
+                        errorText = "Naziv grupe smije sadržavati\nsamo slova i razmake.";
+                      });
+                      return;
+                    }
+                    var request = {
+                      "competitionId" : widget.competitionId,
+                      "name" : name
+                    };
+
+                    try {
+                      if(selectedGroup == null)
+                      {
+                        await groupProvider.insert(request);
+                      }
+                      else
+                      {
+                        await groupProvider.update(selectedGroup.groupId!, request);
+                      }
+                      if(context.mounted)
+                      {
+                        showBottomRightNotification(context, selectedGroup == null ?  'Grupa kreirana' : 'Grupa uspješno ažurirana');
+                        _loadGroups();
+                        Navigator.pop(context, true);
+                      }
+                    } catch (e) {
+                      showDialog(
+                        context: context, 
+                        builder: (context) => AlertDialog(
+                        title: Text("Error"), 
+                        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
+                        content: Text(e.toString()),));
+                    }
+                  },
+                  child: Text(selectedGroup == null ?  'Dodaj' : 'Spasi'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  
+  void _deleteGroup(int id) async{
+    bool confirmed = await showConfirmDeleteDialog(context, content: 'Jeste li sigurni da želite izbrisati ovu grupu?');
+    if(confirmed)
+    {
+      try {
+      await groupProvider.delete(id);
+      if(context.mounted)
+      {
+        showBottomRightNotification(context, 'Grupa uspješno obrisana');
+        _loadGroups();
+      }
+      } catch (e) {
+        showDialog(
+          context: context, 
+          builder: (context) => AlertDialog(
+          title: const Text("Error"), 
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
+          content: Text(e.toString()),));
+      }
+    }
+    }
 }

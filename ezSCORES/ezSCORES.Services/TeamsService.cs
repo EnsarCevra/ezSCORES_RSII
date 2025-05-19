@@ -54,6 +54,7 @@ namespace ezSCORES.Services
 
 		public override void BeforeInsert(TeamsInsertRequest request, Team entity)
 		{
+			base.BeforeInsert(request, entity);
 			entity.UserId = _activeUserService.GetActiveUserId() ?? throw new InvalidOperationException("Authenticated user ID cannot be null.");
 		}
 		protected override Team? ApplyIncludes(int id, DbSet<Team> set)

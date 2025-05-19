@@ -245,9 +245,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           return 'Prekratko ime organizacije';
         }
 
-        final regex = RegExp(r'^[a-zA-ZčćžšđČĆŽŠĐ]+$');
+        final regex = RegExp(r'^[a-zA-ZčćžšđČĆŽŠĐ\s]+$');
         if (!regex.hasMatch(value)) {
-          return 'Ime organizacije smije sadržavati samo slova.';
+          return 'Ime organizacije smije sadržavati samo slova i razmake.';
         }
 
         return null;

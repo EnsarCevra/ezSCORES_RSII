@@ -79,6 +79,19 @@ abstract class BaseProvider<T> with ChangeNotifier {
       throw new Exception("Unknown error");
     }
   }
+  Future delete(int id) async {
+    var url = "$baseUrl$_endpoint/$id";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.delete(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      return;
+    } else {
+      throw Exception("Unknown error");
+    }
+  }
 
   Future<T> getById(int id) async {
   var url = "$baseUrl$_endpoint/$id";
@@ -112,9 +125,9 @@ abstract class BaseProvider<T> with ChangeNotifier {
       {
         final errorResponse = jsonDecode(response.body);
 
-        if(errorResponse is Map<String, dynamic> && errorResponse['errors'] != null && errorResponse['errors']['userError'] != null)
+        if(errorResponse is Map<String, dynamic> && errorResponse['errors'] != null && errorResponse['errors']['UserError'] != null)
         {
-          throw UserException(errorResponse['errors']['userError'].join(', '));
+          throw UserException(errorResponse['errors']['UserError'].join(', '));
         }
         else
         {

@@ -212,7 +212,10 @@ Widget build(BuildContext context) {
     AuthProvider.picture = null;
     AuthProvider.email = null;
     AuthProvider.phoneNumber = null;                            
-    AuthProvider.organization= null;                                
+    AuthProvider.organization= null;
+    AuthProvider.roleID = null;
+    AuthProvider.roleDecription = null;
+    AuthProvider.roleName = null;                                
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MyApp()));
     setState(() {});                                                       
   }
