@@ -5,6 +5,7 @@ import 'package:ezscores_desktop/screens/admin_setting_screen.dart';
 import 'package:ezscores_desktop/screens/competitions_list_screen.dart';
 import 'package:ezscores_desktop/screens/players_list_screen.dart';
 import 'package:ezscores_desktop/screens/profile_screen.dart';
+import 'package:ezscores_desktop/screens/referees_list.screen.dart';
 import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:ezscores_desktop/screens/users_list.dart';
 import 'package:flutter/material.dart';
@@ -37,9 +38,10 @@ class _MasterScreenState extends State<MasterScreen> {
      case 1: screenToPush = CompetitionsListScreen(selectedIndex: index,);
     case 2: screenToPush = TeamsListScreen(selectedIndex: index);
     case 3: screenToPush = PlayersListScreen(selectedIndex: index,);
-    case 4: screenToPush = AdminSettingsScreen(selectedIndex: index,);
-    case 5:  screenToPush = UsersListScreen(selectedIndex: index,);
-    case 6:  screenToPush = ProfileScreen(selectedIndex: index,);
+    case 4: screenToPush = RefereesListScreen(selectedIndex: index,);
+    case 5: screenToPush = AdminSettingsScreen(selectedIndex: index,);
+    case 6:  screenToPush = UsersListScreen(selectedIndex: index,);
+    case 7:  screenToPush = ProfileScreen(selectedIndex: index,);
       break;
     default:
       return;
@@ -128,21 +130,29 @@ Widget build(BuildContext context) {
                                 isSelected: widget.selectedIndex == 3,
                                 onTap: () => onSidebarItemTapped(3),
                               ),
-                            if (AuthProvider.roleID == 3)
+                              if (AuthProvider.roleID == 3)
                               _SidebarItem(
                                 index: 4,
-                                icon: Icons.settings_applications_outlined,
-                                title: "Admin postavke",
+                                icon: Icons.person,
+                                title: "Upravljaj sudcima",
                                 isSelected: widget.selectedIndex == 4,
                                 onTap: () => onSidebarItemTapped(4),
                               ),
                             if (AuthProvider.roleID == 3)
                               _SidebarItem(
                                 index: 5,
-                                icon: Icons.supervised_user_circle_sharp,
-                                title: "Korisnici",
+                                icon: Icons.settings_applications_outlined,
+                                title: "Admin postavke",
                                 isSelected: widget.selectedIndex == 5,
                                 onTap: () => onSidebarItemTapped(5),
+                              ),
+                            if (AuthProvider.roleID == 3)
+                              _SidebarItem(
+                                index: 6,
+                                icon: Icons.supervised_user_circle_sharp,
+                                title: "Korisnici",
+                                isSelected: widget.selectedIndex == 6,
+                                onTap: () => onSidebarItemTapped(6),
                               ),
                           ],
                         ),
@@ -152,17 +162,17 @@ Widget build(BuildContext context) {
                     // Bottom-aligned profile & logout
                     const Divider(height: 20),
                     _SidebarItem(
-                      index: 6,
+                      index: 7,
                       icon: Icons.person_outline,
                       title: "Profil",
-                      isSelected: widget.selectedIndex == 6,
-                      onTap: () => onSidebarItemTapped(6),
+                      isSelected: widget.selectedIndex == 7,
+                      onTap: () => onSidebarItemTapped(7),
                     ),
                     _SidebarItem(
-                      index: 7,
+                      index: 8,
                       icon: Icons.logout,
                       title: "Odjavi se",
-                      isSelected: widget.selectedIndex == 7,
+                      isSelected: widget.selectedIndex == 8,
                       onTap: () => logOut(),
                     ),
                   ],

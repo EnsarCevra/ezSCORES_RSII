@@ -46,7 +46,7 @@ class _AddTeamsToGroupDialogState extends State<AddTeamsToGroupDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Dodavanje timova u grupu"),
+      title: const Text("Upravljanje timovima u grupi"),
       content: SizedBox(
         width: 600,
         height: 500,

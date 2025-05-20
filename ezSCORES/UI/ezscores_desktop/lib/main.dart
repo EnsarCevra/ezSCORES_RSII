@@ -3,6 +3,7 @@ import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionTeamsProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/PlayersProvider.dart';
+import 'package:ezscores_desktop/providers/RefereesProvider.dart';
 import 'package:ezscores_desktop/providers/RolesProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/SponsorsProvider.dart';
@@ -32,6 +33,7 @@ void main() {
     ChangeNotifierProvider(create: (_) => ApplicationProvider()),
     ChangeNotifierProvider(create: (_) => CompetitionTeamsProvider()),
     ChangeNotifierProvider(create: (_) => GroupProvider()),
+    ChangeNotifierProvider(create: (_) => RefereeProvider()),
 
 
 
