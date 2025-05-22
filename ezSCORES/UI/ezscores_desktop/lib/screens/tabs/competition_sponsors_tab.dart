@@ -1,35 +1,34 @@
 import 'dart:convert';
-
-import 'package:ezscores_desktop/models/competitionsReferees.dart';
-import 'package:ezscores_desktop/models/referees.dart';
+import 'package:ezscores_desktop/models/competitionsSponsors.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
-import 'package:ezscores_desktop/providers/CompetitionRefereeProvider.dart';
-import 'package:ezscores_desktop/providers/RefereesProvider.dart';
+import 'package:ezscores_desktop/models/sponsors.dart';
+import 'package:ezscores_desktop/providers/CompetitionSponsorsProvider.dart';
+import 'package:ezscores_desktop/providers/SponsorsProvider.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CompetitionRefereesTab extends StatefulWidget
+class CompetitionsSponsorsTab extends StatefulWidget
 {
   int competitionId;
-  CompetitionRefereesTab({super.key, required this.competitionId});
+  CompetitionsSponsorsTab({super.key, required this.competitionId});
   
   @override
-  State<CompetitionRefereesTab> createState() => _CompetitionRefereesTabState();
+  State<CompetitionsSponsorsTab> createState() => _CompetitionsSponsorsTabState();
 }
-class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
+class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
 {
-  late RefereeProvider refereeProvider;
-  late CompetitionsRefereesProvider competitionRefereeProvider;
-  SearchResult<Referees>? refereeResult;
-  SearchResult<CompetitionsReferees>? competitionRefereeResult; 
-  Set<int?>? excludedReferees;
+  late SponsorProvider sponsorProvider;
+  late CompetitionsSponsorsProvider compeititonsSponsorsProvider;
+  SearchResult<Sponsors>? sponsorResult;
+  SearchResult<CompetitionsSponsors>? competitionSponsorResult; 
+  Set<int?>? excludedSponsors;
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
-    refereeProvider = context.read<RefereeProvider>();
-    competitionRefereeProvider = context.read<CompetitionsRefereesProvider>();
+    sponsorProvider = context.read<SponsorProvider>();
+    compeititonsSponsorsProvider = context.read<CompetitionsSponsorsProvider>();
     super.initState();
     initForm();
   } 
@@ -38,12 +37,12 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
     var filter = {
       "competitionId" : widget.competitionId
     };
-    var refereeData = await refereeProvider.get();
-    var competitionsRefereesData = await competitionRefereeProvider.get(filter: filter);
+    var sponsorData = await sponsorProvider.get();
+    var competitionsSponsorsData = await compeititonsSponsorsProvider.get(filter: filter);
     setState(() {
-      refereeResult = refereeData;
-      competitionRefereeResult = competitionsRefereesData;
-      _excludeAssignedReferees();
+      sponsorResult = sponsorData;
+      competitionSponsorResult = competitionsSponsorsData;
+      _excludeAssignedSponsors();
     });
    }
 
@@ -65,13 +64,13 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
                       const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          "Dodijeljeni sudci",
+                          "Aktuelni sponzori",
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                       Expanded(
                         child: SingleChildScrollView(
-                          child: _buildAssignedRefereesView(),
+                          child: _buildAssignedSponsorsView(),
                         ),
                       ),
                     ],
@@ -85,7 +84,7 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
                       const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          "Pretraži i dodijeli sudce",
+                          "Pretraži i dodijeli sponzore",
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -103,7 +102,7 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
       ),
     );
   }
-  final TextEditingController _gteFirstLastNameEditingController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   _buildSearch() {
     return Padding(
         padding: const EdgeInsets.all(15),
@@ -111,16 +110,16 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
           key: _formKey,
           child: Row(
           children: [
-            Expanded(child: TextField(controller: _gteFirstLastNameEditingController, decoration: const InputDecoration(labelText: "Ime/prezime"),)),
+            Expanded(child: TextField(controller: _nameController, decoration: const InputDecoration(labelText: "Naziv"),)),
             const SizedBox(width: 8,),
             ElevatedButton(onPressed: () async{
               var filter = {
-                "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
+                "name" : _nameController.text,
               };
-              var data = await refereeProvider.get(filter: filter);
+              var data = await sponsorProvider.get(filter: filter);
               setState(() {
-                refereeResult = data;
-                _excludeAssignedReferees();
+                sponsorResult = data;
+                _excludeAssignedSponsors();
               });
             }, child: const Icon(Icons.search)),
           ],
@@ -130,8 +129,8 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
   }
   
  _buildResultView() {
-  if (refereeResult != null) {
-    return refereeResult!.result.isNotEmpty
+  if (sponsorResult != null) {
+    return sponsorResult!.result.isNotEmpty
         ? SingleChildScrollView(
               child: Container(
                 width: double.infinity,
@@ -144,16 +143,13 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
                       label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold)))),
                     ),
                     DataColumn(
-                      label: Flexible(child: Center(child: Text("Ime", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Prezime", style: TextStyle(fontWeight: FontWeight.bold)))),
+                      label: Flexible(child: Center(child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold)))),
                     ),
                     DataColumn(
                       label: Flexible(child: Center(child: Text("Akcija", style: TextStyle(fontWeight: FontWeight.bold)))),
                     ),
                   ],
-                  rows: refereeResult!.result.map((e) {
+                  rows: sponsorResult!.result.map((e) {
                     return DataRow(cells: [
                       DataCell(
                         Center(
@@ -168,20 +164,19 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
                                     ? imageFromString(e.picture!)
                                     : const CircleAvatar(
                                     backgroundColor: Colors.transparent,
-                                    child: Icon(Icons.account_circle, color: Colors.grey, size: 30),
+                                    child: Icon(Icons.handshake, color: Colors.grey, size: 30),
                                   ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      DataCell(Center(child: Text(e.firstName ?? ""))),
-                      DataCell(Center(child: Text(e.lastName ?? ""))),
+                      DataCell(Center(child: Text(e.name ?? ""))),
                       DataCell(
                         Center(
                           child: ElevatedButton(
                             onPressed: () async {
-                              _assignReferee(e);
+                              _assignSponsor(e);
                               initForm();
                             },
                             child: const Text("Dodijeli"),
@@ -196,7 +191,7 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
         : const Expanded(
             child: Align(
               alignment: Alignment.center,
-              child: Text('Nema dostupnih sudija za dodavanje'),
+              child: Text('Nema dostupnih sponzora za dodavanje'),
             ),
           );
   } else {
@@ -210,8 +205,8 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
 }
 
   
-_buildAssignedRefereesView() {
-  if (competitionRefereeResult == null) {
+_buildAssignedSponsorsView() {
+  if (competitionSponsorResult == null) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       width: double.infinity,
@@ -220,9 +215,9 @@ _buildAssignedRefereesView() {
     );
   }
 
-  final assignedReferees = competitionRefereeResult!.result;
+  final assignedSponsors = competitionSponsorResult!.result;
 
-  if (assignedReferees.isEmpty) {
+  if (assignedSponsors.isEmpty) {
     return const Padding(
       padding: EdgeInsets.all(16.0),
       child: Text("Nema dodijeljenih sudija."),
@@ -234,11 +229,11 @@ _buildAssignedRefereesView() {
     child: Wrap(
       spacing: 16,
       runSpacing: 16,
-      children: assignedReferees.map((e) {
-        final referee = e.referee;
+      children: assignedSponsors.map((e) {
+        final sponsor = e.sponsor;
 
         return Container(
-          width: 200,
+          width: 150,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
@@ -254,19 +249,24 @@ _buildAssignedRefereesView() {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.transparent,
-                backgroundImage: referee?.picture != null
-                    ? MemoryImage(base64Decode(referee!.picture!))
-                    : null,
-                child: referee?.picture == null
-                    ? const Icon(Icons.account_circle, size: 50)
-                    : null,
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: sponsor?.picture != null
+                    ? Image.memory(
+                        base64Decode(sponsor!.picture!),
+                        fit: BoxFit.contain, // or BoxFit.contain if you want full image fit
+                      )
+                    : const Icon(Icons.handshake, size: 40, color: Colors.grey),
               ),
               const SizedBox(height: 10),
               Text(
-                '${referee?.firstName ?? ""} ${referee?.lastName ?? ""}',
+                sponsor?.name ?? "",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -276,7 +276,7 @@ _buildAssignedRefereesView() {
               const SizedBox(height: 10),
               ElevatedButton.icon(
                 onPressed: () async {
-                  _unassignReferee(referee!.id!);
+                  _removeSponsor(sponsor!.id!);
                 },
                 icon: const Icon(Icons.remove_circle_outline),
                 label: const Text("Ukloni"),
@@ -293,16 +293,16 @@ _buildAssignedRefereesView() {
   );
 }
 
-  void _assignReferee(Referees selectedReferee) async{
+  void _assignSponsor(Sponsors selectedSponsor) async{
     var request = {
       "competitionId" : widget.competitionId,
-      "refereeId" : selectedReferee.id
+      "sponsorId" : selectedSponsor.id
     };
     try {
-          await competitionRefereeProvider.insert(request);
+          await compeititonsSponsorsProvider.insert(request);
           if(context.mounted)
           {
-            showBottomRightNotification(context, "Uspješno dodijeljen sudac");
+            showBottomRightNotification(context, "Uspješno dodan sponzor");
           }
         } on UserException catch (e) {
           showDialog(
@@ -321,12 +321,12 @@ _buildAssignedRefereesView() {
     }
   }
   
-  void _unassignReferee(int id) async {
+  void _removeSponsor(int id) async {
     try {
-      await competitionRefereeProvider.delete(id);
+      await compeititonsSponsorsProvider.delete(id);
       if(context.mounted)
       {
-        showBottomRightNotification(context, 'Sudac uspješno uklonjen!');
+        showBottomRightNotification(context, 'Sponzor uspješno uklonjen!');
         initForm(); 
       }
     } catch (e) {
@@ -336,10 +336,11 @@ _buildAssignedRefereesView() {
           title: const Text("Error"), 
           actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
           content: Text(e.toString()),));
-      }                  // Refresh
+      }
   }
-  void _excludeAssignedReferees() {
-    excludedReferees = competitionRefereeResult!.result.map((e) => e.refereeId).toSet();
-    refereeResult!.result = refereeResult!.result.where((ref)=> !excludedReferees!.contains(ref.id)).toList();
+  
+  void _excludeAssignedSponsors() {
+    excludedSponsors = competitionSponsorResult!.result.map((e) => e.sponsorId).toSet();
+    sponsorResult!.result = sponsorResult!.result.where((ref)=> !excludedSponsors!.contains(ref.id)).toList();
   }
 }

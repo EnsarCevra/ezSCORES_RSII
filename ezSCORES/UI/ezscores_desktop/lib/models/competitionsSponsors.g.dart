@@ -12,7 +12,10 @@ CompetitionsSponsors _$CompetitionsSponsorsFromJson(
       ..id = (json['id'] as num?)?.toInt()
       ..competitionId = (json['competitionId'] as num?)?.toInt()
       ..sponsorId = (json['sponsorId'] as num?)?.toInt()
-      ..type = (json['type'] as num?)?.toInt();
+      ..type = (json['type'] as num?)?.toInt()
+      ..sponsor = json['sponsor'] == null
+          ? null
+          : Sponsors.fromJson(json['sponsor'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$CompetitionsSponsorsToJson(
         CompetitionsSponsors instance) =>
@@ -21,4 +24,5 @@ Map<String, dynamic> _$CompetitionsSponsorsToJson(
       'competitionId': instance.competitionId,
       'sponsorId': instance.sponsorId,
       'type': instance.type,
+      'sponsor': instance.sponsor,
     };
