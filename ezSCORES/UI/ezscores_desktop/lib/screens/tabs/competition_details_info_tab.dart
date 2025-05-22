@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:ezscores_desktop/models/cities.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
+import 'package:ezscores_desktop/models/enums/competitionStatus.dart';
 import 'package:ezscores_desktop/models/enums/competitionType.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/selections.dart';
@@ -9,6 +10,7 @@ import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
+import 'package:ezscores_desktop/screens/tabs/competitions_aditidional_settings_tab.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -404,6 +406,20 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          if (_isAllowed()) ElevatedButton(
+            onPressed: () async {
+              await Navigator.of(context).push(PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => CompetitionAditionalSettingsScreen(selectedIndex: 1, competitionId: widget.competition!.id!,),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+                  },
+                ));
+            },
+            child: const Text("Dodatne postavke")),
+          const SizedBox(width: 10,),
           ElevatedButton(
             onPressed: () async {
               final isValid = _formKey.currentState?.saveAndValidate();
@@ -434,7 +450,7 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text("Error"),
-                      actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))],
+                      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Ok"))],
                       content: Text(exception.toString()),
                     ),
                   );
@@ -459,5 +475,13 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
     }
 
     return null;
+  }
+  
+  _isAllowed() {//should be allowed as soon as competition is created and user should be notified that he can edit this as well after he creates competition
+    if(widget.competition!.status! == CompetitionStatus.applicationsOpen || widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished)
+    {
+      return true;
+    }
+    return false;
   }
 }

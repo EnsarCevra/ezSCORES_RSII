@@ -77,7 +77,7 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
       case 2: return _buildStandingsContent();
       case 3: return _buildMatchesContent();
       default:
-        return Center(child: Text('Nepoznata kartica'));
+        return const Center(child: Text('Nepoznata kartica'));
     }
   }
 

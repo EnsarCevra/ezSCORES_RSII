@@ -3,7 +3,6 @@ import 'package:ezscores_desktop/models/referees.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/providers/RefereesProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
-import 'package:ezscores_desktop/screens/players_details_screen.dart';
 import 'package:ezscores_desktop/screens/referees_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -72,7 +71,7 @@ class _RefereesListScreenState extends State<RefereesListScreen>
         const SizedBox(width: 8,),
          ElevatedButton(onPressed: () async{
             final actionResult = await Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(),
+              pageBuilder: (context, animation, secondaryAnimation) => RefereesDetailsScreen(selectedIndex: widget.selectedIndex),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
                   opacity: animation,
