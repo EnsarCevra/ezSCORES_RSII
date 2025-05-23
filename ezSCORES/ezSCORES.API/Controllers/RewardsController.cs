@@ -11,7 +11,7 @@ namespace ezSCORES.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class RewardsController : BaseCRUDController<Rewards, BaseSearchObject, RewardInsertRequest, RewardUpdateRequest>
+	public class RewardsController : BaseCRUDController<Rewards, BaseCompetitionSearchObject, RewardInsertRequest, RewardUpdateRequest>
 	{
 		public RewardsController(IRewardsService service) : base (service)
 		{

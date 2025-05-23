@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public class RewardsService : BaseCRUDService<Rewards, BaseSearchObject, Reward, RewardInsertRequest, RewardUpdateRequest>, IRewardsService
+    public class RewardsService : BaseCRUDService<Rewards, BaseCompetitionSearchObject, Reward, RewardInsertRequest, RewardUpdateRequest>, IRewardsService
 	{
 		public RewardsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
@@ -24,7 +24,7 @@ namespace ezSCORES.Services
 		{
 			if(request.RankingPosition != null)
 			{
-				if(Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition).Any())
+				if(Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition && x.CompetitionId == request.CompetitionId).Any())
 				{
 					throw new UserException("Nagrada za ovo mjesto već postoji!");
 				}
@@ -40,6 +40,14 @@ namespace ezSCORES.Services
 					throw new UserException("Nagrada za ovo mjesto već postoji!");
 				}
 			}
+		}
+		public override IQueryable<Reward> AddFilter(BaseCompetitionSearchObject search, IQueryable<Reward> query)
+		{
+			if(search.CompetitionId != null)
+			{
+				query = query.Where(x=>x.CompetitionId ==  search.CompetitionId);
+			}
+			return base.AddFilter(search, query);
 		}
 	}
 }

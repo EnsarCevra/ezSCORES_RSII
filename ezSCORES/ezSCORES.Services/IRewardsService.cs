@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public interface IRewardsService : ICRUDService<Rewards, BaseSearchObject, RewardInsertRequest, RewardUpdateRequest>
+    public interface IRewardsService : ICRUDService<Rewards, BaseCompetitionSearchObject, RewardInsertRequest, RewardUpdateRequest>
 	{
 	}
 }

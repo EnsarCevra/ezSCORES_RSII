@@ -1,6 +1,7 @@
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/screens/tabs/competition_referees_tab.dart';
 import 'package:ezscores_desktop/screens/tabs/competition_sponsors_tab.dart';
+import 'package:ezscores_desktop/screens/tabs/rewards_tab.dart';
 import 'package:flutter/material.dart';
 
 class CompetitionAditionalSettingsScreen extends StatefulWidget
@@ -94,6 +95,6 @@ class _CompetitionAditionalSettingsScreenState extends State<CompetitionAditiona
   }
   Widget _buildRewardsContent()
   {
-    return const Center(child: Text('Sponzori tab content'));
+    return Expanded(child: RewardsTab(competitionId: widget.competitionId, ));
   }
 }
