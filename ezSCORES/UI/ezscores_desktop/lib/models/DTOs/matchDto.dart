@@ -1,6 +1,7 @@
 import 'package:ezscores_desktop/models/DTOs/goalDto.dart';
 import 'package:ezscores_desktop/models/DTOs/teamDto.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
+import 'package:ezscores_desktop/models/enums/game_stage_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'matchDto.g.dart';
@@ -19,7 +20,10 @@ class MatchDTO {
 	int? fixtureId;
 	String? group;
 	int? fixtureSequenceNumber;
+
+  @GameStageConverter()
   GameStage? gameStage;
+  
 	bool? isUnderway;
 	bool? isCompleted;
 

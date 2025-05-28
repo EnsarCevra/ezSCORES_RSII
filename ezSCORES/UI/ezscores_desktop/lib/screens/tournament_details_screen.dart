@@ -3,6 +3,7 @@ import 'package:ezscores_desktop/models/enums/competitionStatus.dart';
 import 'package:ezscores_desktop/models/enums/competitionType.dart';
 import 'package:ezscores_desktop/screens/tabs/applications_tab.dart';
 import 'package:ezscores_desktop/screens/tabs/competition_details_info_tab.dart';
+import 'package:ezscores_desktop/screens/tabs/matches_tab.dart';
 import 'package:ezscores_desktop/screens/tabs/standings_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
@@ -120,6 +121,6 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
   }
   Widget _buildMatchesContent()
   {
-    return Center(child: Text('Utakmice tab content'));
+    return Expanded(child: MatchesTab(competitionId: widget.competition!.id!,));
   }
 }

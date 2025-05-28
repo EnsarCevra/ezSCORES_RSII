@@ -4,6 +4,8 @@ import 'package:ezscores_desktop/providers/CompetitionRefereeProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionSponsorsProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionTeamsProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
+import 'package:ezscores_desktop/providers/FixturesProvider.dart';
+import 'package:ezscores_desktop/providers/MatchesProvider.dart';
 import 'package:ezscores_desktop/providers/PlayersProvider.dart';
 import 'package:ezscores_desktop/providers/RefereesProvider.dart';
 import 'package:ezscores_desktop/providers/RewardsProvider.dart';
@@ -40,6 +42,8 @@ void main() {
     ChangeNotifierProvider(create: (_) => CompetitionsRefereesProvider()),
     ChangeNotifierProvider(create: (_) => CompetitionsSponsorsProvider()),
     ChangeNotifierProvider(create: (_) => RewardProvider()),
+    ChangeNotifierProvider(create: (_) => FixtureProvider()),
+    ChangeNotifierProvider(create: (_) => MatchesProvider()),
 
 
 

@@ -11,8 +11,5 @@ namespace ezSCORES.Model.Requests.FixtureRequests
 
 		public GameStage GameStage { get; set; }
 
-		public bool IsCurrentlyActive { get; set; }
-
-		public bool IsCompleted { get; set; }
 	}
 }

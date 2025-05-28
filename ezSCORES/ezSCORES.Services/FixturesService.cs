@@ -1,6 +1,7 @@
 ﻿using ezSCORES.Model;
 using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
+using ezSCORES.Model.Requests.ApplicationRequests;
 using ezSCORES.Model.Requests.FixtureRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
@@ -24,26 +25,19 @@ namespace ezSCORES.Services
 		{
 		}
 
-		public void ActivateFixture(int fixtureId)
+		public void ToogleFixtureStatus(int fixtureId, ToogleStatusRequest request)
 		{
 			var fixture = Context.Fixtures.Find(fixtureId);
 			if (fixture == null)
 			{
 				throw new UserException("Odabrano kolo ne postoji ili je izbrisano!");
 			}
-			var activeFixture = Context.Fixtures.FirstOrDefault(x => x.CompetitionId == fixture.CompetitionId && x.IsCurrentlyActive);
+			var activeFixture = Context.Fixtures.FirstOrDefault(x => x.Id != fixtureId && x.CompetitionId == fixture.CompetitionId && x.IsCurrentlyActive);
 			if(activeFixture != null)
 			{
-				if(activeFixture.Id == fixtureId)
-				{
-					throw new UserException($"Ovo kolo je već aktivno!");
-				}
-				else
-				{
-					throw new UserException($"Već je aktivno drugo kolo: {activeFixture.Id}");
-				}
+				throw new UserException($"Već postoji drugo aktivno kolo!");
 			}
-			fixture.IsCurrentlyActive = true;
+			fixture.IsCurrentlyActive = request.Status;
 			Context.SaveChanges();
 		}
 
@@ -99,11 +93,13 @@ namespace ezSCORES.Services
 		public List<FixtureDTO> GetFixturesByCompetition(GetFixturesByCompetitionRequest request)
 		{
 			var fixtures = Context.Fixtures
-							.AsSplitQuery() // ✅ Optimizes query execution
+							.AsSplitQuery()
 							.Where(f => f.CompetitionId == request.competitionId
-							&&( (request.GetSchedule && !f.IsCompleted && !f.IsCurrentlyActive) || (!request.GetSchedule && (f.IsCompleted || f.IsCurrentlyActive) ) ))
-							.OrderByDescending(f => f.GameStage) // ✅ Latest game stages first
-							.ThenByDescending(f => f.SequenceNumber) // ✅ Latest sequence first
+							&&( request.GetSchedule == null ||
+								(request.GetSchedule == true && !f.IsCompleted && !f.IsCurrentlyActive) || 
+								(request.GetSchedule == false  && (f.IsCompleted || f.IsCurrentlyActive) ) ))
+							.OrderByDescending(f => f.GameStage) 
+							.ThenByDescending(f => f.SequenceNumber) 
 							.Include(f => f.Matches)
 								.ThenInclude(m => m.HomeTeam).ThenInclude(t => t.Team)
 							.Include(f => f.Matches)
@@ -118,7 +114,7 @@ namespace ezSCORES.Services
 								IsCurrentlyActive = f.IsCurrentlyActive,
 								IsCompleted = f.IsCompleted,
 								Matches = f.Matches
-									.OrderByDescending(m => m.DateAndTime) // ✅ Latest matches first
+									.OrderByDescending(m => m.DateAndTime)
 									.Select(m => new MatchDTO
 									{
 										MatchId = m.Id,
@@ -144,11 +140,6 @@ namespace ezSCORES.Services
 							.ToList();
 
 			return fixtures;
-		}
-		protected override Fixture? ApplyIncludes(int id, DbSet<Fixture> set)
-		{
-			return set.Where(x=>x.Id == id).Include(x => x.Matches).ThenInclude(x => x.HomeTeam).ThenInclude(x => x.Team)
-							.Include(x => x.Matches).ThenInclude(x => x.AwayTeam).ThenInclude(x => x.Team).FirstOrDefault();
 		}
 		public override Fixture? BeforeDelete(int id, DbSet<Fixture> set)
 		{

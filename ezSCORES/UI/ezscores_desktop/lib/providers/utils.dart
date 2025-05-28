@@ -195,7 +195,7 @@ Widget buildCityTypeAheadField({
   );
 }
 
-Future<bool> showConfirmDeleteDialog(BuildContext context, {String? title, String? content}) async {
+Future<bool> showConfirmDeleteDialog(BuildContext context, {String? title, String? content, String? confirmMessage}) async {
   final result = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
@@ -211,7 +211,7 @@ Future<bool> showConfirmDeleteDialog(BuildContext context, {String? title, Strin
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
           ),
-          child: const Text('Izbriši'),
+          child: Text(confirmMessage ?? 'Izbriši'),
         ),
       ],
     ),

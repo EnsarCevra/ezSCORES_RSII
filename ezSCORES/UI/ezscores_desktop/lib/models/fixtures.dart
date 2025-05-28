@@ -1,9 +1,11 @@
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
+import 'package:ezscores_desktop/models/enums/game_stage_converter.dart';
 import 'package:ezscores_desktop/models/matches.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'fixtures.g.dart';
 
+@GameStageConverter()
 @JsonSerializable()
 class Fixtures {
 	int? id;

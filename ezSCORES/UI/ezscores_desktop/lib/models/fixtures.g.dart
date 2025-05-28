@@ -13,7 +13,8 @@ Fixtures _$FixturesFromJson(Map<String, dynamic> json) => Fixtures()
   ..matchLength = (json['matchLength'] as num?)?.toInt()
   ..isCurrentlyActive = json['isCurrentlyActive'] as bool?
   ..isCompleted = json['isCompleted'] as bool?
-  ..gameStage = $enumDecodeNullable(_$GameStageEnumMap, json['gameStage'])
+  ..gameStage =
+      const GameStageConverter().fromJson((json['gameStage'] as num?)?.toInt())
   ..matches = (json['matches'] as List<dynamic>?)
       ?.map((e) => Matches.fromJson(e as Map<String, dynamic>))
       .toList();
@@ -25,16 +26,6 @@ Map<String, dynamic> _$FixturesToJson(Fixtures instance) => <String, dynamic>{
       'matchLength': instance.matchLength,
       'isCurrentlyActive': instance.isCurrentlyActive,
       'isCompleted': instance.isCompleted,
-      'gameStage': _$GameStageEnumMap[instance.gameStage],
+      'gameStage': const GameStageConverter().toJson(instance.gameStage),
       'matches': instance.matches,
     };
-
-const _$GameStageEnumMap = {
-  GameStage.groupPhase: 'groupPhase',
-  GameStage.roundOf16: 'roundOf16',
-  GameStage.quarterFinals: 'quarterFinals',
-  GameStage.semiFinals: 'semiFinals',
-  GameStage.thirdPlace: 'thirdPlace',
-  GameStage.finals: 'finals',
-  GameStage.league: 'league',
-};

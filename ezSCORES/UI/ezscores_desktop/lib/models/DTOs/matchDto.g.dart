@@ -28,7 +28,8 @@ MatchDTO _$MatchDTOFromJson(Map<String, dynamic> json) => MatchDTO()
   ..fixtureId = (json['fixtureId'] as num?)?.toInt()
   ..group = json['group'] as String?
   ..fixtureSequenceNumber = (json['fixtureSequenceNumber'] as num?)?.toInt()
-  ..gameStage = $enumDecodeNullable(_$GameStageEnumMap, json['gameStage'])
+  ..gameStage =
+      const GameStageConverter().fromJson((json['gameStage'] as num?)?.toInt())
   ..isUnderway = json['isUnderway'] as bool?
   ..isCompleted = json['isCompleted'] as bool?;
 
@@ -45,17 +46,7 @@ Map<String, dynamic> _$MatchDTOToJson(MatchDTO instance) => <String, dynamic>{
       'fixtureId': instance.fixtureId,
       'group': instance.group,
       'fixtureSequenceNumber': instance.fixtureSequenceNumber,
-      'gameStage': _$GameStageEnumMap[instance.gameStage],
+      'gameStage': const GameStageConverter().toJson(instance.gameStage),
       'isUnderway': instance.isUnderway,
       'isCompleted': instance.isCompleted,
     };
-
-const _$GameStageEnumMap = {
-  GameStage.groupPhase: 'groupPhase',
-  GameStage.roundOf16: 'roundOf16',
-  GameStage.quarterFinals: 'quarterFinals',
-  GameStage.semiFinals: 'semiFinals',
-  GameStage.thirdPlace: 'thirdPlace',
-  GameStage.finals: 'finals',
-  GameStage.league: 'league',
-};

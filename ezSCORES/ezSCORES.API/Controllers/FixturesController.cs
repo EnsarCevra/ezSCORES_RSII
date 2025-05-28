@@ -1,6 +1,8 @@
-﻿using ezSCORES.Model;
+﻿using Azure.Core;
+using ezSCORES.Model;
 using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
+using ezSCORES.Model.Requests.ApplicationRequests;
 using ezSCORES.Model.Requests.FixtureRequests;
 using ezSCORES.Model.Requests.GroupRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
@@ -19,10 +21,10 @@ namespace ezSCORES.API.Controllers
 		{
 		}
 
-		[HttpPatch("{id}/activate-fixture")]
-		public void ActivateFixture(int id)
+		[HttpPatch("{id}/toggle-status")]
+		public void ToogleFixtureStatus(int id, ToogleStatusRequest request)
 		{
-			(_service as IFixturesService).ActivateFixture(id);
+			(_service as IFixturesService).ToogleFixtureStatus(id, request);
 		}
 
 		[HttpPatch("{id}/finish-fixture")]
@@ -30,7 +32,7 @@ namespace ezSCORES.API.Controllers
 		{
 			(_service as IFixturesService).FinishFixture(id);
 		}
-		[HttpGet("/get-fixtures-by-competition")]
+		[HttpGet("get-fixtures-by-competition")]
 		public List<FixtureDTO> GetFixturesByCompetition([FromQuery] GetFixturesByCompetitionRequest request)
 		{
 			return (_service as IFixturesService).GetFixturesByCompetition(request);
