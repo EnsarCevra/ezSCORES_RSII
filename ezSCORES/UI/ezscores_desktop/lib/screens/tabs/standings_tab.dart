@@ -38,19 +38,6 @@ class _StandingsTabState extends State<StandingsTab> {
       groupStandings = data;
     });
   }
-
-  // Future<List<GroupStandingsDTO>> _fetchGroupStandings() async {
-  //   // Replace this with your actual provider method
-  //   final provider = GroupProvider();
-  //   // You may need to call something like:
-  //   // final ids = await provider.getGroupIds(widget.competitionId);
-  //   // then fetch group standings for each
-
-  //   // Simulated: just fetch one group for the example
-  //   final group = await provider.getGroupStandings(widget.competitionId);
-  //   return [group]; // Adjust this if multiple groups returned
-  // }
-
   @override
   Widget build(BuildContext context) {
     if(groupStandings != null)

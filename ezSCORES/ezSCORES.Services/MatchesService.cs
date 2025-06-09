@@ -116,6 +116,7 @@ namespace ezSCORES.Services
 		protected override Match? ApplyIncludes(int id, DbSet<Match> set)
 		{
 			return set.AsSplitQuery()
+						.Where(x => x.Id == id)
 						.Include(x => x.HomeTeam).ThenInclude(x => x.Team)
 						.Include(x => x.HomeTeam).ThenInclude(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player)
 						.Include(x => x.HomeTeam).ThenInclude(x => x.Group)
@@ -125,7 +126,7 @@ namespace ezSCORES.Services
 						.Include(x => x.Goals).ThenInclude(x => x.CompetitionTeamPlayer).ThenInclude(x => x.Player)
 						.Include(x => x.CompetitionsRefereesMatches).ThenInclude(x => x.CompetitionsReferees).ThenInclude(x => x.Referee)
 						.Include(x => x.Fixture)
-						.Where(x => x.Id == id).FirstOrDefault();
+						.FirstOrDefault();
 		}
 		public MatchDTO GetMatchDetails(int id)
 		{
@@ -148,6 +149,8 @@ namespace ezSCORES.Services
 							Group = x.HomeTeam.Group.Name,
 							GameStage = x.Fixture.GameStage,
 							FixtureSequenceNumber = x.Fixture.SequenceNumber,
+							IsCompleted = x.IsCompleted,
+							IsUnderway = x.IsUnderway,
 							HomeTeam = new TeamDTO
 							{
 								Id = x.HomeTeam.Id,
@@ -168,6 +171,12 @@ namespace ezSCORES.Services
 									Name = p.Player.FirstName + " " + p.Player.LastName
 								}).ToList()
 							},
+							Referees = x.CompetitionsRefereesMatches.Select(crm => new RefereesDTO
+							{
+								Id = crm.Id,
+								CompetitionRefereeId = crm.CompetitionsRefereesId,
+								Name = crm.CompetitionsReferees.Referee.FirstName + " " + crm.CompetitionsReferees.Referee.LastName
+							}).ToList(),
 							Stadium = x.Stadium.Name,
 							Goals = x.Goals.Select(g => new GoalDTO
 							{

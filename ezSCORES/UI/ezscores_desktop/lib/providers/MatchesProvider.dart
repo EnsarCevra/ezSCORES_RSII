@@ -16,7 +16,7 @@ class MatchesProvider extends BaseProvider<Matches>
 
   Future<MatchDTO> getMatchDetails(int id) async {
     var url =
-        "${BaseProvider.baseUrl}get-match-details/$id";
+        "${BaseProvider.baseUrl}Matches/get-match-details/$id";
 
     var uri = Uri.parse(url);
     var headers = createHeaders();
@@ -28,7 +28,7 @@ class MatchesProvider extends BaseProvider<Matches>
     }
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
-      return data.map((e) => MatchDTO.fromJson(e));
+      return MatchDTO.fromJson(data);
     } else {
       throw UserException("Unknown error.");
     }

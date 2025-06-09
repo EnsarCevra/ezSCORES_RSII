@@ -3,6 +3,7 @@ import 'package:ezscores_desktop/models/DTOs/fixtureDto.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
 import 'package:ezscores_desktop/providers/FixturesProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
+import 'package:ezscores_desktop/screens/match_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -82,7 +83,7 @@ class _MatchesTabState extends State<MatchesTab> {
               itemBuilder: (context, index) {
                 final fixture = fixtures![index];
                 return Card(
-                  color: fixture.isCurrentlyActive == true ? Color.fromARGB(255, 113, 232, 117) : null,
+                  color: fixture.isCurrentlyActive == true ? Color.fromARGB(255, 180, 239, 182) : null,
                   margin: const EdgeInsets.only(bottom: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 4,
@@ -146,8 +147,19 @@ class _MatchesTabState extends State<MatchesTab> {
                             : Column(
                                 children: fixture.matches!.map((match) {
                                   return InkWell(
-                                    onTap: () {
-                                      // TODO: Navigate to match detail/edit screen
+                                    onTap: () async{
+                                      final actionResult = await Navigator.of(context).push(
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(matchID: match.matchId, fixture: fixture, competitionId: widget.competitionId,),
+                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                          return FadeTransition(opacity: animation, child: child);
+                                        },
+                                      ),
+                                    );
+
+                                    if (actionResult == true) {
+                                      initForm();
+                                    }
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(vertical: 6),

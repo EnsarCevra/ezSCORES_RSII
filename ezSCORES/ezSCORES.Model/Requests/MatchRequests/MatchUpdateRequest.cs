@@ -14,8 +14,6 @@ namespace ezSCORES.Model.Requests.MatchRequests
 
 		public int StadiumId { get; set; }
 
-		public int? WinnerId { get; set; }
-
 		public DateTime DateAndTime { get; set; }
 	}
 }

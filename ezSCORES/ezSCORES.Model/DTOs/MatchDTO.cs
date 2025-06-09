@@ -15,7 +15,7 @@ namespace ezSCORES.Model.DTOs
 		public TeamDTO AwayTeam { get; set; }
 		public string Stadium { get; set; }
 		public List<GoalDTO> Goals { get; set; }
-		public List<string> Referees { get; set; }
+		public List<RefereesDTO> Referees { get; set; }
 		public int FixtureId { get; set; }
 		public string? Group { get; set; }
 		public int FixtureSequenceNumber { get; set; }

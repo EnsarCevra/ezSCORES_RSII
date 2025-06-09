@@ -5,4 +5,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\38762\Desktop\ezSCORES_RSII\ezSCORES\ezSCORES.Model\DTOs\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\38762\Desktop\ezSCORES_RSII\ezSCORES\ezSCORES.Model\DTOs\.editorconfig" />
+  </ItemGroup>
+
 </Project>

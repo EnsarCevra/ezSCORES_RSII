@@ -23,8 +23,9 @@ MatchDTO _$MatchDTOFromJson(Map<String, dynamic> json) => MatchDTO()
   ..goals = (json['goals'] as List<dynamic>?)
       ?.map((e) => GoalDTO.fromJson(e as Map<String, dynamic>))
       .toList()
-  ..referees =
-      (json['referees'] as List<dynamic>?)?.map((e) => e as String).toList()
+  ..referees = (json['referees'] as List<dynamic>?)
+      ?.map((e) => RefereeDTO.fromJson(e as Map<String, dynamic>))
+      .toList()
   ..fixtureId = (json['fixtureId'] as num?)?.toInt()
   ..group = json['group'] as String?
   ..fixtureSequenceNumber = (json['fixtureSequenceNumber'] as num?)?.toInt()

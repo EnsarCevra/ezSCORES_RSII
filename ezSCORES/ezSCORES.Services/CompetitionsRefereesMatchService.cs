@@ -20,5 +20,14 @@ namespace ezSCORES.Services
 		public CompetitionsRefereesMatchService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
+
+		public override IQueryable<CompetitionsRefereesMatch> AddFilter(BaseCompetitionSearchObject search, IQueryable<CompetitionsRefereesMatch> query)
+		{
+			if (search.CompetitionId != null)
+			{
+				query = query.Where(x => x.CompetitionsReferees.CompetitionId == search.CompetitionId).Include(x => x.CompetitionsReferees).ThenInclude(x=>x.Referee);
+			}
+			return base.AddFilter(search, query);
+		}
 	}
 }
