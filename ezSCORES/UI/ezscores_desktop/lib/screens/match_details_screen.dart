@@ -1,17 +1,23 @@
 import 'dart:convert';
 import 'package:ezscores_desktop/dialogs/assign_match_referees_dialog.dart';
+import 'package:ezscores_desktop/dialogs/competitionTeam_match_upsert_dialog.dart';
+import 'package:ezscores_desktop/dialogs/goal_upsert_dialog.dart';
+import 'package:ezscores_desktop/dialogs/match_stadium_upsert_dialog.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/DTOs/fixtureDto.dart';
 import 'package:ezscores_desktop/models/DTOs/goalDto.dart';
 import 'package:ezscores_desktop/models/DTOs/matchDto.dart';
 import 'package:ezscores_desktop/models/DTOs/playerDto.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
+import 'package:ezscores_desktop/models/stadiums.dart';
 import 'package:ezscores_desktop/providers/CompetitionRefereeProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsRefereesMatchesProvider.dart';
+import 'package:ezscores_desktop/providers/GoalProvider.dart';
 import 'package:ezscores_desktop/providers/MatchesProvider.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
@@ -28,13 +34,15 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
   late MatchesProvider matchesProvider;
   late CompetitionsRefereesProvider competitionsRefereesProvider;
   late CompeititionRefereeMatchProvider compeititionRefereeMatchProvider;
+  late GoalProvider goalProvider;
+  DateTime? _selectedDateTime;
   MatchDTO? match;
-
   @override
   void initState() {
     matchesProvider = context.read<MatchesProvider>();
     competitionsRefereesProvider = context.read<CompetitionsRefereesProvider>();
     compeititionRefereeMatchProvider = context.read<CompeititionRefereeMatchProvider>();
+    goalProvider = context.read<GoalProvider>();
     super.initState();
     initForm();
   }
@@ -42,6 +50,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
   Future initForm() async {
     if (widget.matchID != null) {
       match = await matchesProvider.getMatchDetails(widget.matchID!);
+      _selectedDateTime = match?.dateAndTime;
       if (match!.goals != null) {
         match!.homeTeamScore = match!.goals!.where((e) => e.isHomeGoal == true).length;
         match!.awayTeamScore = match!.goals!.where((e) => e.isHomeGoal == false).length;
@@ -71,9 +80,9 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
             children: [
               _buildMainInfo(),
               const SizedBox(height: 16),
-              _buildPlayerData(),
+              if(widget.matchID != null) _buildPlayerData(),//display additional data when match already created
               const SizedBox(height: 16),
-              _buildSaveButton(),
+              if(widget.matchID == null) _buildSaveButton(),//manual save only when creating match
             ],
           ),
         ),
@@ -101,26 +110,228 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(match?.homeTeam?.name ?? "", style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white)),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () async {
+                    final selectedTeamId = await showDialog<int>(
+                      context: context,
+                      builder: (context) => TeamSelectionDialog(
+                        competitionId: widget.competitionId,
+                        gameStage: widget.fixture.gameStage!,
+                        competitionTeamId: widget.matchID != null ? match!.homeTeam!.id : null,
+                        oposingCompetitionTeamId: widget.matchID != null ? match!.awayTeam!.id : null,
+                        group: match!.group,
+                      ),
+                    );
+
+                    if (selectedTeamId != null) {
+                      try {
+                        var request = {
+                          "fixtureId": widget.fixture.id,
+                          "homeTeamId": selectedTeamId,
+                          "awayTeamId": match!.awayTeam!.id,
+                          "stadiumId": 1,
+                          "dateAndTime": match!.dateAndTime!.toIso8601String()
+                        };
+                        if(widget.matchID == null)
+                        {
+                          await matchesProvider.insert(request);
+                        }
+                        else{
+                          await matchesProvider.update(widget.matchID!, request);
+                        }
+                        initForm();
+                      } catch (e) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Greška"),
+                            content: Text(e.toString()),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("OK"),
+                              )
+                            ],
+                          ),
+                        );
+                      }
+                        
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        match?.homeTeam?.name ?? "",
+                        style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.edit, size: 20, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(width: 16),
               Text(
-                isFinished || match!.isUnderway == true ? "${match?.homeTeamScore} : ${match?.awayTeamScore}" : "- : -",
+                isFinished || match!.isUnderway == true
+                    ? "${match?.homeTeamScore} : ${match?.awayTeamScore}"
+                    : "- : -",
                 style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(width: 8),
-              Text(match?.awayTeam?.name ?? "", style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white)),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () async{
+                    final selectedTeamId = await showDialog<int>(
+                      context: context,
+                      builder: (context) => TeamSelectionDialog(
+                        competitionId: widget.competitionId,
+                        gameStage: widget.fixture.gameStage!,
+                        competitionTeamId: widget.matchID != null ? match!.awayTeam!.id : null,
+                        oposingCompetitionTeamId: widget.matchID != null ? match!.homeTeam!.id : null,
+                        group: match!.group,
+                      ),
+                    );
+
+                    if (selectedTeamId != null) {
+                      try {
+                        var request = {
+                          "fixtureId": widget.fixture.id,
+                          "homeTeamId": match!.homeTeam!.id,
+                          "awayTeamId": selectedTeamId,
+                          "stadiumId": 1,//have to change this
+                          "dateAndTime": match!.dateAndTime!.toIso8601String()
+                        };
+                        if(widget.matchID == null)
+                        {
+                          await matchesProvider.insert(request);
+                        }
+                        else{
+                          await matchesProvider.update(widget.matchID!, request);
+                        }
+
+                        initForm();
+                      } catch (e) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Greška"),
+                            content: Text(e.toString()),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("OK"),
+                              )
+                            ],
+                          ),
+                        );
+                      }
+                        
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        match?.awayTeam?.name ?? "",
+                        style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.edit, size: 20, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.calendar_today, size: 20, color: Colors.white),
-              const SizedBox(width: 4),
-              Text("${formatDateTime(match!.dateAndTime)} • ", style: const TextStyle(color: Colors.white, fontSize: 20)),
-              const Icon(Icons.stadium, size: 20, color: Colors.white),
-              const SizedBox(width: 4),
-              Text(match?.stadium ?? "Nepoznat stadion", style: const TextStyle(color: Colors.white, fontSize: 20)),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: _pickDateTime,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.calendar_today, size: 20, color: Colors.white.withOpacity(0.8)),
+                      const SizedBox(width: 6),
+                      Text(
+                        formatDateTime(_selectedDateTime),
+                        style: const TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.edit, size: 18, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
+              const Text(" • • • ", style: TextStyle(color: Colors.white, fontSize: 20)),
+              MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () async {
+                  final selectedStadium = await showDialog<Stadiums>(
+                    context: context,
+                    builder: (context) => SelectStadiumDialog(
+                      competitionId: widget.competitionId,
+                      initiallySelectedStadium: match?.stadium,
+                    ),
+                  );
+
+                  if (selectedStadium != null) {
+                    match?.stadium = selectedStadium;
+                    try {
+                      final request = {
+                        "fixtureId": widget.fixture.id,
+                        "homeTeamId": match!.homeTeam!.id,
+                        "awayTeamId": match!.awayTeam!.id,
+                        "stadiumId": selectedStadium.id,
+                        "dateAndTime": match!.dateAndTime!.toIso8601String(),
+                      };
+
+                      if (widget.matchID == null) {
+                        await matchesProvider.insert(request);
+                      } else {
+                        await matchesProvider.update(widget.matchID!, request);
+                      }
+
+                      initForm(); // reload updated match info
+                    } catch (e) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Greška"),
+                          content: Text(e.toString()),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.stadium, size: 20, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      match?.stadium?.name ?? "Nepoznat stadion",
+                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.edit, size: 18, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
+
             ],
           ),
           const SizedBox(height: 8),
@@ -130,12 +341,12 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
               Text(
                 "${widget.fixture.gameStage!.displayName}"
                 "${(widget.fixture.gameStage == GameStage.league || widget.fixture.gameStage == GameStage.groupPhase) ? " • ${widget.fixture.sequenceNumber! + 1}. kolo" : ""}"
-                " • ${match!.group}",
+                " • ${match!.group?.name}",
                 style: const TextStyle(color: Colors.white, fontSize: 20),
               ),
             ],
           ),
-          if (isFinished && match?.goals != null) ...[
+          if ((isFinished || match?.isUnderway == true) && match?.goals != null) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -145,6 +356,37 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
               ],
             ),
             const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                onPressed: (){
+                  showGoalUpsertDialog(
+                            context: context,
+                            matchId: widget.matchID!,
+                            competitionTeamId: match!.homeTeam!.id!,
+                            isHomeGoal: true,
+                            goal: null,
+                            onSuccess: (){initForm();}
+                          );
+                },
+                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
+                child: const Text("Novi pogodak domaćina"),
+              ),
+              ElevatedButton(
+                onPressed: (){
+                  showGoalUpsertDialog(
+                            context: context,
+                            matchId: widget.matchID!,
+                            competitionTeamId: match!.awayTeam!.id!,
+                            isHomeGoal: false,
+                            goal: null,
+                            onSuccess: (){initForm();}
+                          );
+                },
+                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
+                child: const Text("Novi pogodak gosta")),
+            ],)
           ],
         ],
       ),
@@ -287,7 +529,53 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                 color: Colors.grey.shade600,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(strikerText, style: const TextStyle(color: Colors.white)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(strikerText, style: const TextStyle(color: Colors.white)),
+                  const SizedBox(width: 8),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Tooltip(
+                      message: "Uredi",
+                      child: GestureDetector(
+                        onTap: () {
+                          showGoalUpsertDialog(
+                            context: context,
+                            matchId: widget.matchID!,
+                            competitionTeamId: goal.isHomeGoal == true ? match!.homeTeam!.id! : match!.awayTeam!.id!,
+                            isHomeGoal: goal.isHomeGoal!,
+                            goal: goal,
+                            onSuccess: (){initForm();}
+                          );
+                        },
+                        child: const Icon(
+                          Icons.edit,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10,),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Tooltip(
+                      message: "Ukloni",
+                      child: GestureDetector(
+                        onTap: () {
+                          _deleteGoal(goal.id!);
+                        },
+                        child: const Icon(
+                          Icons.delete,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         );
@@ -335,4 +623,113 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
       );
     }
   }
+
+  void _deleteGoal (int goalId) async{
+    bool confirmed = await showConfirmDeleteDialog(context, content: 'Jeste li sigurni da želite izbrisati ovaj pogodak?');
+    if(confirmed)
+    {
+      try {
+      await goalProvider.delete(goalId);
+      if(context.mounted)
+      {
+        showBottomRightNotification(context, 'Pogodak uspješno obrisan');
+        initForm();
+      }
+      } catch (e) {
+        showDialog(
+          context: context, 
+          builder: (context) => AlertDialog(
+          title: const Text("Error"), 
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
+          content: Text(e.toString()),));
+      }
+    }
+    }
+
+  Future<void> showGoalUpsertDialog({
+  required BuildContext context,
+  required int matchId,
+  required int competitionTeamId,
+  required bool isHomeGoal,
+  required GoalDTO? goal,
+  required VoidCallback onSuccess,
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (context) => GoalUpsertDialog(
+      matchId: matchId,
+      competitionTeamId: competitionTeamId,
+      isHomeGoal: isHomeGoal,
+      goal: goal,
+    ),
+  );
+
+  if (result == true) {
+    onSuccess();
+  }
+}
+Future<void> _pickDateTime() async {
+  final currentDateTime = _selectedDateTime ?? DateTime.now();
+
+  final DateTime? pickedDate = await showDatePicker(
+    context: context,
+    initialDate: currentDateTime,
+    firstDate: DateTime(2023),
+    lastDate: DateTime(2100),
+  );
+
+  if (pickedDate == null) return;
+
+  final TimeOfDay? pickedTime = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.fromDateTime(currentDateTime),
+  );
+
+  if (pickedTime == null) return;
+
+  setState(() {
+    _selectedDateTime = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+  });
+  if(widget.matchID != null)
+    {
+      //Update match
+      try {
+        final request = {
+            "fixtureId": widget.fixture.id,
+            "homeTeamId": match!.homeTeam!.id,
+            "awayTeamId": match!.awayTeam!.id,
+            "stadiumId": match?.stadium?.id,
+            "dateAndTime": _selectedDateTime!.toIso8601String(),
+          };
+
+          if (widget.matchID == null) {
+            await matchesProvider.insert(request);
+          } else {
+            await matchesProvider.update(widget.matchID!, request);
+          }
+
+          initForm();
+      } catch (e) {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Greška"),
+              content: Text(e.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+          );
+      }
+    }
+}
 }

@@ -19,7 +19,9 @@ MatchDTO _$MatchDTOFromJson(Map<String, dynamic> json) => MatchDTO()
   ..awayTeam = json['awayTeam'] == null
       ? null
       : TeamDTO.fromJson(json['awayTeam'] as Map<String, dynamic>)
-  ..stadium = json['stadium'] as String?
+  ..stadium = json['stadium'] == null
+      ? null
+      : Stadiums.fromJson(json['stadium'] as Map<String, dynamic>)
   ..goals = (json['goals'] as List<dynamic>?)
       ?.map((e) => GoalDTO.fromJson(e as Map<String, dynamic>))
       .toList()
@@ -27,7 +29,9 @@ MatchDTO _$MatchDTOFromJson(Map<String, dynamic> json) => MatchDTO()
       ?.map((e) => RefereeDTO.fromJson(e as Map<String, dynamic>))
       .toList()
   ..fixtureId = (json['fixtureId'] as num?)?.toInt()
-  ..group = json['group'] as String?
+  ..group = json['group'] == null
+      ? null
+      : GroupDTO.fromJson(json['group'] as Map<String, dynamic>)
   ..fixtureSequenceNumber = (json['fixtureSequenceNumber'] as num?)?.toInt()
   ..gameStage =
       const GameStageConverter().fromJson((json['gameStage'] as num?)?.toInt())

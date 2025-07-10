@@ -5,6 +5,7 @@ part 'goalDto.g.dart';
 @JsonSerializable()
 class GoalDTO {
 	int? id;
+  int? competitionTeamPlayerId;
 	String? scorer;
 	int? scoredAtMinute;
 	bool? isHomeGoal;

@@ -131,7 +131,7 @@ namespace ezSCORES.Services
 											Id = m.AwayTeam.Team.Id,
 											Name = m.AwayTeam.Team.Name
 										},
-										Stadium = m.Stadium != null ? m.Stadium.Name : null,
+										Stadium = m.Stadium != null ? new Stadiums {Id = m.Stadium.Id, Name = m.Stadium.Name, Picture = m.Stadium.Picture } : null,
 										HomeTeamScore = m.IsCompleted ? Context.Goals.Count(g => g.MatchId == m.Id && g.IsHomeGoal) : null,
 										AwayTeamScore = m.IsCompleted ? Context.Goals.Count(g => g.MatchId == m.Id && !g.IsHomeGoal) : null
 									})

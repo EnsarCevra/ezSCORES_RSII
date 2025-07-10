@@ -52,11 +52,119 @@ namespace ezSCORES.Services
 					throw new UserException("Odabrani strijelac nije član ekipe koja je postigla pogodak!");
 				}
 			}
-			int previousMaxSequenceNumber = Context.Goals.Where(x => x.MatchId == entity.MatchId)
-			.OrderByDescending(x => x.SequenceNumber)
-			.Select(x => x.SequenceNumber)
-			.FirstOrDefault();
-			entity.SequenceNumber = previousMaxSequenceNumber + 1;
+
+			var laterGoals = Context.Goals
+			.Where(g => g.MatchId == entity.MatchId && g.ScoredAtMinute >= entity.ScoredAtMinute)
+			.OrderBy(g => g.ScoredAtMinute)
+			.ThenBy(g => g.SequenceNumber)
+			.ToList();
+
+			if (laterGoals.Any())
+			{
+				var insertPosition = laterGoals.First().SequenceNumber;
+
+				// Shift all later goals
+				foreach (var goal in Context.Goals.Where(g => g.MatchId == entity.MatchId && g.SequenceNumber >= insertPosition))
+				{
+					goal.SequenceNumber += 1;
+				}
+
+				entity.SequenceNumber = insertPosition;
+			}
+			else
+			{
+				// Append at the end
+				var lastSeq = Context.Goals
+					.Where(g => g.MatchId == entity.MatchId)
+					.Max(g => (int?)g.SequenceNumber) ?? 0;
+
+				entity.SequenceNumber = lastSeq + 1;
+			}
+
+			Context.SaveChanges();
+		}
+		public override void BeforeUpdate(GoalUpdateRequest request, Goal entity)
+		{
+			var match = Context.Matches.Where(x => x.Id == entity.MatchId)
+			.Select(x => new
+			{
+				Match = x,
+				MatchLength = x.Fixture.MatchLength
+			}).FirstOrDefault();
+
+			if (request.ScoredAtMinute < 0 || request.ScoredAtMinute > match!.MatchLength)
+			{
+				throw new UserException($"Unijeli ste sljedeći minut pogotka: {request.ScoredAtMinute}, a utakmica traje {match.MatchLength} minuta!");
+			}
+
+			if (request.CompetitionTeamPlayerId != null)
+			{
+				var playerTeamId = Context.CompetitionsTeamsPlayers
+					.Where(x => x.Id == request.CompetitionTeamPlayerId)
+					.Select(x => x.CompetitionsTeamsId)
+					.FirstOrDefault();
+
+				if ((request.IsHomeGoal && match.Match.HomeTeamId != playerTeamId) ||
+					(!request.IsHomeGoal && match.Match.AwayTeamId != playerTeamId))
+				{
+					throw new UserException("Odabrani strijelac nije član ekipe koja je postigla pogodak!");
+				}
+			}
+
+			var existingGoal = Context.Goals
+				.AsNoTracking()
+				.FirstOrDefault(g => g.Id == entity.Id);
+
+			if (existingGoal != null &&
+				(existingGoal.ScoredAtMinute != request.ScoredAtMinute || existingGoal.MatchId != entity.MatchId))
+			{
+				// Step 1: Shift down others from old position
+				var goalsToShiftDown = Context.Goals
+					.Where(g => g.MatchId == existingGoal.MatchId && g.SequenceNumber > existingGoal.SequenceNumber)
+					.ToList();
+
+				foreach (var goal in goalsToShiftDown)
+				{
+					goal.SequenceNumber -= 1;
+				}
+
+				// Step 2: Find new insert position
+				var laterGoals = Context.Goals
+					.Where(g => g.MatchId == entity.MatchId &&
+								g.ScoredAtMinute >= request.ScoredAtMinute &&
+								g.Id != entity.Id)
+					.OrderBy(g => g.ScoredAtMinute)
+					.ThenBy(g => g.SequenceNumber)
+					.ToList();
+
+				if (laterGoals.Any())
+				{
+					var insertPosition = laterGoals.First().SequenceNumber;
+
+					var goalsToShiftUp = Context.Goals
+						.Where(g => g.MatchId == entity.MatchId && g.SequenceNumber >= insertPosition)
+						.ToList();
+
+					foreach (var goal in goalsToShiftUp)
+					{
+						goal.SequenceNumber += 1;
+					}
+
+					entity.SequenceNumber = insertPosition;
+				}
+				else
+				{
+					var lastSeq = Context.Goals
+						.Where(g => g.MatchId == entity.MatchId)
+						.Max(g => (int?)g.SequenceNumber) ?? 0;
+
+					entity.SequenceNumber = lastSeq + 1;
+				}
+
+				entity.ScoredAtMinute = request.ScoredAtMinute;
+			}
+
+			Context.SaveChanges();
 		}
 		public override Goal? BeforeDelete(int id, DbSet<Goal> set)
 		{

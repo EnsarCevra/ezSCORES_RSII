@@ -1,8 +1,10 @@
 import 'package:ezscores_desktop/models/DTOs/goalDto.dart';
+import 'package:ezscores_desktop/models/DTOs/groupDto.dart';
 import 'package:ezscores_desktop/models/DTOs/refereeDto.dart';
 import 'package:ezscores_desktop/models/DTOs/teamDto.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
 import 'package:ezscores_desktop/models/enums/game_stage_converter.dart';
+import 'package:ezscores_desktop/models/stadiums.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'matchDto.g.dart';
@@ -15,11 +17,11 @@ class MatchDTO {
 	DateTime? dateAndTime;
   TeamDTO? homeTeam;
   TeamDTO? awayTeam;
-	String? stadium;
+	Stadiums? stadium;
   List<GoalDTO>? goals;
 	List<RefereeDTO>? referees;
 	int? fixtureId;
-	String? group;
+	GroupDTO? group;
 	int? fixtureSequenceNumber;
 
   @GameStageConverter()

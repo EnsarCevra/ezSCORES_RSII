@@ -180,7 +180,7 @@ class _MatchesTabState extends State<MatchesTab> {
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  '${DateFormat('dd.MM.yyyy HH:mm').format(match.dateAndTime!)} • ${match.stadium ?? ""}',
+                                                  '${DateFormat('dd.MM.yyyy HH:mm').format(match.dateAndTime!)} • ${match.stadium?.name ?? ""}',
                                                   style: Theme.of(context).textTheme.bodySmall,
                                                 ),
                                               ],

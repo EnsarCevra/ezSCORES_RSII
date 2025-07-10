@@ -146,7 +146,11 @@ namespace ezSCORES.Services
 							MatchId = x.Id,
 							DateAndTime = x.DateAndTime,
 							FixtureId = x.FixtureId,
-							Group = x.HomeTeam.Group.Name,
+							Group = new GroupDTO
+							{
+								Id = x.HomeTeam.Group.Id,
+								Name = x.HomeTeam.Group.Name
+							},
 							GameStage = x.Fixture.GameStage,
 							FixtureSequenceNumber = x.Fixture.SequenceNumber,
 							IsCompleted = x.IsCompleted,
@@ -177,15 +181,21 @@ namespace ezSCORES.Services
 								CompetitionRefereeId = crm.CompetitionsRefereesId,
 								Name = crm.CompetitionsReferees.Referee.FirstName + " " + crm.CompetitionsReferees.Referee.LastName
 							}).ToList(),
-							Stadium = x.Stadium.Name,
+							Stadium = new Stadiums
+							{
+								Id = x.Stadium.Id,
+								Name = x.Stadium.Name,
+								Picture = x.Stadium.Picture
+							},
 							Goals = x.Goals.Select(g => new GoalDTO
 							{
 								Id = g.Id,
+								CompetitionTeamPlayerId = g.CompetitionTeamPlayerId,
 								Scorer = g.CompetitionTeamPlayer != null ? g.CompetitionTeamPlayer.Player.FirstName + " " + g.CompetitionTeamPlayer.Player.LastName : null,
 								ScoredAtMinute = g.ScoredAtMinute,
 								SequenceNumber = g.SequenceNumber,
 								IsHomeGoal = g.IsHomeGoal
-							}).OrderByDescending(g=>g.SequenceNumber).ToList(),
+							}).OrderBy(g=>g.SequenceNumber).ToList(),
 						}).FirstOrDefault();
 			if (match == null)
 				throw new UserException("Odabrana utakmica ne postoji!");

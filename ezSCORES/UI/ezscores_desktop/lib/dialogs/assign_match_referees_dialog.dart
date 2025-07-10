@@ -30,7 +30,7 @@ class AssignRefereesDialog extends StatefulWidget {
 class _AssignRefereesDialogState extends State<AssignRefereesDialog> {
   late CompetitionsRefereesProvider competitionsRefereesProvider;
   late CompeititionRefereeMatchProvider competitionsRefereesMatchesProvider;
-  SearchResult<CompetitionsReferees>? competitionRefereeResult; 
+  SearchResult<CompetitionsReferees>? competitionRefereeResult;
   Set<int?> assignedIds = {};
   bool isLoading = true;
 

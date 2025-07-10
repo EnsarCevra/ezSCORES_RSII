@@ -40,7 +40,7 @@ namespace ezSCORES.Services
 			}
 			if (search.GroupId != null && search.OnlyNullAndCurrentGroup == null)
 			{
-				query = query.Where(x => x.GroupId == search.GroupId);
+				query = query.Where(x => x.GroupId == search.GroupId).Include(x=>x.Team);
 			}
 			if(search.OnlyNullAndCurrentGroup != null && search.GroupId != null)
 			{
