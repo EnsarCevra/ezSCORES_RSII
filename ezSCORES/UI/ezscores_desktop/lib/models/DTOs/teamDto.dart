@@ -9,7 +9,7 @@ class TeamDTO {
 	String? name;
   List<PlayerDTO>? players;
 
-	TeamDTO();
+	TeamDTO({this.id, this.name});
 
 	factory TeamDTO.fromJson(Map<String, dynamic> json) => _$TeamDTOFromJson(json);
 

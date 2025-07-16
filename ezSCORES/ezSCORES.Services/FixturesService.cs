@@ -110,6 +110,7 @@ namespace ezSCORES.Services
 							{
 								Id = f.Id,
 								GameStage = f.GameStage,
+
 								SequenceNumber = f.SequenceNumber,
 								IsCurrentlyActive = f.IsCurrentlyActive,
 								IsCompleted = f.IsCompleted,

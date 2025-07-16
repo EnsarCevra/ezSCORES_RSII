@@ -83,7 +83,7 @@ class _MatchesTabState extends State<MatchesTab> {
               itemBuilder: (context, index) {
                 final fixture = fixtures![index];
                 return Card(
-                  color: fixture.isCurrentlyActive == true ? Color.fromARGB(255, 180, 239, 182) : null,
+                  color: fixture.isCurrentlyActive == true ? const Color.fromARGB(255, 180, 239, 182) : null,
                   margin: const EdgeInsets.only(bottom: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 4,
@@ -98,7 +98,7 @@ class _MatchesTabState extends State<MatchesTab> {
                               '${fixture.gameStage!.displayName} • ${fixture.sequenceNumber! + 1}. kolo ${fixture.isCompleted == true ? '•  Kompletirano' : ''}',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
-                            const Spacer(),
+                            const Spacer(),  
                             if((activeFixtureId != null && fixture.id == activeFixtureId) || 
                                   (activeFixtureId == null && fixture.isCompleted == false))
                                 Row(
@@ -139,6 +139,20 @@ class _MatchesTabState extends State<MatchesTab> {
                                 _deleteFixture(fixture.id!);
                               },
                             ),
+                            ElevatedButton(onPressed: () async {
+                              final actionResult = await Navigator.of(context).push(
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competitionId,),
+                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                          return FadeTransition(opacity: animation, child: child);
+                                        },
+                                      ),
+                                    );
+
+                                    if (actionResult == true) {
+                                      initForm();
+                                    }
+                            }, child: const Text('Dodaj utakmicu')), 
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -165,6 +179,7 @@ class _MatchesTabState extends State<MatchesTab> {
                                       margin: const EdgeInsets.symmetric(vertical: 6),
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
                                         border: Border.all(color: Colors.grey.shade300),
                                         borderRadius: BorderRadius.circular(8),
                                       ),

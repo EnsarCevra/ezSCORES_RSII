@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'package:ezscores_desktop/dialogs/assign_match_referees_dialog.dart';
 import 'package:ezscores_desktop/dialogs/competitionTeam_match_upsert_dialog.dart';
 import 'package:ezscores_desktop/dialogs/goal_upsert_dialog.dart';
+import 'package:ezscores_desktop/dialogs/match_select_group_dialog.dart';
 import 'package:ezscores_desktop/dialogs/match_stadium_upsert_dialog.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/DTOs/fixtureDto.dart';
 import 'package:ezscores_desktop/models/DTOs/goalDto.dart';
+import 'package:ezscores_desktop/models/DTOs/groupDto.dart';
 import 'package:ezscores_desktop/models/DTOs/matchDto.dart';
 import 'package:ezscores_desktop/models/DTOs/playerDto.dart';
+import 'package:ezscores_desktop/models/DTOs/teamDto.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
 import 'package:ezscores_desktop/models/stadiums.dart';
 import 'package:ezscores_desktop/providers/CompetitionRefereeProvider.dart';
@@ -17,7 +20,6 @@ import 'package:ezscores_desktop/providers/MatchesProvider.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
@@ -37,6 +39,14 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
   late GoalProvider goalProvider;
   DateTime? _selectedDateTime;
   MatchDTO? match;
+  GroupDTO? selectedGroup;
+  TeamDTO? selectedHomeTeam;
+  TeamDTO? selectedAwayTeam;
+  Stadiums? selectedStadium;
+
+  bool _validationErrorNotifier = false;
+  Color getFieldColor(bool isValid) => (!_validationErrorNotifier || isValid) ? Colors.white : Colors.red;
+
   @override
   void initState() {
     matchesProvider = context.read<MatchesProvider>();
@@ -46,22 +56,27 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
     super.initState();
     initForm();
   }
-
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if(widget.matchID == null && widget.fixture.gameStage == GameStage.groupPhase)
+    {
+      Future.microtask(() => _displayGroupSelection());
+    }
+  }
   Future initForm() async {
     if (widget.matchID != null) {
-      match = await matchesProvider.getMatchDetails(widget.matchID!);
-      _selectedDateTime = match?.dateAndTime;
-      if (match!.goals != null) {
-        match!.homeTeamScore = match!.goals!.where((e) => e.isHomeGoal == true).length;
-        match!.awayTeamScore = match!.goals!.where((e) => e.isHomeGoal == false).length;
-      }
+      await _loadMatch(widget.matchID!);
     }
-    setState(() {});
+    if(mounted)
+    {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (match == null) {
+    if (widget.matchID != null && match == null) {
       return MasterScreen(
         "Detalji utakmice",
         selectedIndex: 1,
@@ -80,9 +95,9 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
             children: [
               _buildMainInfo(),
               const SizedBox(height: 16),
-              if(widget.matchID != null) _buildPlayerData(),//display additional data when match already created
+              if(match != null) _buildPlayerData(),//display additional data when match already created
               const SizedBox(height: 16),
-              if(widget.matchID == null) _buildSaveButton(),//manual save only when creating match
+              if(match == null) _buildSaveButton(),//manual save only when creating match
             ],
           ),
         ),
@@ -99,7 +114,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
         image: const DecorationImage(
           image: AssetImage('assets/images/match_bg_3.jpeg'),
           fit: BoxFit.cover,
-          opacity: 0.9,
+          opacity: 0.95,
         ),
         border: Border.all(color: Colors.grey.shade400, width: 1.5),
         borderRadius: BorderRadius.circular(12),
@@ -110,61 +125,50 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                "${widget.fixture.gameStage!.displayName}"
+                "${(widget.fixture.gameStage == GameStage.league || widget.fixture.gameStage == GameStage.groupPhase) ? " • ${widget.fixture.sequenceNumber! + 1}. kolo" : ""}"
+                 "${widget.fixture.gameStage == GameStage.groupPhase ? " • ${match != null ? match!.group?.name : selectedGroup != null ? selectedGroup?.name : '[Odaberite grupu]'}" : ""}",
+                style: const TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () async {
-                    final selectedTeamId = await showDialog<int>(
+                    final selectedTeam = await showDialog<TeamDTO>(
                       context: context,
                       builder: (context) => TeamSelectionDialog(
                         competitionId: widget.competitionId,
                         gameStage: widget.fixture.gameStage!,
-                        competitionTeamId: widget.matchID != null ? match!.homeTeam!.id : null,
-                        oposingCompetitionTeamId: widget.matchID != null ? match!.awayTeam!.id : null,
-                        group: match!.group,
+                        competitionTeamId: match != null ? match!.homeTeam!.id : selectedHomeTeam?.id,
+                        oposingCompetitionTeamId: match != null ? match!.awayTeam!.id : selectedAwayTeam?.id,
+                        group: match != null ? match!.group : selectedGroup,
                       ),
                     );
-
-                    if (selectedTeamId != null) {
-                      try {
-                        var request = {
-                          "fixtureId": widget.fixture.id,
-                          "homeTeamId": selectedTeamId,
-                          "awayTeamId": match!.awayTeam!.id,
-                          "stadiumId": 1,
-                          "dateAndTime": match!.dateAndTime!.toIso8601String()
-                        };
-                        if(widget.matchID == null)
-                        {
-                          await matchesProvider.insert(request);
-                        }
-                        else{
-                          await matchesProvider.update(widget.matchID!, request);
-                        }
-                        initForm();
-                      } catch (e) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text("Greška"),
-                            content: Text(e.toString()),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("OK"),
-                              )
-                            ],
-                          ),
-                        );
+                    if(match != null)
+                    {
+                      if (selectedTeam != null && selectedTeam.id != match?.homeTeam?.id) {
+                        updateMatch(widget.fixture.id!, selectedTeam.id!, match!.awayTeam!.id!, match!.stadium!.id!, match!.dateAndTime!);                        
                       }
-                        
+                    }
+                    else
+                    {
+                      setState(() {
+                        selectedHomeTeam = selectedTeam;
+                      });
                     }
                   },
                   child: Row(
                     children: [
                       Text(
-                        match?.homeTeam?.name ?? "",
-                        style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                        match != null ? match!.homeTeam!.name! : selectedHomeTeam != null ? selectedHomeTeam!.name! : '[Odaberite domaćina]',
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getFieldColor(selectedHomeTeam != null)),
                       ),
                       const SizedBox(width: 4),
                       const Icon(Icons.edit, size: 20, color: Colors.white),
@@ -174,7 +178,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
               ),
               const SizedBox(width: 16),
               Text(
-                isFinished || match!.isUnderway == true
+                isFinished || match?.isUnderway == true
                     ? "${match?.homeTeamScore} : ${match?.awayTeamScore}"
                     : "- : -",
                 style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
@@ -184,58 +188,34 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () async{
-                    final selectedTeamId = await showDialog<int>(
+                    final selectedTeam = await showDialog<TeamDTO>(
                       context: context,
                       builder: (context) => TeamSelectionDialog(
                         competitionId: widget.competitionId,
                         gameStage: widget.fixture.gameStage!,
-                        competitionTeamId: widget.matchID != null ? match!.awayTeam!.id : null,
-                        oposingCompetitionTeamId: widget.matchID != null ? match!.homeTeam!.id : null,
-                        group: match!.group,
+                        competitionTeamId: match != null ? match!.awayTeam!.id : selectedAwayTeam?.id,
+                        oposingCompetitionTeamId: match != null ? match!.homeTeam!.id : selectedHomeTeam?.id,
+                        group: match != null ? match!.group : selectedGroup,
                       ),
                     );
-
-                    if (selectedTeamId != null) {
-                      try {
-                        var request = {
-                          "fixtureId": widget.fixture.id,
-                          "homeTeamId": match!.homeTeam!.id,
-                          "awayTeamId": selectedTeamId,
-                          "stadiumId": 1,//have to change this
-                          "dateAndTime": match!.dateAndTime!.toIso8601String()
-                        };
-                        if(widget.matchID == null)
-                        {
-                          await matchesProvider.insert(request);
-                        }
-                        else{
-                          await matchesProvider.update(widget.matchID!, request);
-                        }
-
-                        initForm();
-                      } catch (e) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text("Greška"),
-                            content: Text(e.toString()),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("OK"),
-                              )
-                            ],
-                          ),
-                        );
+                    if(match != null)
+                    {
+                      if (selectedTeam != null && selectedTeam.id != match?.awayTeam?.id) {
+                        updateMatch(widget.fixture.id!, match!.homeTeam!.id!, selectedTeam.id!, match!.stadium!.id!, match!.dateAndTime!);                        
                       }
-                        
+                    }
+                    else
+                    {
+                      setState(() {
+                        selectedAwayTeam = selectedTeam;
+                      });
                     }
                   },
                   child: Row(
                     children: [
                       Text(
-                        match?.awayTeam?.name ?? "",
-                        style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                        match != null ? match!.awayTeam!.name! : selectedAwayTeam != null ? selectedAwayTeam!.name! : '[Odaberite gosta]',
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getFieldColor(selectedAwayTeam != null)),
                       ),
                       const SizedBox(width: 4),
                       const Icon(Icons.edit, size: 20, color: Colors.white),
@@ -259,8 +239,8 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                       Icon(Icons.calendar_today, size: 20, color: Colors.white.withOpacity(0.8)),
                       const SizedBox(width: 6),
                       Text(
-                        formatDateTime(_selectedDateTime),
-                        style: const TextStyle(color: Colors.white, fontSize: 20),
+                        match != null ? formatDateTime(match!.dateAndTime) : _selectedDateTime != null ? formatDateTime(_selectedDateTime) : '[Odaberite datum]',
+                        style: TextStyle(color: getFieldColor(_selectedDateTime != null), fontSize: 20),
                       ),
                       const SizedBox(width: 4),
                       const Icon(Icons.edit, size: 18, color: Colors.white),
@@ -277,42 +257,21 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                     context: context,
                     builder: (context) => SelectStadiumDialog(
                       competitionId: widget.competitionId,
-                      initiallySelectedStadium: match?.stadium,
+                      initiallySelectedStadium: match != null ? match?.stadium : this.selectedStadium,
                     ),
                   );
 
                   if (selectedStadium != null) {
-                    match?.stadium = selectedStadium;
-                    try {
-                      final request = {
-                        "fixtureId": widget.fixture.id,
-                        "homeTeamId": match!.homeTeam!.id,
-                        "awayTeamId": match!.awayTeam!.id,
-                        "stadiumId": selectedStadium.id,
-                        "dateAndTime": match!.dateAndTime!.toIso8601String(),
-                      };
-
-                      if (widget.matchID == null) {
-                        await matchesProvider.insert(request);
-                      } else {
-                        await matchesProvider.update(widget.matchID!, request);
-                      }
-
-                      initForm(); // reload updated match info
-                    } catch (e) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Greška"),
-                          content: Text(e.toString()),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("OK"),
-                            ),
-                          ],
-                        ),
-                      );
+                    if(match != null)
+                    {
+                      match?.stadium = selectedStadium;
+                      updateMatch(widget.fixture.id!, match!.homeTeam!.id!, match!.awayTeam!.id!, selectedStadium.id!, match!.dateAndTime!);
+                    }
+                    else
+                    {
+                      setState(() {
+                        this.selectedStadium = selectedStadium;
+                      });
                     }
                   }
                 },
@@ -322,8 +281,8 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                     const Icon(Icons.stadium, size: 20, color: Colors.white),
                     const SizedBox(width: 4),
                     Text(
-                      match?.stadium?.name ?? "Nepoznat stadion",
-                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                     match != null ?  match!.stadium!.name! : selectedStadium != null ? selectedStadium!.name! : '[Odaberite stadion]',  
+                      style: TextStyle(color: getFieldColor(selectedStadium != null), fontSize: 20),
                     ),
                     const SizedBox(width: 4),
                     const Icon(Icons.edit, size: 18, color: Colors.white),
@@ -335,17 +294,6 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "${widget.fixture.gameStage!.displayName}"
-                "${(widget.fixture.gameStage == GameStage.league || widget.fixture.gameStage == GameStage.groupPhase) ? " • ${widget.fixture.sequenceNumber! + 1}. kolo" : ""}"
-                " • ${match!.group?.name}",
-                style: const TextStyle(color: Colors.white, fontSize: 20),
-              ),
-            ],
-          ),
           if ((isFinished || match?.isUnderway == true) && match?.goals != null) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -356,37 +304,38 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
               ],
             ),
             const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                onPressed: (){
-                  showGoalUpsertDialog(
-                            context: context,
-                            matchId: widget.matchID!,
-                            competitionTeamId: match!.homeTeam!.id!,
-                            isHomeGoal: true,
-                            goal: null,
-                            onSuccess: (){initForm();}
-                          );
-                },
-                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
-                child: const Text("Novi pogodak domaćina"),
-              ),
-              ElevatedButton(
-                onPressed: (){
-                  showGoalUpsertDialog(
-                            context: context,
-                            matchId: widget.matchID!,
-                            competitionTeamId: match!.awayTeam!.id!,
-                            isHomeGoal: false,
-                            goal: null,
-                            onSuccess: (){initForm();}
-                          );
-                },
-                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
-                child: const Text("Novi pogodak gosta")),
-            ],)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: (){
+                    showGoalUpsertDialog(
+                              context: context,
+                              matchId: match!.matchId!,
+                              competitionTeamId: match!.homeTeam!.id!,
+                              isHomeGoal: true,
+                              goal: null,
+                              onSuccess: (){initForm();}
+                            );
+                  },
+                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
+                  child: const Text("Novi pogodak domaćina"),
+                ),
+                ElevatedButton(
+                  onPressed: (){
+                    showGoalUpsertDialog(
+                              context: context,
+                              matchId: match!.matchId!,
+                              competitionTeamId: match!.awayTeam!.id!,
+                              isHomeGoal: false,
+                              goal: null,
+                              onSuccess: (){initForm();}
+                            );
+                  },
+                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
+                  child: const Text("Novi pogodak gosta")),
+              ],
+            )
           ],
         ],
       ),
@@ -415,32 +364,42 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
   }
 
   Widget _playersList(String title, List<PlayerDTO>? players, bool isHomeList) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: isHomeList ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          SizedBox(
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: players?.length ?? 0,
-              itemBuilder: (context, index) {
-                final player = players![index];
-                return Container(
-                  alignment: isHomeList ? Alignment.centerLeft : Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Text(player.name!, style: const TextStyle(fontSize: 16)),
-                );
-              },
+  return Padding(
+    padding: const EdgeInsets.all(20.0),
+    child: Column(
+      crossAxisAlignment: isHomeList ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+      children: [
+        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        if (players != null && players.isNotEmpty)
+          ...players.map(
+            (player) => Container(
+              constraints: const BoxConstraints(minHeight: 50),
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: isHomeList ? Alignment.centerLeft : Alignment.centerRight,
+              child: Text(
+                player.name ?? "",
+                textAlign: isHomeList ? TextAlign.left : TextAlign.right,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
+          )
+        else
+          Text(
+            "Nema igrača",
+            style: TextStyle(color: Colors.grey.shade600),
           ),
-        ],
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
+
+
 
   Widget _buildSaveButton() {
     return Align(
@@ -468,6 +427,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           if (referees.isNotEmpty)
             ...referees.map(
               (ref) => Container(
+                constraints: const BoxConstraints(minHeight: 50),
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -496,7 +456,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                 context: context,
                 builder: (_) => AssignRefereesDialog(
                   competitionId: widget.competitionId,
-                  matchId: widget.matchID!,
+                  matchId: match!.matchId!,
                   initiallyAssignedReferees: match!.referees!,
                   onClose: () {
                     setState(() {
@@ -542,7 +502,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                         onTap: () {
                           showGoalUpsertDialog(
                             context: context,
-                            matchId: widget.matchID!,
+                            matchId: match!.matchId!,
                             competitionTeamId: goal.isHomeGoal == true ? match!.homeTeam!.id! : match!.awayTeam!.id!,
                             isHomeGoal: goal.isHomeGoal!,
                             goal: goal,
@@ -596,7 +556,50 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
     );
   }
 
-  void _save() {}
+  void _save() async{
+    //first validate if every field is inserted
+    //if not then display it in red color
+    if(selectedHomeTeam == null || selectedAwayTeam == null || selectedStadium == null || _selectedDateTime == null)
+    {
+      setState(() {
+        _validationErrorNotifier = true;
+      });
+      showErrorBottomNotification(context, 'Morate popuniti sva polja');
+    }
+    //after validation is completed and if input is valid create request
+    else
+    {
+      try {
+         final request = {
+           "fixtureId": widget.fixture.id,
+           "homeTeamId": selectedHomeTeam?.id,
+           "awayTeamId": selectedAwayTeam?.id,
+           "stadiumId": selectedStadium?.id,
+           "dateAndTime": _selectedDateTime!.toIso8601String(),
+         };
+         var newMatch = await matchesProvider.insert(request);
+         showBottomRightNotification(context, 'Uspjesno kreirana utakmica');
+         await _loadMatch(newMatch.id!);
+         setState(() {
+         });
+       } catch (e) {
+         showDialog(
+           context: context,
+           builder: (context) => AlertDialog(
+             title: const Text("Greška"),
+             content: Text(e.toString()),
+             actions: [
+               TextButton(
+                 onPressed: () => Navigator.pop(context),
+                 child: const Text("OK"),
+               ),
+             ],
+           ),
+         );
+       }
+    }
+    //should we allow user to switch groups after creating the match?
+  }
 
   Future<void> _unassignReferee(int competitionRefereeMatchId) async {
     try {
@@ -674,7 +677,7 @@ Future<void> _pickDateTime() async {
   final DateTime? pickedDate = await showDatePicker(
     context: context,
     initialDate: currentDateTime,
-    firstDate: DateTime(2023),
+    firstDate: DateTime(2025),
     lastDate: DateTime(2100),
   );
 
@@ -696,40 +699,64 @@ Future<void> _pickDateTime() async {
       pickedTime.minute,
     );
   });
-  if(widget.matchID != null)
+  if(match != null)
     {
-      //Update match
-      try {
-        final request = {
-            "fixtureId": widget.fixture.id,
-            "homeTeamId": match!.homeTeam!.id,
-            "awayTeamId": match!.awayTeam!.id,
-            "stadiumId": match?.stadium?.id,
-            "dateAndTime": _selectedDateTime!.toIso8601String(),
-          };
-
-          if (widget.matchID == null) {
-            await matchesProvider.insert(request);
-          } else {
-            await matchesProvider.update(widget.matchID!, request);
-          }
-
-          initForm();
-      } catch (e) {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text("Greška"),
-              content: Text(e.toString()),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("OK"),
-                ),
-              ],
-            ),
-          );
-      }
+      updateMatch(widget.fixture.id!, match!.homeTeam!.id!, match!.awayTeam!.id!, match!.stadium!.id!, _selectedDateTime!);
     }
 }
+
+  void updateMatch(int fixtureId, int homeTeamId, int awayTeamId, int stadiumId, DateTime dateAndTime) async {
+    if(match != null)
+    {
+      try {
+         final request = {
+           "fixtureId": fixtureId,
+           "homeTeamId": homeTeamId,
+           "awayTeamId": awayTeamId,
+           "stadiumId": stadiumId,
+           "dateAndTime": dateAndTime.toIso8601String(),
+         };
+         await matchesProvider.update(match!.matchId!, request);
+         initForm();
+       } catch (e) {
+         showDialog(
+           context: context,
+           builder: (context) => AlertDialog(
+             title: const Text("Greška"),
+             content: Text(e.toString()),
+             actions: [
+               TextButton(
+                 onPressed: () => Navigator.pop(context),
+                 child: const Text("OK"),
+               ),
+             ],
+           ),
+         );
+       }
+    }
+  }
+  
+  Future<void> _displayGroupSelection() async{
+    final selectedGroup = await showDialog<GroupDTO>(
+      context: context,
+      builder: (context) => SelectGroupDialog(
+        competitionId: widget.competitionId,
+        initiallySelectedGroupId: this.selectedGroup?.id,)
+    );
+    if (selectedGroup != null)
+    {
+      setState(() {
+        this.selectedGroup = selectedGroup;
+      });
+    }
+  }
+  
+  Future<void> _loadMatch(int matchID) async {
+    this.match = await matchesProvider.getMatchDetails(matchID);
+    _selectedDateTime = match?.dateAndTime;
+    if (match!.goals!.isNotEmpty == true) {
+      match!.homeTeamScore = match!.goals!.where((e) => e.isHomeGoal == true).length;
+      match!.awayTeamScore = match!.goals!.where((e) => e.isHomeGoal == false).length;
+    }
+  }
 }

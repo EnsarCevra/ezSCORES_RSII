@@ -1,63 +1,62 @@
-import 'dart:convert';
-import 'package:ezscores_desktop/providers/StadiumsProvider.dart';
-import 'package:flutter/material.dart';
+import 'package:ezscores_desktop/models/DTOs/groupDto.dart';
+import 'package:ezscores_desktop/models/groups.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
-import 'package:ezscores_desktop/models/stadiums.dart';
+import 'package:ezscores_desktop/providers/GroupsProvider.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SelectStadiumDialog extends StatefulWidget {
+class SelectGroupDialog extends StatefulWidget {
   final int competitionId;
-  final Stadiums? initiallySelectedStadium;
+  final int? initiallySelectedGroupId;
 
-  const SelectStadiumDialog({
+  const SelectGroupDialog({
     super.key,
     required this.competitionId,
-    this.initiallySelectedStadium,
+    this.initiallySelectedGroupId,
   });
 
   @override
-  State<SelectStadiumDialog> createState() => _SelectStadiumDialogState();
+  State<SelectGroupDialog> createState() => _SelectGroupDialogState();
 }
 
-class _SelectStadiumDialogState extends State<SelectStadiumDialog> {
-  late StadiumProvider stadiumProvider;
-  SearchResult<Stadiums>? stadiumsResult;
-  Stadiums? selectedStadium;
+class _SelectGroupDialogState extends State<SelectGroupDialog> {
+  late GroupProvider groupsProvider;
+  SearchResult<Groups>? groupsResult;
+  Groups? selectedGroup;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    stadiumProvider = context.read<StadiumProvider>();
-    _loadStadiums();
+    groupsProvider = context.read<GroupProvider>();
+    _loadGroups();
   }
 
-  Future<void> _loadStadiums() async {
-    final data = await stadiumProvider.get(filter: {"competitionId": widget.competitionId});
+  Future<void> _loadGroups() async {
+    final data = await groupsProvider.get(filter: {"competitionId": widget.competitionId});
     setState(() {
-      stadiumsResult = data;
-      if(widget.initiallySelectedStadium != null)
-      {
-        selectedStadium = data.result.firstWhere(
-        (s) => s.id == widget.initiallySelectedStadium?.id
-      );
+      groupsResult = data;
+      if (widget.initiallySelectedGroupId != null) {
+        selectedGroup = data.result.firstWhere(
+          (g) => g.id == widget.initiallySelectedGroupId
+        );
       }
       isLoading = false;
     });
   }
 
-  void _selectStadium(Stadiums stadium) {
+  void _selectGroup(Groups group) {
     setState(() {
-      selectedStadium = stadium;
+      selectedGroup = group;
     });
   }
 
   void _save() {
-    if (selectedStadium != null && selectedStadium!.id != null) {
-      Navigator.of(context).pop(selectedStadium);
+    if (selectedGroup != null && selectedGroup!.id != null) {
+      Navigator.of(context).pop(GroupDTO(id: selectedGroup?.id, name: selectedGroup?.name));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Molimo odaberite stadion.")),
+        const SnackBar(content: Text("Molimo odaberite grupu.")),
       );
     }
   }
@@ -78,7 +77,7 @@ class _SelectStadiumDialogState extends State<SelectStadiumDialog> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Text(
-                      "Odaberite stadion",
+                      "Odaberite grupu",
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
@@ -87,14 +86,10 @@ class _SelectStadiumDialogState extends State<SelectStadiumDialog> {
                         child: Wrap(
                           spacing: 16,
                           runSpacing: 16,
-                          children: stadiumsResult!.result.map((stadium) {
-                            final isSelected = selectedStadium?.id == stadium.id;
-                            final image = stadium.picture != null && stadium.picture!.isNotEmpty
-                                ? MemoryImage(base64Decode(stadium.picture!))
-                                : null;
-
+                          children: groupsResult!.result.map((group) {
+                            final isSelected = selectedGroup?.id == group.id;
                             return GestureDetector(
-                              onTap: () => _selectStadium(stadium),
+                              onTap: () => _selectGroup(group),
                               child: Container(
                                 width: 180,
                                 padding: const EdgeInsets.all(12),
@@ -109,16 +104,10 @@ class _SelectStadiumDialogState extends State<SelectStadiumDialog> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage: image,
-                                      child: image == null
-                                          ? const Icon(Icons.stadium, size: 32, color: Colors.grey)
-                                          : null,
-                                    ),
+                                    const Icon(Icons.group, size: 36, color: Colors.grey),
                                     const SizedBox(height: 10),
                                     Text(
-                                      stadium.name ?? "Nepoznat stadion",
+                                      group.name ?? "Nepoznata grupa",
                                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                       textAlign: TextAlign.center,
                                     ),
@@ -134,15 +123,10 @@ class _SelectStadiumDialogState extends State<SelectStadiumDialog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text("Zatvori"),
-                        ),
-                        const SizedBox(width: 10),
                         ElevatedButton.icon(
                           onPressed: _save,
                           icon: const Icon(Icons.check),
-                          label: const Text("Spremi"),
+                          label: const Text("Odaberi"),
                         ),
                       ],
                     )
@@ -153,4 +137,3 @@ class _SelectStadiumDialogState extends State<SelectStadiumDialog> {
     );
   }
 }
-

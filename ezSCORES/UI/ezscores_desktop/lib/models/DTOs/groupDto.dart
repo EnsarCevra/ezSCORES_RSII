@@ -7,7 +7,7 @@ class GroupDTO {
 	int? id;
 	String? name;
 
-	GroupDTO();
+	GroupDTO({this.id, this.name});
 
 	factory GroupDTO.fromJson(Map<String, dynamic> json) => _$GroupDTOFromJson(json);
 
