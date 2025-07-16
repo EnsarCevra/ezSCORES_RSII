@@ -19,7 +19,9 @@ import 'package:ezscores_desktop/providers/GoalProvider.dart';
 import 'package:ezscores_desktop/providers/MatchesProvider.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
@@ -137,42 +139,63 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () async {
-                    final selectedTeam = await showDialog<TeamDTO>(
-                      context: context,
-                      builder: (context) => TeamSelectionDialog(
-                        competitionId: widget.competitionId,
-                        gameStage: widget.fixture.gameStage!,
-                        competitionTeamId: match != null ? match!.homeTeam!.id : selectedHomeTeam?.id,
-                        oposingCompetitionTeamId: match != null ? match!.awayTeam!.id : selectedAwayTeam?.id,
-                        group: match != null ? match!.group : selectedGroup,
-                      ),
-                    );
-                    if(match != null)
-                    {
-                      if (selectedTeam != null && selectedTeam.id != match?.homeTeam?.id) {
-                        updateMatch(widget.fixture.id!, selectedTeam.id!, match!.awayTeam!.id!, match!.stadium!.id!, match!.dateAndTime!);                        
+              AbsorbPointer(
+                absorbing: match?.isUnderway == true || match?.isCompleted == true,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final selectedTeam = await showDialog<TeamDTO>(
+                        context: context,
+                        builder: (context) => TeamSelectionDialog(
+                          competitionId: widget.competitionId,
+                          gameStage: widget.fixture.gameStage!,
+                          competitionTeamId: match != null ? match!.homeTeam!.id : selectedHomeTeam?.id,
+                          oposingCompetitionTeamId: match != null ? match!.awayTeam!.id : selectedAwayTeam?.id,
+                          group: match != null ? match!.group : selectedGroup,
+                        ),
+                      );
+                      if(match != null)
+                      {
+                        if (selectedTeam != null && selectedTeam.id != match?.homeTeam?.id) {
+                          updateMatch(widget.fixture.id!, selectedTeam.id!, match!.awayTeam!.id!, match!.stadium!.id!, match!.dateAndTime!);                        
+                        }
                       }
-                    }
-                    else
-                    {
-                      setState(() {
-                        selectedHomeTeam = selectedTeam;
-                      });
-                    }
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        match != null ? match!.homeTeam!.name! : selectedHomeTeam != null ? selectedHomeTeam!.name! : '[Odaberite domaćina]',
-                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getFieldColor(selectedHomeTeam != null)),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.edit, size: 20, color: Colors.white),
-                    ],
+                      else
+                      {
+                        setState(() {
+                          selectedHomeTeam = selectedTeam;
+                        });
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: match?.homeTeam?.picture != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.memory(
+                                    base64Decode(match!.homeTeam!.picture!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Icon(Icons.image_not_supported, color: Colors.grey),
+                        ),
+                        const SizedBox(width: 20,),
+                        Text(
+                          match != null ? match!.homeTeam!.name! : selectedHomeTeam != null ? selectedHomeTeam!.name! : '[Odaberite domaćina]',
+                          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getFieldColor(selectedHomeTeam != null)),
+                        ),
+                        const SizedBox(width: 8),
+                        if(match?.isUnderway == false && match?.isCompleted == false) const Icon(Icons.edit, size: 18, color: Colors.white),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -183,43 +206,64 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                     : "- : -",
                 style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
               ),
-              const SizedBox(width: 8),
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () async{
-                    final selectedTeam = await showDialog<TeamDTO>(
-                      context: context,
-                      builder: (context) => TeamSelectionDialog(
-                        competitionId: widget.competitionId,
-                        gameStage: widget.fixture.gameStage!,
-                        competitionTeamId: match != null ? match!.awayTeam!.id : selectedAwayTeam?.id,
-                        oposingCompetitionTeamId: match != null ? match!.homeTeam!.id : selectedHomeTeam?.id,
-                        group: match != null ? match!.group : selectedGroup,
-                      ),
-                    );
-                    if(match != null)
-                    {
-                      if (selectedTeam != null && selectedTeam.id != match?.awayTeam?.id) {
-                        updateMatch(widget.fixture.id!, match!.homeTeam!.id!, selectedTeam.id!, match!.stadium!.id!, match!.dateAndTime!);                        
+              const SizedBox(width: 16),
+              AbsorbPointer(
+                absorbing: match?.isUnderway == true || match?.isCompleted == true,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () async{
+                      final selectedTeam = await showDialog<TeamDTO>(
+                        context: context,
+                        builder: (context) => TeamSelectionDialog(
+                          competitionId: widget.competitionId,
+                          gameStage: widget.fixture.gameStage!,
+                          competitionTeamId: match != null ? match!.awayTeam!.id : selectedAwayTeam?.id,
+                          oposingCompetitionTeamId: match != null ? match!.homeTeam!.id : selectedHomeTeam?.id,
+                          group: match != null ? match!.group : selectedGroup,
+                        ),
+                      );
+                      if(match != null)
+                      {
+                        if (selectedTeam != null && selectedTeam.id != match?.awayTeam?.id) {
+                          updateMatch(widget.fixture.id!, match!.homeTeam!.id!, selectedTeam.id!, match!.stadium!.id!, match!.dateAndTime!);                        
+                        }
                       }
-                    }
-                    else
-                    {
-                      setState(() {
-                        selectedAwayTeam = selectedTeam;
-                      });
-                    }
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        match != null ? match!.awayTeam!.name! : selectedAwayTeam != null ? selectedAwayTeam!.name! : '[Odaberite gosta]',
-                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getFieldColor(selectedAwayTeam != null)),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.edit, size: 20, color: Colors.white),
-                    ],
+                      else
+                      {
+                        setState(() {
+                          selectedAwayTeam = selectedTeam;
+                        });
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        if(match?.isUnderway == false && match?.isCompleted == false) const Icon(Icons.edit, size: 18, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text(
+                          match != null ? match!.awayTeam!.name! : selectedAwayTeam != null ? selectedAwayTeam!.name! : '[Odaberite gosta]',
+                          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getFieldColor(selectedAwayTeam != null)),
+                        ),
+                        const SizedBox(width: 20),
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: match?.awayTeam?.picture != null && match?.awayTeam?.picture?.isNotEmpty == true
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.memory(
+                                    base64Decode(match!.awayTeam!.picture!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Icon(Icons.image_not_supported, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -229,67 +273,73 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: _pickDateTime,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.calendar_today, size: 20, color: Colors.white.withOpacity(0.8)),
-                      const SizedBox(width: 6),
-                      Text(
-                        match != null ? formatDateTime(match!.dateAndTime) : _selectedDateTime != null ? formatDateTime(_selectedDateTime) : '[Odaberite datum]',
-                        style: TextStyle(color: getFieldColor(_selectedDateTime != null), fontSize: 20),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.edit, size: 18, color: Colors.white),
-                    ],
+              AbsorbPointer(
+                absorbing: match?.isUnderway == true || match?.isCompleted == true,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: _pickDateTime,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.calendar_today, size: 20, color: Colors.white.withOpacity(0.8)),
+                        const SizedBox(width: 6),
+                        Text(
+                          match != null ? formatDateTime(match!.dateAndTime) : _selectedDateTime != null ? formatDateTime(_selectedDateTime) : '[Odaberite datum]',
+                          style: TextStyle(color: getFieldColor(_selectedDateTime != null), fontSize: 20),
+                        ),
+                        const SizedBox(width: 4),
+                        if(match?.isUnderway == false && match?.isCompleted == false) const Icon(Icons.edit, size: 18, color: Colors.white),
+                      ],
+                    ),
                   ),
                 ),
               ),
               const Text(" • • • ", style: TextStyle(color: Colors.white, fontSize: 20)),
-              MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () async {
-                  final selectedStadium = await showDialog<Stadiums>(
-                    context: context,
-                    builder: (context) => SelectStadiumDialog(
-                      competitionId: widget.competitionId,
-                      initiallySelectedStadium: match != null ? match?.stadium : this.selectedStadium,
-                    ),
-                  );
-
-                  if (selectedStadium != null) {
-                    if(match != null)
-                    {
-                      match?.stadium = selectedStadium;
-                      updateMatch(widget.fixture.id!, match!.homeTeam!.id!, match!.awayTeam!.id!, selectedStadium.id!, match!.dateAndTime!);
+              AbsorbPointer(
+                absorbing: match?.isUnderway == true || match?.isCompleted == true,
+                child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () async {
+                    final selectedStadium = await showDialog<Stadiums>(
+                      context: context,
+                      builder: (context) => SelectStadiumDialog(
+                        competitionId: widget.competitionId,
+                        initiallySelectedStadium: match != null ? match?.stadium : this.selectedStadium,
+                      ),
+                    );
+                
+                    if (selectedStadium != null) {
+                      if(match != null)
+                      {
+                        match?.stadium = selectedStadium;
+                        updateMatch(widget.fixture.id!, match!.homeTeam!.id!, match!.awayTeam!.id!, selectedStadium.id!, match!.dateAndTime!);
+                      }
+                      else
+                      {
+                        setState(() {
+                          this.selectedStadium = selectedStadium;
+                        });
+                      }
                     }
-                    else
-                    {
-                      setState(() {
-                        this.selectedStadium = selectedStadium;
-                      });
-                    }
-                  }
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.stadium, size: 20, color: Colors.white),
-                    const SizedBox(width: 4),
-                    Text(
-                     match != null ?  match!.stadium!.name! : selectedStadium != null ? selectedStadium!.name! : '[Odaberite stadion]',  
-                      style: TextStyle(color: getFieldColor(selectedStadium != null), fontSize: 20),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.edit, size: 18, color: Colors.white),
-                  ],
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.stadium, size: 20, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                       match != null ?  match!.stadium!.name! : selectedStadium != null ? selectedStadium!.name! : '[Odaberite stadion]',  
+                        style: TextStyle(color: getFieldColor(selectedStadium != null), fontSize: 20),
+                      ),
+                      const SizedBox(width: 4),
+                      if(match?.isUnderway == false && match?.isCompleted == false) const Icon(Icons.edit, size: 18, color: Colors.white),
+                    ],
+                  ),
                 ),
+                            ),
               ),
-            ),
 
             ],
           ),
@@ -319,7 +369,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                             );
                   },
                   style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
-                  child: const Text("Novi pogodak domaćina"),
+                  child: const Text("Dodaj pogodak domaćina"),
                 ),
                 ElevatedButton(
                   onPressed: (){
@@ -333,10 +383,89 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                             );
                   },
                   style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.green)),
-                  child: const Text("Novi pogodak gosta")),
+                  child: const Text("Dodaj pogodak gosta")),
               ],
             )
           ],
+          if(match?.isUnderway == false && match?.isCompleted == false) ElevatedButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Jeste li sigurni"),
+                  content: const Text(
+                    "Kada pokrenete utakmicu nećete više moći vršiti izmjene nad ovom utakmicom.",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context), // Closes the dialog
+                      child: const Text("Odustani"),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                      onPressed: () async {
+                        await _startMatch();
+
+                        showBottomRightNotification(context, "Utakmica je pokrenuta");
+                        Navigator.pop(context);
+                        setState(() {}); // If needed, to reflect changes
+                      },
+                      child: const Text("Pokreni"),
+                    ),
+                  ],
+                ),
+              );
+
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Pokreni utakmicu'),
+          ),
+          if(match?.isUnderway == true) ElevatedButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Jeste li sigurni"),
+                  content: const Text(
+                    "Ovo je nepovratna operacija, utakmica će trajno biti završena!",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Odustani"),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                      onPressed: () async {
+                        await _finishMatch(true);//finish match endpoint
+
+                        showBottomRightNotification(context, "Utakmica je završena");
+                        Navigator.pop(context);
+                        setState(() {}); // If needed, to reflect changes
+                      },
+                      child: const Text("Završi"),
+                    ),
+                  ],
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Završi utakmicu'),
+          )
         ],
       ),
     );
@@ -438,7 +567,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(ref.name!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    IconButton(
+                    if(match?.isUnderway == false) IconButton(
                       icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
                       tooltip: "Ukloni sudiju",
                       onPressed: () => _unassignReferee(ref.id!),
@@ -450,7 +579,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           else
             const Text("Nema dodijeljenih sudija."),
           const SizedBox(height: 12),
-          ElevatedButton(
+          if(match?.isUnderway == false && match?.isCompleted == false) ElevatedButton(
             onPressed: () {
               showDialog(
                 context: context,
@@ -752,11 +881,53 @@ Future<void> _pickDateTime() async {
   }
   
   Future<void> _loadMatch(int matchID) async {
-    this.match = await matchesProvider.getMatchDetails(matchID);
+    match = await matchesProvider.getMatchDetails(matchID);
     _selectedDateTime = match?.dateAndTime;
-    if (match!.goals!.isNotEmpty == true) {
-      match!.homeTeamScore = match!.goals!.where((e) => e.isHomeGoal == true).length;
-      match!.awayTeamScore = match!.goals!.where((e) => e.isHomeGoal == false).length;
+    match!.homeTeamScore = match!.goals!.where((e) => e.isHomeGoal == true).length;
+    match!.awayTeamScore = match!.goals!.where((e) => e.isHomeGoal == false).length;
+  }
+  
+  _startMatch() async{
+    try {
+      await matchesProvider.startMatch(widget.matchID!);
+    } catch (e) {
+      showDialog(
+           context: context,
+           builder: (context) => AlertDialog(
+             title: const Text("Greška"),
+             content: Text(e.toString()),
+             actions: [
+               TextButton(
+                 onPressed: () => Navigator.pop(context),
+                 child: const Text("OK"),
+               ),
+             ],
+           ),
+         );
     }
+    match?.isUnderway = true;//no need to reload everything just because these prop
+    match?.homeTeamScore = 0;
+    match?.awayTeamScore = 0;
+  }
+  _finishMatch(bool isCompletedInRegullarTime) async {
+    try {
+      await matchesProvider.finishMatch(widget.matchID!, isCompletedInRegullarTime);
+    } catch (e) {
+      showDialog(
+           context: context,
+           builder: (context) => AlertDialog(
+             title: const Text("Greška"),
+             content: Text(e.toString()),
+             actions: [
+               TextButton(
+                 onPressed: () => Navigator.pop(context),
+                 child: const Text("OK"),
+               ),
+             ],
+           ),
+         );
+    }
+    match?.isCompleted = true;
+    match?.isUnderway = false;
   }
 }

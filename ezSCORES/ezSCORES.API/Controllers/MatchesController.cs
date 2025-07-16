@@ -29,7 +29,7 @@ namespace ezSCORES.API.Controllers
 		}
 
 		[HttpPatch("{id}/finish-match")]
-		public void FinishFixture(int id, FinishMatchRequest request)
+		public void FinishMatch(int id, FinishMatchRequest request)
 		{
 			(_service as IMatchesService).FinishMatch(id, request);
 		}

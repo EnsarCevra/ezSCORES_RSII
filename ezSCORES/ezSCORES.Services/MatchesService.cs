@@ -159,6 +159,7 @@ namespace ezSCORES.Services
 							{
 								Id = x.HomeTeam.Id,
 								Name = x.HomeTeam.Team.Name,
+								Picture = x.HomeTeam.Team.Picture,
 								Players = x.HomeTeam.CompetitionsTeamsPlayers.Select(p => new PlayerDTO
 								{
 									Id = p.Id,
@@ -169,6 +170,7 @@ namespace ezSCORES.Services
 							{
 								Id = x.AwayTeam.Id,
 								Name = x.AwayTeam.Team.Name,
+								Picture = x.AwayTeam.Team.Picture,
 								Players = x.AwayTeam.CompetitionsTeamsPlayers.Select(p => new PlayerDTO
 								{
 									Id = p.Id,

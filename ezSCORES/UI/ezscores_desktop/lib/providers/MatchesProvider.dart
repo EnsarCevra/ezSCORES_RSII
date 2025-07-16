@@ -33,4 +33,39 @@ class MatchesProvider extends BaseProvider<Matches>
       throw UserException("Unknown error.");
     }
   }
+
+  Future<void> startMatch(int matchId) async {
+    var url = "${BaseProvider.baseUrl}Matches/$matchId/start-match";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+    http.Response response;
+
+    try {
+      response = await http.patch(uri, headers: headers);
+    } on UserException {
+      rethrow;
+    }
+
+    if (!isValidResponse(response)) {
+      throw UserException("Neuspješno pokretanje utakmice.");
+    }
+  }
+
+  Future<void> finishMatch(int matchId, isCompletedInRegullarTime) async {
+    var url = "${BaseProvider.baseUrl}Matches/$matchId/finish-match";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+    final body = jsonEncode({"isCompletedInRegullarTime": isCompletedInRegullarTime});
+    http.Response response;
+
+    try {
+      response = await http.patch(uri, headers: headers, body: body);
+    } on UserException {
+      rethrow;
+    }
+
+    if (!isValidResponse(response)) {
+      throw UserException("Neuspješno završavanje utakmice.");
+    }
+  }
 }

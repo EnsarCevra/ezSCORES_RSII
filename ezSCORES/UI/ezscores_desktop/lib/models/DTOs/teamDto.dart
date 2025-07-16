@@ -7,6 +7,7 @@ part 'teamDto.g.dart';
 class TeamDTO {
 	int? id;
 	String? name;
+  String? picture;
   List<PlayerDTO>? players;
 
 	TeamDTO({this.id, this.name});
