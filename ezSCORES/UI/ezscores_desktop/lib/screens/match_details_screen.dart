@@ -387,7 +387,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
               ],
             )
           ],
-          if(match?.isUnderway == false && match?.isCompleted == false) ElevatedButton(
+          if((match?.isUnderway == false && match?.isCompleted == false) && widget.fixture.isCurrentlyActive == true) ElevatedButton(
             onPressed: () {
               showDialog(
                 context: context,

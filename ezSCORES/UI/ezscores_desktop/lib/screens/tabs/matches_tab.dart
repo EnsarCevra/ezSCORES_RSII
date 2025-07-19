@@ -139,7 +139,7 @@ class _MatchesTabState extends State<MatchesTab> {
                                 _deleteFixture(fixture.id!);
                               },
                             ),
-                            ElevatedButton(onPressed: () async {
+                            if(fixtureLimitReached(fixture)) ElevatedButton(onPressed: () async {
                               final actionResult = await Navigator.of(context).push(
                                       PageRouteBuilder(
                                         pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competitionId,),
@@ -282,5 +282,20 @@ class _MatchesTabState extends State<MatchesTab> {
           content: Text(e.toString()),));
       }
     }
+  }
+  
+  bool fixtureLimitReached(FixtureDTO fixture) {
+    final limits = {
+      GameStage.finals: 1,
+      GameStage.semiFinals: 2,
+      GameStage.quarterFinals: 4,
+      GameStage.groupPhase: 9999,
+      GameStage.league: 9999,
+    };
+
+    final limit = limits[fixture.gameStage] ?? 9999;
+    final current = fixture.matches?.length ?? 0;
+
+    return current < limit;
   }
 }

@@ -290,9 +290,9 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(errorText: 'Sezona je obavezna'),
                         FormBuilderValidators.match(
-                            r'^\d{4}(\/\d{4})?$',
-                            errorText: 'Format mora biti npr. 2025 ili 2024/2025',
-                          ),
+                          r'^(\d{4}|\d{2}\/\d{2}|\d{4}\/\d{2}|\d{4}\/\d{4})$',
+                          errorText: 'Format mora biti npr. 2025, 24/25, 2024/25 ili 2024/2025',
+                        ),
                       ]),
                     ),
                   ),
