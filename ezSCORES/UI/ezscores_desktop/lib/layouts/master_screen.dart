@@ -3,10 +3,7 @@ import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/screens/admin_dashboard_screen.dart';
 import 'package:ezscores_desktop/screens/admin_setting_screen.dart';
 import 'package:ezscores_desktop/screens/competitions_list_screen.dart';
-import 'package:ezscores_desktop/screens/players_list_screen.dart';
 import 'package:ezscores_desktop/screens/profile_screen.dart';
-import 'package:ezscores_desktop/screens/referees_list.screen.dart';
-import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:ezscores_desktop/screens/users_list.dart';
 import 'package:flutter/material.dart';
 
@@ -34,11 +31,8 @@ class _MasterScreenState extends State<MasterScreen> {
 
   Widget? screenToPush;
   switch (index) {
-     case 0: screenToPush = const AdminDashboardScreen();
-     case 1: screenToPush = CompetitionsListScreen(selectedIndex: index,);
-    case 2: screenToPush = TeamsListScreen(selectedIndex: index);
-    case 3: screenToPush = PlayersListScreen(selectedIndex: index,);
-    case 4: screenToPush = RefereesListScreen(selectedIndex: index,);
+    case 0: screenToPush = const AdminDashboardScreen();
+    case 1: screenToPush = CompetitionsListScreen(selectedIndex: index,);
     case 5: screenToPush = AdminSettingsScreen(selectedIndex: index,);
     case 6:  screenToPush = UsersListScreen(selectedIndex: index,);
     case 7:  screenToPush = ProfileScreen(selectedIndex: index,);
@@ -56,7 +50,6 @@ class _MasterScreenState extends State<MasterScreen> {
       ),
     );
 
-    // Handle the selectedIndex on pop back
     if (result != null) {
       setState(() {
         _currentIndex = result;
@@ -89,12 +82,9 @@ Widget build(BuildContext context) {
                 ],
               ),
               const SizedBox(height: 40),
-
-              // Sidebar items + sticky bottom section
               Expanded(
                 child: Column(
                   children: [
-                    // Scrollable sidebar items
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -116,30 +106,6 @@ Widget build(BuildContext context) {
                             ),
                             if (AuthProvider.roleID == 3)
                               _SidebarItem(
-                                index: 2,
-                                icon: Icons.group,
-                                title: "Upravljaj ekipama",
-                                isSelected: widget.selectedIndex == 2,
-                                onTap: () => onSidebarItemTapped(2),
-                              ),
-                            if (AuthProvider.roleID == 3)
-                              _SidebarItem(
-                                index: 3,
-                                icon: Icons.person,
-                                title: "Upravljaj igračima",
-                                isSelected: widget.selectedIndex == 3,
-                                onTap: () => onSidebarItemTapped(3),
-                              ),
-                              if (AuthProvider.roleID == 3)
-                              _SidebarItem(
-                                index: 4,
-                                icon: Icons.person,
-                                title: "Upravljaj sudcima",
-                                isSelected: widget.selectedIndex == 4,
-                                onTap: () => onSidebarItemTapped(4),
-                              ),
-                            if (AuthProvider.roleID == 3)
-                              _SidebarItem(
                                 index: 5,
                                 icon: Icons.settings_applications_outlined,
                                 title: "Admin postavke",
@@ -159,7 +125,6 @@ Widget build(BuildContext context) {
                       ),
                     ),
 
-                    // Bottom-aligned profile & logout
                     const Divider(height: 20),
                     _SidebarItem(
                       index: 7,
@@ -182,7 +147,6 @@ Widget build(BuildContext context) {
           ),
         ),
 
-        // Main content area with AppBar and content
         Expanded(
           child: Column(
             children: [

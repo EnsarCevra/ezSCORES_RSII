@@ -478,9 +478,12 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
   }
   
   _isAllowed() {//should be allowed as soon as competition is created and user should be notified that he can edit this as well after he creates competition
-    if(widget.competition!.status! == CompetitionStatus.applicationsOpen || widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished)
+    if(widget.competition != null)
     {
-      return true;
+      if(widget.competition!.status! == CompetitionStatus.preparation || widget.competition!.status! == CompetitionStatus.applicationsOpen || widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished)
+      {
+        return true;
+      }
     }
     return false;
   }

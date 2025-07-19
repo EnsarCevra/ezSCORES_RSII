@@ -1,8 +1,11 @@
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/screens/cities_list_screen.dart';
+import 'package:ezscores_desktop/screens/players_list_screen.dart';
+import 'package:ezscores_desktop/screens/referees_list.screen.dart';
 import 'package:ezscores_desktop/screens/selections_list_screen.dart';
 import 'package:ezscores_desktop/screens/sponsors_list_screen.dart';
 import 'package:ezscores_desktop/screens/stadiums_list_screen.dart';
+import 'package:ezscores_desktop/screens/teams_list.dart';
 import 'package:flutter/material.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
@@ -11,10 +14,40 @@ class AdminSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<_AdminCardItem> cardItems = [
+      _AdminCardItem("Upravljaj ekipama", Icons.people, () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => TeamsListScreen(selectedIndex: selectedIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
+      }),
+      _AdminCardItem("Upravljaj igračima", Icons.people, () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => PlayersListScreen(selectedIndex: selectedIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
+      }),
       _AdminCardItem("Upravljaj selekcijama", Icons.group_add, () {
         Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => SelectionsListScreen(selectedIndex: selectedIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
+      }),
+      _AdminCardItem("Upravljaj sudcima", Icons.safety_check, () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => RefereesListScreen(selectedIndex: selectedIndex),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
@@ -58,13 +91,13 @@ class AdminSettingsScreen extends StatelessWidget {
       selectedIndex: selectedIndex, 
       LayoutBuilder(
         builder: (context, constraints) {
-          final double cardWidth = 250;
-          final double cardHeight = 120;
-          final double spacing = 24;
-          final int crossAxisCount = 2;
+          const double cardWidth = 250;
+          const double cardHeight = 120;
+          const double spacing = 24;
+          const int crossAxisCount = 3;
 
           // Calculate total grid width
-          final double totalWidth = (crossAxisCount * cardWidth) + ((crossAxisCount - 1) * spacing);
+          const  double totalWidth = (crossAxisCount * cardWidth) + ((crossAxisCount - 1) * spacing);
           final double horizontalPadding = (constraints.maxWidth - totalWidth) / 2;
 
           return Center(
@@ -73,7 +106,7 @@ class AdminSettingsScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 32),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: cardItems.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
@@ -110,11 +143,11 @@ class AdminSettingsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(item.icon, size: 36, color: Colors.blueAccent),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 item.title,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ],
           ),
