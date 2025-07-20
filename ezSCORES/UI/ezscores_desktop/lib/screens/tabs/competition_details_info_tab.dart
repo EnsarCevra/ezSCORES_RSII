@@ -428,22 +428,30 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
                 final formData = Map<String, dynamic>.from(originalFormData!);
                 DateTime applicationEndDate = formData['applicationEndDate'];
                 DateTime startDate = formData['startDate'];
-                formData['startDate'] = startDate.toUtc().toIso8601String();
-                formData['applicationEndDate'] = applicationEndDate.toUtc().toIso8601String();
+                formData['startDate'] = startDate.toIso8601String();
+                formData['applicationEndDate'] = applicationEndDate.toIso8601String();
                 var request = Map.from(formData);
                 request["picture"] = _base64Image;
                 request["cityId"] = _selectedCity!.id!;
                 try {
+                  final bool isNewCompetition = widget.competition == null;
                   if (widget.competition == null) {
-                    await competitionProvider.insert(request);
+                    widget.competition = await competitionProvider.insert(request);
                   } else {
-                    await competitionProvider.update(widget.competition!.id!, request);
+                    widget.competition = await competitionProvider.update(widget.competition!.id!, request);
                   }
                   if (context.mounted) {
-                    widget.competition == null
-                        ? showBottomRightNotification(context, 'Takmičenje uspješno kreirano.')
-                        : showBottomRightNotification(context, 'Takmičenje uspješno ažurirano.');
-                    Navigator.pop(context, true);
+                    if(isNewCompetition)
+                    {
+                      _showInsertSuccessDialog(context);
+                    }
+                    else
+                    {
+                      showBottomRightNotification(context, 'Takmičenje uspješno ažurirano.');
+                    }
+                    setState(() {
+                      
+                    });
                   }
                 } on Exception catch (exception) {
                   showDialog(
@@ -486,5 +494,40 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
       }
     }
     return false;
+  }
+  
+  _showInsertSuccessDialog(BuildContext context) {
+     showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Takmičenje uspješno kreirano"),
+        content: const Text(
+          "Uspješno ste kreirali takmičenje koje je sada u fazi pripreme.\n"
+          "Sada možete pristupiti dodatnim postavkama za upravaljanje sudijama, sponzorima i nagradama!",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Uredu", style: TextStyle(color: Colors.blue),),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await Navigator.of(context).push(PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => CompetitionAditionalSettingsScreen(selectedIndex: 1, competitionId: widget.competition!.id!,),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+                  },
+                ));
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+            child: const Text("Dodatne postavke"),
+          ),
+        ],
+      ),
+    );
   }
 }
