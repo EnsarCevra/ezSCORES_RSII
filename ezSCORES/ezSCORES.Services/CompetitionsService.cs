@@ -39,7 +39,7 @@ namespace ezSCORES.Services
 		}
 		public override IQueryable<Competition> AddFilter(CompetitionsSearchObject search, IQueryable<Competition> query)
 		{
-			base.AddFilter(search, query);
+			//base.AddFilter(search, query);
 			if (search.SelectionId != null)
 			{
 				query = query.Where(x=>x.SelectionId == search.SelectionId);

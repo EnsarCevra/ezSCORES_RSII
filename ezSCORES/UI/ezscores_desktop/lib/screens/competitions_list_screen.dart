@@ -1,3 +1,5 @@
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/cities.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
@@ -34,7 +36,7 @@ class _CompetitionListScreenState extends State<CompetitionsListScreen>
   String? selectedSelectionID;
   int? selectedStatus;
   int? selectedCompetitionType;
-  SearchResult<Competitions>? competitionResult = null; 
+  late PaginationController<Competitions> _paginationController;
   SearchResult<Selections>? selectionResult = null; 
   final _formKey = GlobalKey<FormBuilderState>();
   @override
@@ -53,20 +55,31 @@ class _CompetitionListScreenState extends State<CompetitionsListScreen>
         });
       }
     });
+
+    _paginationController = PaginationController<Competitions>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "name": _nameEditingController.text,
+          "onlyUserCompettions" : AuthProvider.roleID == 3 ? false : true,
+          "cityId": _selectedCity?.id,
+          "isSelectionIncluded": true,
+          "status": selectedStatus,
+          "competitionType" : selectedCompetitionType,
+          "selectionId": selectedSelectionID,
+          "page": page,
+          "pageSize": pageSize,
+        };
+        return competitionProvider.get(filter: filter);
+      }
+    );
     initForm();
   }
  
 
   Future initForm() async{
-    var filter = {"isSelectionIncluded" : true, "isCityIncluded" : true};
-    if(AuthProvider.roleID == 1)
-    {
-      filter['onlyUserCompettions'] = true;
-    }
-    var playerData = await competitionProvider.get(filter: filter);
+    await _paginationController.loadPage();
     var selectionData = await selectionProvider.get();
     setState(() {
-      competitionResult = playerData;
       selectionResult = selectionData;
     });
    }
@@ -84,7 +97,10 @@ class _CompetitionListScreenState extends State<CompetitionsListScreen>
       child: Column(
         children: [
           _buildSearch(),
-          _buildResultView()
+          AnimatedBuilder(
+            animation: _paginationController,
+            builder: (context, _) => _buildResultView(),
+          )
         ],
       ),
     ));
@@ -241,22 +257,13 @@ Widget _buildSearch() {
               ElevatedButton(
                 onPressed: () async {
                   if (!_formKey.currentState!.validate()) return;
-                  var filter = {
-                    "name": _nameEditingController.text,
-                    "cityId": _selectedCity?.id,
-                    "isSelectionIncluded": true,
-                    "status": selectedStatus,
-                    "competitionType" : selectedCompetitionType,
-                    "selectionId": selectedSelectionID
-                  };
-                  var data = await competitionProvider.get(filter: filter);
+                  await _paginationController.loadPage(0);
                   setState(() {
-                    competitionResult = data;
                   });
                 },
                 child: Icon(Icons.search),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: () async {
                   final actionResult = await Navigator.of(context).push(
@@ -283,82 +290,79 @@ Widget _buildSearch() {
 
 final ScrollController _horizontalScrollController = ScrollController();
 Widget _buildResultView() {
-  if (competitionResult != null) {
-    if (competitionResult!.count != 0) {
-      return Expanded( // This allows vertical scrolling within available space
-        child: Scrollbar(
-          controller: _horizontalScrollController,
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            controller: _horizontalScrollController,
-            scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context).size.width,
-                ),
-                child: DataTable(
-                  columnSpacing: 16.0,
-                  showCheckboxColumn: false,
-                  columns: const [
-                    DataColumn(label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold))))),
-                    DataColumn(label: Flexible(child: Center(child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold))))),
-                    DataColumn(label: Flexible(child: Center(child: Text("Tip", style: TextStyle(fontWeight: FontWeight.bold))))),
-                    DataColumn(label: Flexible(child: Center(child: Text("Status", style: TextStyle(fontWeight: FontWeight.bold))))),
-                    DataColumn(label: Flexible(child: Center(child: Text("Selekcija/uzrast", style: TextStyle(fontWeight: FontWeight.bold))))),
-                    DataColumn(label: Flexible(child: Center(child: Text("Prijave do", style: TextStyle(fontWeight: FontWeight.bold))))),
-                    DataColumn(label: Flexible(child: Center(child: Text("Početak takmičenja", style: TextStyle(fontWeight: FontWeight.bold))))),
-                  ],
-                  rows: competitionResult?.result.map((e) => DataRow(
-                    onSelectChanged: (_) => _handleRowTap(e),
-                    cells: [
-                      DataCell(Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: e.picture != null
-                                  ? imageFromString(e.picture!)
-                                  : Icon(Icons.sports_soccer),
+  return Expanded(
+    child: Column(
+      children: [
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : Scrollbar(
+                      controller: _horizontalScrollController,
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        controller: _horizontalScrollController,
+                        scrollDirection: Axis.horizontal,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: MediaQuery.of(context).size.width,
+                            ),
+                            child: DataTable(
+                              columnSpacing: 16.0,
+                              showCheckboxColumn: false,
+                              columns: const [
+                                DataColumn(label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold))))),
+                                DataColumn(label: Flexible(child: Center(child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold))))),
+                                DataColumn(label: Flexible(child: Center(child: Text("Tip", style: TextStyle(fontWeight: FontWeight.bold))))),
+                                DataColumn(label: Flexible(child: Center(child: Text("Status", style: TextStyle(fontWeight: FontWeight.bold))))),
+                                DataColumn(label: Flexible(child: Center(child: Text("Selekcija/uzrast", style: TextStyle(fontWeight: FontWeight.bold))))),
+                                DataColumn(label: Flexible(child: Center(child: Text("Prijave do", style: TextStyle(fontWeight: FontWeight.bold))))),
+                                DataColumn(label: Flexible(child: Center(child: Text("Početak takmičenja", style: TextStyle(fontWeight: FontWeight.bold))))),
+                              ],
+                              rows: _paginationController.items.map((e) => DataRow(
+                                onSelectChanged: (_) => _handleRowTap(e),
+                                cells: [
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 50,
+                                        height: 50,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(25),
+                                          child: e.picture != null
+                                              ? imageFromString(e.picture!)
+                                              : Icon(Icons.sports_soccer),
+                                        ),
+                                      ),
+                                    ),
+                                  )),
+                                  DataCell(Center(child: Text(e.name ?? ""))),
+                                  DataCell(Center(child: Text(e.competitionType?.displayName ?? '-'))),
+                                  DataCell(Center(child: Text(e.status?.displayName ?? '-'))),
+                                  DataCell(Center(child: Text(e.selection?.name ?? '-'))),
+                                  DataCell(Center(child: Text(formatDateOnly(e.applicationEndDate)))),
+                                  DataCell(Center(child: Text(formatDateOnly(e.startDate)))),
+                                ],
+                              )).toList(),
                             ),
                           ),
                         ),
-                      )),
-                      DataCell(Center(child: Text(e.name ?? ""))),
-                      DataCell(Center(child: Text(e.competitionType?.displayName ?? '-'))),
-                      DataCell(Center(child: Text(e.status?.displayName ?? '-'))),
-                      DataCell(Center(child: Text(e.selection?.name ?? '-'))),
-                      DataCell(Center(child: Text(formatDateOnly(e.applicationEndDate)))),
-                      DataCell(Center(child: Text(formatDateOnly(e.startDate)))),
-                    ],
-                  )).toList() ?? [],
-                ),
-              ),
-            ),
-          ),
+                      ),
+                    ),
         ),
-      );
-    } else {
-      return const Expanded(
-        child: Align(
-          alignment: Alignment.center,
-          child: Text('Nema podataka'),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
         ),
-      );
-    }
-  } else {
-    return const Expanded(
-      child: Align(
-        alignment: Alignment.center,
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
+      ],
+    ),
+  );
 }
+
 
 
   

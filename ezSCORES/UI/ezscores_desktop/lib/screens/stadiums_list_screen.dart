@@ -1,7 +1,8 @@
 import 'package:ezscores_desktop/dialogs/stadium_dialog.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/stadiums.dart';
-import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/providers/StadiumsProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class StadiumsListScreen extends StatefulWidget {
 
 class _StadiumsListScreenState extends State<StadiumsListScreen> {
   late StadiumProvider stadiumProvider;
-  SearchResult<Stadiums>? stadiumResult;
+  late PaginationController<Stadiums> _paginationController;
 
   @override
   void didChangeDependencies() {
@@ -29,13 +30,22 @@ class _StadiumsListScreenState extends State<StadiumsListScreen> {
   void initState() {
     super.initState();
     stadiumProvider = context.read<StadiumProvider>();
+    _paginationController = PaginationController<Stadiums>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "name": _ftsEditingController.text,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return stadiumProvider.get(filter: filter);
+      }
+    );
     initForm();
   }
 
   Future initForm() async {
-    var stadiumData = await stadiumProvider.get();
+    await _paginationController.loadPage();
     setState(() {
-      stadiumResult = stadiumData;
     });
   }
 
@@ -50,7 +60,10 @@ class _StadiumsListScreenState extends State<StadiumsListScreen> {
         child: Column(
           children: [
             _buildSearch(),
-            _buildResultView(),
+            AnimatedBuilder(
+              animation: _paginationController,
+              builder: (context, _) => _buildResultView(),
+            )
           ],
         ),
       ),
@@ -71,12 +84,8 @@ class _StadiumsListScreenState extends State<StadiumsListScreen> {
           const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () async {
-              var filter = {
-                "name": _ftsEditingController.text,
-              };
-              var data = await stadiumProvider.get(filter: filter);
+              await _paginationController.loadPage(0);
               setState(() {
-                stadiumResult = data;
               });
             },
             child: const Icon(Icons.search),
@@ -99,75 +108,76 @@ class _StadiumsListScreenState extends State<StadiumsListScreen> {
   }
 
   Widget _buildResultView() {
-    if (stadiumResult != null) {
-      return stadiumResult!.count != 0
-          ? Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8.0),
-                  child: DataTable(
-                    columnSpacing: 16.0,
-                    showCheckboxColumn: false,
-                    columns: [
-                      DataColumn(
-                          label: SizedBox(
-                            child: Text(
-                              "Slika",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
+  return Expanded(
+    child: Column(
+      children: [
+        // Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Center(
+                                  child: Text(
+                                    "Slika",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                             ),
-                          ),
-                      ),
-                      DataColumn(
-                          label: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Text(
-                              "Naziv",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                      ),
-                    ],
-                    rows: stadiumResult?.result.map((e) => DataRow(
-                          onSelectChanged: (_) => _handleRowTap(e),
-                          cells: [
-                            DataCell(
-                                SizedBox(
-                                  width: 30,
-                                  child: e.picture != null ? imageFromString(e.picture!)
-                                   : Icon(Icons.stadium)),
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: Text(e.name ?? "")),
-                              ),
+                            DataColumn(
+                              label: Text(
+                                    "Naziv",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.left,
+                                  )
                             ),
                           ],
-                        ))
-                        .toList()
-                        .cast<DataRow>() ?? [],
-                  ),
-                ),
-              ),
-            )
-          : const Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text('Nema podataka'),
-              ),
-            );
-    } else {
-      return const Expanded(
-        child: Align(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(),
+                          rows: _paginationController.items.map((e) {
+                            return DataRow(
+                              onSelectChanged: (_) => _handleRowTap(e),
+                              cells: [
+                                DataCell(
+                                  SizedBox(
+                                    width: 30,
+                                    child: e.picture != null
+                                        ? imageFromString(e.picture!)
+                                        : const Icon(Icons.stadium),
+                                  ),
+                                ),
+                                DataCell(
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(e.name ?? ""),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
         ),
-      );
-    }
-  }
+
+        // Pagination controls pinned at bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
+    ),
+  );
+}
+
 
   _handleRowTap(Stadiums selectedStadium) async {
     final shouldReload = await showDialog<bool>(

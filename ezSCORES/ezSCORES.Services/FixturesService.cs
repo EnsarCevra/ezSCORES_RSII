@@ -122,6 +122,13 @@ namespace ezSCORES.Services
 										DateAndTime = m.DateAndTime,
 										IsCompleted = m.IsCompleted,
 										IsUnderway = m.IsUnderway,
+										Group = m.HomeTeam.Group == null
+										? null
+										: new GroupDTO
+										{
+											Id = m.HomeTeam.Group.Id,
+											Name = m.HomeTeam.Group.Name
+										},
 										HomeTeam = new TeamDTO
 										{
 											Id = m.HomeTeam.Team.Id,

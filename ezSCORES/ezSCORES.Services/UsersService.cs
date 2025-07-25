@@ -53,15 +53,14 @@ namespace ezSCORES.Services
 			{
 				query = query.Include(x => x.Role);
 			}
-			int count = query.Count();
 			if (!string.IsNullOrWhiteSpace(search.OrderBy))
 			{
 				//query = query.OrderBy(searchObject.OrderBy);
 			}
-			if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
-			{
-				query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
-			}
+			//if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
+			//{
+			//	query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
+			//}
 			return base.AddFilter(search, query);
 		}
 		public override void BeforeInsert(UsersInsertRequests request, User entity)

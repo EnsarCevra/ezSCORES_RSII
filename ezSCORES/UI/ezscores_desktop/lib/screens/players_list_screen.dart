@@ -1,3 +1,5 @@
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/players.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
@@ -20,20 +22,31 @@ class PlayersListScreen extends StatefulWidget
 class _PlayerListScreen extends State<PlayersListScreen>
 {
   late PlayerProvider playerProvider;
+  late PaginationController<Players> _paginationController;
   DateTime? _selectedDate;
-  SearchResult<Players>? playerResult = null; 
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
-    playerProvider = context.read<PlayerProvider>();
     super.initState();
+    playerProvider = context.read<PlayerProvider>();
+    _paginationController = PaginationController<Players>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
+          "birthDate" : _selectedDate,
+          "year" : _birthYearEditingController.text,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return playerProvider.get(filter: filter);
+      }
+    );
     initForm();
   } 
 
   Future initForm() async{
-    var playerData = await playerProvider.get();
+    await _paginationController.loadPage();
     setState(() {
-      playerResult = playerData;
     });
    }
 
@@ -46,7 +59,10 @@ class _PlayerListScreen extends State<PlayersListScreen>
       child: Column(
         children: [
           _buildSearch(),
-          _buildResultView()
+          AnimatedBuilder(
+            animation: _paginationController,
+            builder: (context, _) => _buildResultView(),
+          )
         ],
       ),
     ));
@@ -103,17 +119,11 @@ class _PlayerListScreen extends State<PlayersListScreen>
         ),
         SizedBox(width: 8,),
         ElevatedButton(onPressed: () async{
-          var filter = {
-            "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
-            "birthDate" : _selectedDate,
-            "year" : _birthYearEditingController.text
-          };
-          var data = await playerProvider.get(filter: filter);
+          await _paginationController.loadPage(0);
           setState(() {
-            playerResult = data;
           });
-        }, child: Icon(Icons.search)),
-         SizedBox(width: 8,),
+        }, child: const Icon(Icons.search)),
+         const SizedBox(width: 8,),
          ElevatedButton(onPressed: () async{
             final actionResult = await Navigator.of(context).push(PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(),
@@ -135,105 +145,124 @@ class _PlayerListScreen extends State<PlayersListScreen>
     );
   }
   
-  _buildResultView() {
-    if(playerResult != null)
-  {
-    return playerResult!.count != 0 ? Expanded(
-    child: SingleChildScrollView(
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8.0),
-        child: DataTable(
-          columnSpacing: 16.0,
-          showCheckboxColumn: false,
-          columns: const [
-            DataColumn(
-                label: Flexible(
-                  child: Center(
-                    child: Text(textAlign: TextAlign.center,
-                      "Slika",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-            ),
-            DataColumn(
-                label: Flexible(
-                  child: Center(
-                    child: Text(textAlign: TextAlign.center,
-                      "Ime",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-            ),
-             DataColumn(
-                  label: Flexible(
-                    child: Center(
-                      child: Text(
-                        "Prezime",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-            ),
-            DataColumn(
-                  label: Flexible(
-                    child: Center(
-                      child: Text(textAlign: TextAlign.center,
-                        "Datum rođenja",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-            ),
-          ],
-          rows: playerResult?.result.map((e)=>
-            DataRow(
-              onSelectChanged: (_) => _handleRowTap(e),
-              cells: [
-                DataCell(
-                      Padding(
+Widget _buildResultView() {
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: e.picture != null
-                                  ? imageFromString(e.picture!)
-                                  : const Icon(Icons.account_circle, size: 30),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Slika",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Ime",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Prezime",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Datum rođenja",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                          rows: _paginationController.items.map((e) => DataRow(
+                            onSelectChanged: (_) => _handleRowTap(e),
+                            cells: [
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: e.picture != null
+                                            ? imageFromString(e.picture!)
+                                            : const Icon(Icons.account_circle, size: 30),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(e.firstName ?? "")),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(e.lastName ?? "")),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(formatDateOnly(e.birthDate))),
+                                ),
+                              ),
+                            ],
+                          )).toList(),
                         ),
                       ),
                     ),
-              DataCell(Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text(e.firstName ?? ""),),
-              ),),
-              DataCell(Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text(e.lastName ?? "")),
-              ),),
-              DataCell(Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text(formatDateOnly(e.birthDate))),
-              ),),
-            ])
-          ).toList().cast<DataRow>() ?? [],
         ),
-      ),
+
+        /// Pagination controls pinned at bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
     ),
-  ) : Expanded(child: Align(alignment: Alignment.center, child: Text('Nema podataka'),),);
-  }
-  else
-  {
-    return Expanded(child: Align(alignment: Alignment.center, child: CircularProgressIndicator(),),);
-  }
-  }
+  );
+}
+
   
   _handleRowTap(Players selectedPlayer) async{
     final actionResult = await Navigator.of(context).push(

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/models/competitionsSponsors.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/sponsors.dart';
@@ -19,17 +21,28 @@ class CompetitionsSponsorsTab extends StatefulWidget
 }
 class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
 {
+  late PaginationController<Sponsors> _paginationController;
   late SponsorProvider sponsorProvider;
   late CompetitionsSponsorsProvider compeititonsSponsorsProvider;
-  SearchResult<Sponsors>? sponsorResult;
   SearchResult<CompetitionsSponsors>? competitionSponsorResult; 
   Set<int?>? excludedSponsors;
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
+    super.initState();
     sponsorProvider = context.read<SponsorProvider>();
     compeititonsSponsorsProvider = context.read<CompetitionsSponsorsProvider>();
-    super.initState();
+    _paginationController = PaginationController<Sponsors>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "name" : _nameController.text,
+          "competitionId" : widget.competitionId,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return sponsorProvider.get(filter: filter);
+      }
+    );
     initForm();
   } 
 
@@ -37,10 +50,9 @@ class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
     var filter = {
       "competitionId" : widget.competitionId
     };
-    var sponsorData = await sponsorProvider.get();
+    await _paginationController.loadPage();
     var competitionsSponsorsData = await compeititonsSponsorsProvider.get(filter: filter);
     setState(() {
-      sponsorResult = sponsorData;
       competitionSponsorResult = competitionsSponsorsData;
       _excludeAssignedSponsors();
     });
@@ -90,7 +102,7 @@ class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
                       ),
                       _buildSearch(),
                       Expanded(
-                        child: _buildResultView(),
+                        child: AnimatedBuilder(animation: _paginationController, builder: (context, _) => _buildResultView()),
                       ),
                     ],
                   ),
@@ -113,12 +125,8 @@ class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
             Expanded(child: TextField(controller: _nameController, decoration: const InputDecoration(labelText: "Naziv"),)),
             const SizedBox(width: 8,),
             ElevatedButton(onPressed: () async{
-              var filter = {
-                "name" : _nameController.text,
-              };
-              var data = await sponsorProvider.get(filter: filter);
+              await _paginationController.loadPage(0);
               setState(() {
-                sponsorResult = data;
                 _excludeAssignedSponsors();
               });
             }, child: const Icon(Icons.search)),
@@ -128,81 +136,91 @@ class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
     );
   }
   
- _buildResultView() {
-  if (sponsorResult != null) {
-    return sponsorResult!.result.isNotEmpty
-        ? SingleChildScrollView(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8.0),
-                child: DataTable(
-                  columnSpacing: 16.0,
-                  showCheckboxColumn: false,
-                  columns: const [
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Akcija", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                  ],
-                  rows: sponsorResult!.result.map((e) {
-                    return DataRow(cells: [
-                      DataCell(
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(25),
-                                child: e.picture != null
-                                    ? imageFromString(e.picture!)
-                                    : const CircleAvatar(
-                                    backgroundColor: Colors.transparent,
-                                    child: Icon(Icons.handshake, color: Colors.grey, size: 30),
-                                  ),
+ Widget _buildResultView() {
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema dostupnih sponzora za dodavanje'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Center(
+                                child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold)),
                               ),
                             ),
-                          ),
+                            DataColumn(
+                              label: Center(
+                                child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Center(
+                                child: Text("Akcija", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                          rows: _paginationController.items.map((e) {
+                            return DataRow(cells: [
+                              DataCell(
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: e.picture != null
+                                            ? imageFromString(e.picture!)
+                                            : const CircleAvatar(
+                                                backgroundColor: Colors.transparent,
+                                                child: Icon(Icons.handshake, color: Colors.grey, size: 30),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(Center(child: Text(e.name ?? ""))),
+                              DataCell(
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      await _assignSponsor(e);
+                                      await _paginationController.loadPage(_paginationController.currentPage);
+                                    },
+                                    child: const Text("Dodijeli"),
+                                  ),
+                                ),
+                              ),
+                            ]);
+                          }).toList(),
                         ),
                       ),
-                      DataCell(Center(child: Text(e.name ?? ""))),
-                      DataCell(
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              _assignSponsor(e);
-                              initForm();
-                            },
-                            child: const Text("Dodijeli"),
-                          ),
-                        ),
-                      ),
-                    ]);
-                  }).toList(),
-                ),
-              ),
-            )
-        : const Expanded(
-            child: Align(
-              alignment: Alignment.center,
-              child: Text('Nema dostupnih sponzora za dodavanje'),
-            ),
-          );
-  } else {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      width: double.infinity,
-      alignment: Alignment.center,
-      child: const CircularProgressIndicator(),
-    );
-  }
+                    ),
+        ),
+
+        /// Pagination controls always pinned to bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
+    ),
+  );
 }
+
 
   
 _buildAssignedSponsorsView() {
@@ -260,7 +278,7 @@ _buildAssignedSponsorsView() {
                 child: sponsor?.picture != null
                     ? Image.memory(
                         base64Decode(sponsor!.picture!),
-                        fit: BoxFit.contain, // or BoxFit.contain if you want full image fit
+                        fit: BoxFit.contain,
                       )
                     : const Icon(Icons.handshake, size: 40, color: Colors.grey),
               ),
@@ -293,7 +311,7 @@ _buildAssignedSponsorsView() {
   );
 }
 
-  void _assignSponsor(Sponsors selectedSponsor) async{
+  Future<void> _assignSponsor(Sponsors selectedSponsor) async{
     var request = {
       "competitionId" : widget.competitionId,
       "sponsorId" : selectedSponsor.id
@@ -341,6 +359,6 @@ _buildAssignedSponsorsView() {
   
   void _excludeAssignedSponsors() {
     excludedSponsors = competitionSponsorResult!.result.map((e) => e.sponsorId).toSet();
-    sponsorResult!.result = sponsorResult!.result.where((ref)=> !excludedSponsors!.contains(ref.id)).toList();
+    _paginationController.items = _paginationController.items.where((ref)=> !excludedSponsors!.contains(ref.id)).toList();
   }
 }

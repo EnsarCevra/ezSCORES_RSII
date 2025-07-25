@@ -189,6 +189,8 @@ class _MatchesTabState extends State<MatchesTab> {
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
+                                                if(match.gameStage == GameStage.groupPhase) Text(match.group!.name!),
+                                                const SizedBox(height: 8),
                                                 Text(
                                                   '${match.homeTeam?.name ?? "?"} vs ${match.awayTeam?.name ?? "?"}',
                                                   style: Theme.of(context).textTheme.titleMedium,

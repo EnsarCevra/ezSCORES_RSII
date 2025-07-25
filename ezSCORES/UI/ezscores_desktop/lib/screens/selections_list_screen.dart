@@ -1,6 +1,7 @@
 import 'package:ezscores_desktop/dialogs/selection_dialog.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
-import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/selections.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class SelectionsListScreen extends StatefulWidget {
 
 class _SelectionsListScreenState extends State<SelectionsListScreen> {
   late SelectionProvider selectionProvider;
-  SearchResult<Selections>? selectionResult;
+  late PaginationController<Selections> _paginationController;
 
   @override
   void didChangeDependencies() {
@@ -28,13 +29,22 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
   void initState() {
     super.initState();
     selectionProvider = context.read<SelectionProvider>();
+    _paginationController = PaginationController<Selections>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "name": _ftsEditingController.text,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return selectionProvider.get(filter: filter);
+      }
+    );
     initForm();
   }
 
   Future initForm() async {
-    var selectionData = await selectionProvider.get();
+    await _paginationController.loadPage();
     setState(() {
-      selectionResult = selectionData;
     });
   }
 
@@ -49,7 +59,10 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
         child: Column(
           children: [
             _buildSearch(),
-            _buildResultView(),
+            AnimatedBuilder(
+              animation: _paginationController,
+              builder: (context, _) => _buildResultView(),
+            )
           ],
         ),
       ),
@@ -70,12 +83,8 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
           const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () async {
-              var filter = {
-                "name": _ftsEditingController.text,
-              };
-              var data = await selectionProvider.get(filter: filter);
+              await _paginationController.loadPage(0);
               setState(() {
-                selectionResult = data;
               });
             },
             child: const Icon(Icons.search),
@@ -98,78 +107,78 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
   }
 
   Widget _buildResultView() {
-    if (selectionResult != null) {
-      return selectionResult!.count != 0
-          ? Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8.0),
-                  child: DataTable(
-                    columnSpacing: 16.0,
-                    showCheckboxColumn: false,
-                    columns: const [
-                      DataColumn(
-                        label: Flexible(
-                          child: Center(
-                            child: Text(
-                              "Naziv",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Flexible(
-                          child: Center(
-                            child: Text(
-                              "Max. Godine",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                    rows: selectionResult?.result.map((e) => DataRow(
-                          onSelectChanged: (_) => _handleRowTap(e),
-                          cells: [
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: Text(e.name ?? "")),
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Naziv",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               ),
                             ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: Text(e.ageMax?.toString() ?? "")),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Max. Godine",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
-                        ))
-                        .toList()
-                        .cast<DataRow>() ?? [],
-                  ),
-                ),
-              ),
-            )
-          : const Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text('Nema podataka'),
-              ),
-            );
-    } else {
-      return const Expanded(
-        child: Align(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(),
+                          rows: _paginationController.items.map((e) => DataRow(
+                            onSelectChanged: (_) => _handleRowTap(e),
+                            cells: [
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(e.name ?? "")),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(e.ageMax?.toString() ?? "-")),
+                                ),
+                              ),
+                            ],
+                          )).toList(),
+                        ),
+                      ),
+                    ),
         ),
-      );
-    }
-  }
+
+        /// Pagination controls pinned at the bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
+    ),
+  );
+}
+
 
   _handleRowTap(Selections selectedSelection) async {
     final shouldReload = await showDialog<bool>(

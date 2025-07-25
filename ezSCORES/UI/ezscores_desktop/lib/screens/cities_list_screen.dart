@@ -1,4 +1,6 @@
 import 'package:ezscores_desktop/dialogs/city_dialog.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/cities.dart';
@@ -18,7 +20,7 @@ class CitiesListScreen extends StatefulWidget {
 
 class _CitiesListScreenState extends State<CitiesListScreen> {
   late CityProvider cityProvider;
-  SearchResult<Cities>? cityResult;
+  late PaginationController<Cities> _paginationController;
 
   final TextEditingController _ftsEditingController = TextEditingController();
 
@@ -32,13 +34,22 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   void initState() {
     super.initState();
     cityProvider = context.read<CityProvider>();
+    _paginationController = PaginationController<Cities>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "name": _ftsEditingController.text,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return cityProvider.get(filter: filter);
+      }
+    );
     initForm();
   }
 
   Future initForm() async {
-    var cityData = await cityProvider.get();
+    await _paginationController.loadPage();
     setState(() {
-      cityResult = cityData;
     });
   }
 
@@ -51,7 +62,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
         child: Column(
           children: [
             _buildSearch(),
-            _buildResultView(),
+            AnimatedBuilder(animation: _paginationController, builder: (context, _) => _buildResultView(),),
           ],
         ),
       ),
@@ -72,12 +83,8 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
           const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () async {
-              var filter = {
-                "name": _ftsEditingController.text,
-              };
-              var data = await cityProvider.get(filter: filter);
+              await _paginationController.loadPage(0);
               setState(() {
-                cityResult = data;
               });
             },
             child: const Icon(Icons.search),
@@ -101,79 +108,81 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   }
 
   Widget _buildResultView() {
-    if (cityResult != null) {
-      return cityResult!.count != 0
-          ? Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8.0),
-                  child: DataTable(
-                    columnSpacing: 16.0,
-                    showCheckboxColumn: false,
-                    columns: [
-                      DataColumn(
-                        label: SizedBox(
-                          width: 30,
-                          child: Text(
-                            "#",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: Text(
-                            "Naziv",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ],
-                    rows: List<DataRow>.generate(
-                      cityResult!.result.length,
-                      (index) {
-                        final city = cityResult!.result[index];
-                        return DataRow(
-                          onSelectChanged: (_) => _handleRowTap(city),
-                          cells: [
-                            DataCell(
-                              SizedBox(
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: [
+                            DataColumn(
+                              label: SizedBox(
                                 width: 30,
-                                child: Center(child: Text((index + 1).toString())),
+                                child: Text(
+                                  "#",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(city.name ?? ""),
+                            DataColumn(
+                              label: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                child: Text(
+                                  "Naziv",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
                           ],
-                        );
-                      },
+                          rows: List<DataRow>.generate(
+                            _paginationController.items.length,
+                            (index) {
+                              final city = _paginationController.items[index];
+                              return DataRow(
+                                onSelectChanged: (_) => _handleRowTap(city),
+                                cells: [
+                                  DataCell(
+                                    SizedBox(
+                                      width: 30,
+                                      child: Center(child: Text((index + 1).toString())),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(city.name ?? ""),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            )
-          : const Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text('Nema podataka'),
-              ),
-            );
-    } else {
-      return const Expanded(
-        child: Align(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(),
         ),
-      );
-    }
-  }
+
+        /// Pagination controls at the bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
+    ),
+  );
+}
+
 
 
   _handleRowTap(Cities selectedCity) async {

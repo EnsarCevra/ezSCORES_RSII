@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/models/competitionsReferees.dart';
 import 'package:ezscores_desktop/models/referees.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
@@ -20,28 +22,38 @@ class CompetitionRefereesTab extends StatefulWidget
 }
 class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
 {
+  late PaginationController<Referees> _paginationController;
   late RefereeProvider refereeProvider;
   late CompetitionsRefereesProvider competitionRefereeProvider;
-  SearchResult<Referees>? refereeResult;
   SearchResult<CompetitionsReferees>? competitionRefereeResult; 
   Set<int?>? excludedReferees;
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
+    super.initState();
     refereeProvider = context.read<RefereeProvider>();
     competitionRefereeProvider = context.read<CompetitionsRefereesProvider>();
-    super.initState();
+    _paginationController = PaginationController<Referees>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "competitionId" : widget.competitionId,
+          "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return refereeProvider.get(filter: filter);
+      }
+    );
     initForm();
   } 
 
   Future initForm() async{
+    await _paginationController.loadPage();
     var filter = {
-      "competitionId" : widget.competitionId
-    };
-    var refereeData = await refereeProvider.get();
+          "competitionId" : widget.competitionId
+        };
     var competitionsRefereesData = await competitionRefereeProvider.get(filter: filter);
     setState(() {
-      refereeResult = refereeData;
       competitionRefereeResult = competitionsRefereesData;
       _excludeAssignedReferees();
     });
@@ -91,7 +103,7 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
                       ),
                       _buildSearch(),
                       Expanded(
-                        child: _buildResultView(),
+                        child: AnimatedBuilder(animation: _paginationController, builder: (context, _) => _buildResultView()),
                       ),
                     ],
                   ),
@@ -114,12 +126,8 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
             Expanded(child: TextField(controller: _gteFirstLastNameEditingController, decoration: const InputDecoration(labelText: "Ime/prezime"),)),
             const SizedBox(width: 8,),
             ElevatedButton(onPressed: () async{
-              var filter = {
-                "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
-              };
-              var data = await refereeProvider.get(filter: filter);
+              await _paginationController.loadPage(0);
               setState(() {
-                refereeResult = data;
                 _excludeAssignedReferees();
               });
             }, child: const Icon(Icons.search)),
@@ -129,85 +137,97 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
     );
   }
   
- _buildResultView() {
-  if (refereeResult != null) {
-    return refereeResult!.result.isNotEmpty
-        ? SingleChildScrollView(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8.0),
-                child: DataTable(
-                  columnSpacing: 16.0,
-                  showCheckboxColumn: false,
-                  columns: const [
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Ime", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Prezime", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                    DataColumn(
-                      label: Flexible(child: Center(child: Text("Akcija", style: TextStyle(fontWeight: FontWeight.bold)))),
-                    ),
-                  ],
-                  rows: refereeResult!.result.map((e) {
-                    return DataRow(cells: [
-                      DataCell(
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(25),
-                                child: e.picture != null
-                                    ? imageFromString(e.picture!)
-                                    : const CircleAvatar(
-                                    backgroundColor: Colors.transparent,
-                                    child: Icon(Icons.account_circle, color: Colors.grey, size: 30),
-                                  ),
+ Widget _buildResultView() {
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema dostupnih sudija za dodavanje'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Center(
+                                child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold)),
                               ),
                             ),
-                          ),
+                            DataColumn(
+                              label: Center(
+                                child: Text("Ime", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Center(
+                                child: Text("Prezime", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Center(
+                                child: Text("Akcija", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                          rows: _paginationController.items.map((e) {
+                            return DataRow(cells: [
+                              DataCell(
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: e.picture != null
+                                            ? imageFromString(e.picture!)
+                                            : const CircleAvatar(
+                                                backgroundColor: Colors.transparent,
+                                                child: Icon(Icons.account_circle, color: Colors.grey, size: 30),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(Center(child: Text(e.firstName ?? ""))),
+                              DataCell(Center(child: Text(e.lastName ?? ""))),
+                              DataCell(
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      await _assignReferee(e);
+                                      await _paginationController.loadPage(_paginationController.currentPage);
+                                    },
+                                    child: const Text("Dodijeli"),
+                                  ),
+                                ),
+                              ),
+                            ]);
+                          }).toList(),
                         ),
                       ),
-                      DataCell(Center(child: Text(e.firstName ?? ""))),
-                      DataCell(Center(child: Text(e.lastName ?? ""))),
-                      DataCell(
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              _assignReferee(e);
-                              initForm();
-                            },
-                            child: const Text("Dodijeli"),
-                          ),
-                        ),
-                      ),
-                    ]);
-                  }).toList(),
-                ),
-              ),
-            )
-        : const Expanded(
-            child: Align(
-              alignment: Alignment.center,
-              child: Text('Nema dostupnih sudija za dodavanje'),
-            ),
-          );
-  } else {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      width: double.infinity,
-      alignment: Alignment.center,
-      child: const CircularProgressIndicator(),
-    );
-  }
+                    ),
+        ),
+
+        /// Pagination controls pinned at bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
+    ),
+  );
 }
+
 
   
 _buildAssignedRefereesView() {
@@ -293,7 +313,7 @@ _buildAssignedRefereesView() {
   );
 }
 
-  void _assignReferee(Referees selectedReferee) async{
+  Future<void> _assignReferee(Referees selectedReferee) async{
     var request = {
       "competitionId" : widget.competitionId,
       "refereeId" : selectedReferee.id
@@ -340,6 +360,6 @@ _buildAssignedRefereesView() {
   }
   void _excludeAssignedReferees() {
     excludedReferees = competitionRefereeResult!.result.map((e) => e.refereeId).toSet();
-    refereeResult!.result = refereeResult!.result.where((ref)=> !excludedReferees!.contains(ref.id)).toList();
+    _paginationController.items = _paginationController.items.where((ref)=> !excludedReferees!.contains(ref.id)).toList();
   }
 }

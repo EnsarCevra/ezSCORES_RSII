@@ -1,3 +1,5 @@
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/selections.dart';
@@ -22,8 +24,9 @@ class TeamsListScreen extends StatefulWidget
 class _TeamsListScreenState extends State<TeamsListScreen> {
   late TeamProvider teamProvider;
   late SelectionProvider selectionProvider;
-  SearchResult<Selections>? selectionResult = null;
-  SearchResult<Teams>? teamsResult = null; 
+  SearchResult<Selections>? selectionResult;
+  //SearchResult<Teams>? teamsResult = null;
+  late PaginationController<Teams> _paginationController;
    @override
   void didChangeDependencies()
   {
@@ -32,17 +35,28 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   }
   @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
     teamProvider = context.read<TeamProvider>();
     selectionProvider = context.read<SelectionProvider>();
-    super.initState();
+    _paginationController = PaginationController<Teams>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "name": _ftsEditingController.text,
+          "selectionId": selectedSelectionID,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return teamProvider.get(filter: filter);
+      }
+    );
     initForm();
   }
   Future initForm() async{
-    var teamData = await teamProvider.get();
+    //var teamData = await teamProvider.get();
+    await _paginationController.loadPage();
     var selectionData = await selectionProvider.get(); 
     setState(() {
-      teamsResult = teamData;
+      //teamsResult = teamData;
       selectionResult = selectionData;
     });
    }
@@ -50,13 +64,14 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   Widget build(BuildContext context)
   {
     return MasterScreen("Lista timova", selectedIndex: widget.selectedIndex,
-    Container(
-      child: Column(
-        children: [
-          _buildSearch(),
-          _buildResultView()
-        ],
-      ),
+    Column(
+      children: [
+        _buildSearch(),
+        AnimatedBuilder(
+          animation: _paginationController,
+          builder: (context, _) => _buildResultView(),
+          )
+      ],
     ));
   }
 
@@ -68,16 +83,16 @@ Widget _buildSearch()
     padding: const EdgeInsets.all(15),
     child: Row(
     children: [
-      Expanded(child: TextField(controller: _ftsEditingController,decoration: InputDecoration(labelText: "Naziv"),)),
-      SizedBox(width: 8,),
+      Expanded(child: TextField(controller: _ftsEditingController,decoration: const InputDecoration(labelText: "Naziv"),)),
+      const SizedBox(width: 8,),
       Expanded(
                   child: FormBuilderDropdown(
                     name: "selectionId",
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: "Selekcija",
                     ),
                     focusColor: Colors.transparent,
-                    items: [DropdownMenuItem(value: "all", child: Text("Sve"),), ...selectionResult?.result.map((item) => 
+                    items: [const DropdownMenuItem(value: "all", child: Text("Sve"),), ...selectionResult?.result.map((item) => 
                     DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],],
                     onChanged: (value){
                       setState(() {
@@ -86,18 +101,19 @@ Widget _buildSearch()
                     },
                     )
                   ),
-      SizedBox(width: 8,),            
+      const SizedBox(width: 8,),            
       ElevatedButton(onPressed: () async{
-        var filter = {
-          "name" : _ftsEditingController.text,
-          "selectionId" : selectedSelectionID
-        };
-        var data = await teamProvider.get(filter: filter);
-        setState(() {
-          teamsResult = data;
-        });
-      }, child: Icon(Icons.search)),
-      SizedBox(width: 8,),
+        // var filter = {
+        //   "name" : _ftsEditingController.text,
+        //   "selectionId" : selectedSelectionID
+        // };
+        // var data = await teamProvider.get(filter: filter);
+        // setState(() {
+        //   teamsResult = data;
+        // });
+        await _paginationController.loadPage(0);
+      }, child: const Icon(Icons.search)),
+      const SizedBox(width: 8,),
       ElevatedButton(onPressed: () async{
        final actionResult = await Navigator.of(context).push(PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(),
@@ -112,78 +128,102 @@ Widget _buildSearch()
           {
             initForm();
           }
-      }, child: Text("Dodaj"))
+      }, child: const Text("Dodaj"))
     ],
   )
   );
 }
 Widget _buildResultView() {
-  if(teamsResult != null)
-  {
-    return teamsResult!.count != 0 ? Expanded(
-    child: SingleChildScrollView(
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8.0),
-        child: DataTable(
-          columnSpacing: 16.0,
-          horizontalMargin: 8.0,
-          showCheckboxColumn: false,
-          columns: const [
-            DataColumn(
-                    label: SizedBox(
-                      width: 40,
-                      child: Center(
-                        child: Text(textAlign: TextAlign.center,
-                          "Slika",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty ? const Center(child: Text('Nema podataka'),)
+              : SingleChildScrollView(
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(8.0),
+                    child: DataTable(
+                      columnSpacing: 16.0,
+                      horizontalMargin: 8.0,
+                      showCheckboxColumn: false,
+                      columns: const [
+                        DataColumn(
+                          label: SizedBox(
+                            width: 40,
+                            child: Center(
+                              child: Text(
+                                "Slika",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        DataColumn(
+                          label: Text(
+                            "Naziv",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            "Selekcija",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                      rows: _paginationController.items
+                          .map(
+                            (e) => DataRow(
+                              onSelectChanged: (_) => _handleRowTap(e),
+                              cells: [
+                                DataCell(
+                                  e.picture != null
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
+                                          child: SizedBox(
+                                            width: 50,
+                                            height: 50,
+                                            child: imageFromString(e.picture!),
+                                          ),
+                                        )
+                                      : SizedBox(
+                                          width: 50,
+                                          child: Image.asset('assets/images/team_placeholder.png'),
+                                        ),
+                                ),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(e.name ?? ""),
+                                )),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(e.selection?.name ?? ""),
+                                )),
+                              ],
+                            ),
+                          )
+                          .toList(),
                     ),
-            ),
-            DataColumn(
-                  label: Text(textAlign: TextAlign.center,
-                      "Naziv",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-            ),
-             DataColumn(
-                    label: Text(
-                        "Selekcija",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-            ),
-          ],
-          rows: teamsResult?.result.map((e)=>
-            DataRow(
-              onSelectChanged: (_) => _handleRowTap(e),
-              cells: [
-                DataCell(e.picture != null ? Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8),
-                  child: SizedBox(width: 50, height: 50, child: imageFromString(e.picture!),),
-                )
-              : SizedBox(width: 50, child: Image.asset('assets/images/team_placeholder.png',)),),
-              DataCell(Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:Text(e.name ?? ""),
-              ),),
-              DataCell(Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(e.selection?.name ?? ""),
-              ),),
-            ])
-          ).toList().cast<DataRow>() ?? [],
+                  ),
+                ),
         ),
-      ),
+
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
     ),
-  ) : const Expanded(child: Align(alignment: Alignment.center, child: Text('Nema podataka'),),);
-  }
-  else
-  {
-    return Expanded(child: Align(alignment: Alignment.center, child: CircularProgressIndicator(),),);
-  }
+  );
 }
+
 
   _handleRowTap(Teams selectedTeam) async{
     final actionResult = await Navigator.of(context).push(

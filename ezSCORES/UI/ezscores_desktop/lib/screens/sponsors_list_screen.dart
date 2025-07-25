@@ -1,8 +1,9 @@
 import 'package:ezscores_desktop/dialogs/sponsor_dialog.dart';
 import 'package:ezscores_desktop/dialogs/stadium_dialog.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/sponsors.dart';
-import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/providers/SponsorsProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class SponsorsListScreen extends StatefulWidget {
 
 class _SponsorsListScreenState extends State<SponsorsListScreen> {
   late SponsorProvider sponsorProvider;
-  SearchResult<Sponsors>? sponsorResult;
+  late PaginationController<Sponsors> _paginationController;
 
   @override
   void didChangeDependencies() {
@@ -30,13 +31,23 @@ class _SponsorsListScreenState extends State<SponsorsListScreen> {
   void initState() {
     super.initState();
     sponsorProvider = context.read<SponsorProvider>();
+    _paginationController = PaginationController<Sponsors>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "name": _ftsEditingController.text,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return sponsorProvider.get(filter: filter);
+      }
+    );
     initForm();
   }
 
   Future initForm() async {
-    var data = await sponsorProvider.get();
+    await _paginationController.loadPage();
+
     setState(() {
-      sponsorResult = data;
     });
   }
 
@@ -51,7 +62,10 @@ class _SponsorsListScreenState extends State<SponsorsListScreen> {
         child: Column(
           children: [
             _buildSearch(),
-            _buildResultView(),
+            AnimatedBuilder(
+              animation: _paginationController,
+              builder: (context, _) => _buildResultView(),
+            )
           ],
         ),
       ),
@@ -72,12 +86,8 @@ class _SponsorsListScreenState extends State<SponsorsListScreen> {
           const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () async {
-              var filter = {
-                "name": _ftsEditingController.text,
-              };
-              var data = await sponsorProvider.get(filter: filter);
+              await _paginationController.loadPage(0);
               setState(() {
-                sponsorResult = data;
               });
             },
             child: const Icon(Icons.search),
@@ -99,76 +109,73 @@ class _SponsorsListScreenState extends State<SponsorsListScreen> {
     );
   }
 
-  Widget _buildResultView() {
-    if (sponsorResult != null) {
-      return sponsorResult!.count != 0
-          ? Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8.0),
-                  child: DataTable(
-                    columnSpacing: 16.0,
-                    showCheckboxColumn: false,
-                    columns: [
-                      DataColumn(
-                          label: SizedBox(
-                            child: Text(
-                              "Slika",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
+ Widget _buildResultView() {
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Text(
+                                  "Slika",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                )
                             ),
-                          ),
-                      ),
-                      DataColumn(
-                          label: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Text(
-                              "Naziv",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                      ),
-                    ],
-                    rows: sponsorResult?.result.map((e) => DataRow(
-                          onSelectChanged: (_) => _handleRowTap(e),
-                          cells: [
-                            DataCell(
-                                SizedBox(
-                                  width: 30,
-                                  child: e.picture != null ? imageFromString(e.picture!)
-                                   : Icon(Icons.handshake)),
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: Text(e.name ?? "")),
-                              ),
+                            DataColumn(
+                              label: Text(
+                                  "Naziv",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
                             ),
                           ],
-                        ))
-                        .toList()
-                        .cast<DataRow>() ?? [],
-                  ),
-                ),
-              ),
-            )
-          : const Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text('Nema podataka'),
-              ),
-            );
-    } else {
-      return const Expanded(
-        child: Align(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(),
+                          rows: _paginationController.items.map((e) => DataRow(
+                            onSelectChanged: (_) => _handleRowTap(e),
+                            cells: [
+                              DataCell(
+                                SizedBox(
+                                  width: 30,
+                                  child: e.picture != null
+                                      ? imageFromString(e.picture!)
+                                      : const Icon(Icons.handshake),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(e.name ?? ""),
+                                ),
+                              ),
+                            ],
+                          )).toList(),
+                        ),
+                      ),
+                    ),
         ),
-      );
-    }
-  }
+
+        /// Pagination controls at bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
+    ),
+  );
+}
+
 
   _handleRowTap(Sponsors selectedSponsor) async {
     final shouldReload = await showDialog<bool>(

@@ -1,3 +1,5 @@
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/roles.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
@@ -22,9 +24,11 @@ class UsersListScreen extends StatefulWidget {
 class _UsersListScreenState extends State<UsersListScreen> {
   late UserProvider userProvider;
   late RolesProvider roleProvider;
-  SearchResult<Users>? usersResult = null;
-  SearchResult<Roles>? rolesResult = null;
+  late PaginationController<Users> _paginationController;
+  SearchResult<Roles>? rolesResult;
   String? selectedRoleID;
+  final TextEditingController _gteFirstLastNameEditingController = TextEditingController();
+  final TextEditingController _ftsUsernameEditingController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -35,27 +39,34 @@ class _UsersListScreenState extends State<UsersListScreen> {
 
   @override
   void initState() {
+    super.initState();
     userProvider = context.read<UserProvider>();
     roleProvider = context.read<RolesProvider>();
-    super.initState();
+    _paginationController = PaginationController<Users>(
+      fetchPage: (page, pageSize){
+        final filter = <String, dynamic>{
+        if (_gteFirstLastNameEditingController.text.isNotEmpty)
+          "firstNameGTE": _gteFirstLastNameEditingController.text,
+        if (_ftsUsernameEditingController.text.isNotEmpty)
+          "userName": _ftsUsernameEditingController.text,
+        if (selectedRoleID != null) "roleId": selectedRoleID,
+        "isRolesIncluded": true,
+        "page": page,
+        "pageSize": pageSize,
+      };
+        return userProvider.get(filter: filter);
+      }
+    );
     initForm();
   }
 
   Future initForm() async {
-    var filter = 
-    {
-      "isRolesIncluded": true
-    };
-    var userData = await userProvider.get(filter: filter);
+    await _paginationController.loadPage();
     var roleData = await roleProvider.get();
     setState(() {
-      usersResult = userData;
       rolesResult = roleData;
     });
   }
-
-  final TextEditingController _gteFirstLastNameEditingController = TextEditingController();
-  final TextEditingController _ftsUsernameEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +77,10 @@ class _UsersListScreenState extends State<UsersListScreen> {
         child: Column(
           children: [
             _buildSearch(),
-            _buildResultView()
+            AnimatedBuilder(
+              animation: _paginationController,
+              builder: (context, _) => _buildResultView(),
+            )
           ],
         ),
       ),
@@ -81,26 +95,26 @@ class _UsersListScreenState extends State<UsersListScreen> {
           Expanded(
             child: TextField(
               controller: _gteFirstLastNameEditingController,
-              decoration: InputDecoration(labelText: "Ime ili prezime"),
+              decoration: const InputDecoration(labelText: "Ime ili prezime"),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: _ftsUsernameEditingController,
-              decoration: InputDecoration(labelText: "Korisničko ime"),
+              decoration: const InputDecoration(labelText: "Korisničko ime"),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Container(
             width: 150,
             child: FormBuilderDropdown(
               name: "roleId",
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Uloga",
               ),
               focusColor: Colors.transparent,
-              items: [DropdownMenuItem(value: "all", child: Text("Sve"),), ...rolesResult?.result.map((item) => 
+              items: [const DropdownMenuItem(value: "all", child: Text("Sve"),), ...rolesResult?.result.map((item) => 
               DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],],
               onChanged: (value){
                 setState(() {
@@ -109,23 +123,16 @@ class _UsersListScreenState extends State<UsersListScreen> {
               },
               )
             ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () async {
-              var filter = {
-                "firstNameGTE" : _gteFirstLastNameEditingController.text,
-                "userName" : _ftsUsernameEditingController.text,
-                "roleId" : selectedRoleID,
-                "isRolesIncluded": true,
-              };
-              var data = await userProvider.get(filter: filter);
+              await _paginationController.loadPage(0);
               setState(() {
-                usersResult = data;
               });
             },
-            child: Icon(Icons.search),
+            child: const Icon(Icons.search),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           ElevatedButton(onPressed: () async{
             final actionResult = await Navigator.of(context).push(PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) => RegisterScreen(selectedIndex: widget.selectedIndex,),
@@ -140,147 +147,128 @@ class _UsersListScreenState extends State<UsersListScreen> {
                 {
                   initForm();
                 }
-            }, child: Text("Dodaj"))
+            }, child: const Text("Dodaj"))
         ],
       ),
     );
   }
 
-  Widget _buildResultView() {
-    if (usersResult != null) {
-      return usersResult!.count != 0
-          ? Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8.0),
-                  child: DataTable(
-                    columnSpacing: 16.0,
-                    showCheckboxColumn: false,
-                    columns: const [
-                      DataColumn(
-                        label: Flexible(
-                          child: Center(
-                            child: Text(
-                              "Slika",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Flexible(
-                          child: Center(
-                            child: Text(
-                              "Ime",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Flexible(
-                          child: Center(
-                            child: Text(
-                              "Prezime",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Flexible(
-                          child: Center(
-                            child: Text(
-                              "Korisničko ime",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Flexible(
-                          child: Center(
-                            child: Text(
-                              "Uloga",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                    rows: usersResult?.result.map((e) =>
-                      DataRow(
-                        onSelectChanged: (_) => _handleRowTap(e),
-                        cells: [
-                          DataCell(
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(
-                                child: SizedBox(
-                                  width: 50,
-                                  height: 50,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(25),
-                                    child: e.picture != null
-                                        ? imageFromString(e.picture!)
-                                        : Icon(Icons.no_accounts),
+Widget _buildResultView() {
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Slika",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          DataCell(
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(child: Text(e.firstName ?? "")),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Ime",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          DataCell(
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(child: Text(e.lastName ?? "")),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Prezime",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          DataCell(
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(child: Text(e.userName ?? "")),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Korisničko ime",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          DataCell(
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(child: Text(e.role?.name ?? "")),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Uloga",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      )
-                    ).toList().cast<DataRow>() ?? [],
-                  ),
-                ),
-              ),
-            )
-          : Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text('Nema podataka'),
-              ),
-            );
-    } else {
-      return Expanded(
-        child: Align(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(),
+                          ],
+                          rows: _paginationController.items.map((e) {
+                            return DataRow(
+                              onSelectChanged: (_) => _handleRowTap(e),
+                              cells: [
+                                DataCell(
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 50,
+                                        height: 50,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(25),
+                                          child: e.picture != null
+                                              ? imageFromString(e.picture!)
+                                              : const Icon(Icons.no_accounts),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                DataCell(Center(child: Text(e.firstName ?? ""))),
+                                DataCell(Center(child: Text(e.lastName ?? ""))),
+                                DataCell(Center(child: Text(e.userName ?? ""))),
+                                DataCell(Center(child: Text(e.role?.name ?? ""))),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
         ),
-      );
-    }
-  }
+
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
+    ),
+  );
+}
+
 
   _handleRowTap(Users selectedUser) async {
     final actionResult = await Navigator.of(context).push(

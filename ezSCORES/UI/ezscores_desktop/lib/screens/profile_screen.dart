@@ -271,7 +271,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                     });
                   },
                   icon: Icon(_showPasswordFields ? Icons.lock_open : Icons.lock),
-                  label: Text(_showPasswordFields ? "Cancel Password Change" : "Change Password"),
+                  label: Text(_showPasswordFields ? "Otkaži promjenu lozinke" : "Promijeni lozinku"),
                 ),
               ),
 
@@ -282,7 +282,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: FormBuilderTextField(
                         name: 'oldPassword',
-                        decoration: InputDecoration(labelText: 'Old Password'),
+                        decoration: const InputDecoration(labelText: 'Stara lozinka'),
                         obscureText: true,
                         validator: FormBuilderValidators.required(errorText: "Old password required"),
                       ),
@@ -295,7 +295,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: FormBuilderTextField(
                         name: 'password',
-                        decoration: InputDecoration(labelText: 'New Password'),
+                        decoration: const InputDecoration(labelText: 'Nova lozinka'),
                         obscureText: true,
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(errorText: "New password required"),
@@ -311,7 +311,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: FormBuilderTextField(
                         name: 'passwordConfirmation',
-                        decoration: InputDecoration(labelText: 'Confirm Password'),
+                        decoration: const InputDecoration(labelText: 'Potvrda nove lozinke'),
                         obscureText: true,
                         validator: (val) {
                           if (_formKey.currentState?.fields['password']?.value != val) {

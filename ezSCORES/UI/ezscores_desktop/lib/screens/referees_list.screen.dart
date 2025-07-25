@@ -1,3 +1,5 @@
+import 'package:ezscores_desktop/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/referees.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
@@ -18,19 +20,28 @@ class RefereesListScreen extends StatefulWidget
 class _RefereesListScreenState extends State<RefereesListScreen>
 {
   late RefereeProvider refereeProvider;
-  SearchResult<Referees>? refereeResult; 
+  late PaginationController<Referees> _paginationController;
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
-    refereeProvider = context.read<RefereeProvider>();
     super.initState();
+    refereeProvider = context.read<RefereeProvider>();
+    _paginationController = PaginationController<Referees>(
+      fetchPage: (page, pageSize){
+        var filter = {
+          "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
+          "page": page,
+          "pageSize": pageSize
+        };
+        return refereeProvider.get(filter: filter);
+      }
+    );
     initForm();
   } 
 
   Future initForm() async{
-    var refereeData = await refereeProvider.get();
+    await _paginationController.loadPage();
     setState(() {
-      refereeResult = refereeData;
     });
    }
 
@@ -44,7 +55,10 @@ class _RefereesListScreenState extends State<RefereesListScreen>
       child: Column(
         children: [
           _buildSearch(),
-          _buildResultView()
+          AnimatedBuilder(
+          animation: _paginationController,
+          builder: (context, _) => _buildResultView(),
+          )
         ],
       ),
     ));
@@ -63,9 +77,8 @@ class _RefereesListScreenState extends State<RefereesListScreen>
           var filter = {
             "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
           };
-          var data = await refereeProvider.get(filter: filter);
+          await _paginationController.loadPage(0);
           setState(() {
-            refereeResult = data;
           });
         }, child: const Icon(Icons.search)),
         const SizedBox(width: 8,),
@@ -90,91 +103,107 @@ class _RefereesListScreenState extends State<RefereesListScreen>
     );
   }
   
-  _buildResultView() {
-    if(refereeResult != null)
-  {
-    return refereeResult!.count != 0 ? Expanded(
-    child: SingleChildScrollView(
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8.0),
-        child: DataTable(
-          columnSpacing: 16.0,
-          showCheckboxColumn: false,
-          columns: const [
-            DataColumn(
-                label: Flexible(
-                  child: Center(
-                    child: Text(textAlign: TextAlign.center,
-                      "Slika",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-            ),
-            DataColumn(
-                label: Flexible(
-                  child: Center(
-                    child: Text(textAlign: TextAlign.center,
-                      "Ime",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-            ),
-             DataColumn(
-                  label: Flexible(
-                    child: Center(
-                      child: Text(
-                        "Prezime",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-            ),
-          ],
-          rows: refereeResult?.result.map((e)=>
-            DataRow(
-              onSelectChanged: (_) => _handleRowTap(e),
-              cells: [
-                DataCell(
-                      Padding(
+  Widget _buildResultView() {
+  return Expanded(
+    child: Column(
+      children: [
+        /// Main content area
+        Expanded(
+          child: _paginationController.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _paginationController.items.isEmpty
+                  ? const Center(child: Text('Nema podataka'))
+                  : SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: e.picture != null
-                                  ? imageFromString(e.picture!)
-                                  : const Icon(Icons.account_circle, size: 30),
+                        child: DataTable(
+                          columnSpacing: 16.0,
+                          showCheckboxColumn: false,
+                          columns: const [
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Slika",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Ime",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Flexible(
+                                child: Center(
+                                  child: Text(
+                                    "Prezime",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                          rows: _paginationController.items.map((e) => DataRow(
+                            onSelectChanged: (_) => _handleRowTap(e),
+                            cells: [
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: e.picture != null
+                                            ? imageFromString(e.picture!)
+                                            : const Icon(Icons.account_circle, size: 30),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(e.firstName ?? "")),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(e.lastName ?? "")),
+                                ),
+                              ),
+                            ],
+                          )).toList(),
                         ),
                       ),
                     ),
-              DataCell(Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text(e.firstName ?? ""),),
-              ),),
-              DataCell(Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text(e.lastName ?? "")),
-              ),),
-            ])
-          ).toList().cast<DataRow>() ?? [],
         ),
-      ),
+
+        /// Pagination controls always pinned at the bottom
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: PaginationControls(controller: _paginationController),
+        ),
+      ],
     ),
-  ) : const Expanded(child: Align(alignment: Alignment.center, child: Text('Nema podataka'),),);
-  }
-  else
-  {
-    return const Expanded(child: Align(alignment: Alignment.center, child: CircularProgressIndicator(),),);
-  }
-  }
+  );
+}
+
   
   _handleRowTap(Referees selectedReferee) async{
     final actionResult = await Navigator.of(context).push(
