@@ -138,7 +138,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       {
         if (e is UserException)
         {
-          throw e;
+          rethrow;
         }
         throw UserException("Something bad happened, please try again");
       }

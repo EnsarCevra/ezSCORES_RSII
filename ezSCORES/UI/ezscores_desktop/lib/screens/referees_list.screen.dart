@@ -40,7 +40,8 @@ class _RefereesListScreenState extends State<RefereesListScreen>
   } 
 
   Future initForm() async{
-    await _paginationController.loadPage();
+    int currentPage = _paginationController.items.length < 2 && _paginationController.currentPage > 0 ? _paginationController.currentPage - 1 : _paginationController.currentPage;
+    await _paginationController.loadPage(currentPage);
     setState(() {
     });
    }
@@ -74,9 +75,6 @@ class _RefereesListScreenState extends State<RefereesListScreen>
         Expanded(child: TextField(controller: _gteFirstLastNameEditingController, decoration: const InputDecoration(labelText: "Ime/prezime"),)),
         const SizedBox(width: 8,),
         ElevatedButton(onPressed: () async{
-          var filter = {
-            "firstNameLastNameGTE" : _gteFirstLastNameEditingController.text,
-          };
           await _paginationController.loadPage(0);
           setState(() {
           });
@@ -154,6 +152,13 @@ class _RefereesListScreenState extends State<RefereesListScreen>
                                 ),
                               ),
                             ),
+                            DataColumn(
+                              label: Text(
+                                "",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ],
                           rows: _paginationController.items.map((e) => DataRow(
                             onSelectChanged: (_) => _handleRowTap(e),
@@ -187,6 +192,18 @@ class _RefereesListScreenState extends State<RefereesListScreen>
                                   child: Center(child: Text(e.lastName ?? "")),
                                 ),
                               ),
+                              DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Obriši',
+                                    onPressed: () async{
+                                      await deleteEntity(context: context,
+                                      deleteFunction: refereeProvider.delete,
+                                      entityId: e.id!, 
+                                      onDeleted: initForm);
+                                    },)
+                                )),
                             ],
                           )).toList(),
                         ),

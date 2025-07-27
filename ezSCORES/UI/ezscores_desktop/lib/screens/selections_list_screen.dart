@@ -4,6 +4,7 @@ import 'package:ezscores_desktop/helpers/pagination/pagination_controlls.dart';
 import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/selections.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
+import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +44,8 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
   }
 
   Future initForm() async {
-    await _paginationController.loadPage();
+    int currentPage = _paginationController.items.length < 2 && _paginationController.currentPage > 0 ? _paginationController.currentPage - 1 : _paginationController.currentPage;
+    await _paginationController.loadPage(currentPage);
     setState(() {
     });
   }
@@ -146,6 +148,13 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
                                 ),
                               ),
                             ),
+                            DataColumn(
+                              label: Text(
+                                "",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ],
                           rows: _paginationController.items.map((e) => DataRow(
                             onSelectChanged: (_) => _handleRowTap(e),
@@ -162,6 +171,18 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
                                   child: Center(child: Text(e.ageMax?.toString() ?? "-")),
                                 ),
                               ),
+                              DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Obriši',
+                                    onPressed: () async{
+                                      await deleteEntity(context: context,
+                                      deleteFunction: selectionProvider.delete,
+                                      entityId: e.id!, 
+                                      onDeleted: initForm);
+                                    },)
+                                )),
                             ],
                           )).toList(),
                         ),
@@ -169,7 +190,6 @@ class _SelectionsListScreenState extends State<SelectionsListScreen> {
                     ),
         ),
 
-        /// Pagination controls pinned at the bottom
         Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: PaginationControls(controller: _paginationController),

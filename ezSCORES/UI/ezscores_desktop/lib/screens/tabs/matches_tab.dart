@@ -2,6 +2,7 @@ import 'package:ezscores_desktop/dialogs/fixture_upsert_dialog.dart';
 import 'package:ezscores_desktop/models/DTOs/fixtureDto.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
 import 'package:ezscores_desktop/providers/FixturesProvider.dart';
+import 'package:ezscores_desktop/providers/MatchesProvider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/match_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class MatchesTab extends StatefulWidget {
 
 class _MatchesTabState extends State<MatchesTab> {
   late FixtureProvider fixturesProvider;
+  late MatchesProvider matchProvider;
   List<FixtureDTO>? fixtures;
   int? activeFixtureId;
   
@@ -25,6 +27,7 @@ class _MatchesTabState extends State<MatchesTab> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     fixturesProvider = context.read<FixtureProvider>();
+    matchProvider = context.read<MatchesProvider>();
   }
 
   @override
@@ -35,6 +38,7 @@ class _MatchesTabState extends State<MatchesTab> {
 
   Future initForm() async {
     fixturesProvider = context.read<FixtureProvider>();
+    matchProvider = context.read<MatchesProvider>();
     var fixtureData = await fixturesProvider.getByCompetitionId(widget.competitionId);
     setState(() {
       fixtures = fixtureData;
@@ -136,7 +140,11 @@ class _MatchesTabState extends State<MatchesTab> {
                               icon: const Icon(Icons.delete, color: Colors.red),
                               tooltip: 'Obriši kolo',
                               onPressed: () {
-                                _deleteFixture(fixture.id!);
+                                deleteEntity(
+                                  context: context,
+                                  deleteFunction: fixturesProvider.delete,
+                                  entityId: fixture.id!,
+                                  onDeleted: initForm);
                               },
                             ),
                             if(fixtureLimitReached(fixture)) ElevatedButton(onPressed: () async {
@@ -183,32 +191,75 @@ class _MatchesTabState extends State<MatchesTab> {
                                         border: Border.all(color: Colors.grey.shade300),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                if(match.gameStage == GameStage.groupPhase) Text(match.group!.name!),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  '${match.homeTeam?.name ?? "?"} vs ${match.awayTeam?.name ?? "?"}',
-                                                  style: Theme.of(context).textTheme.titleMedium,
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  '${DateFormat('dd.MM.yyyy HH:mm').format(match.dateAndTime!)} • ${match.stadium?.name ?? ""}',
-                                                  style: Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Text(
-                                            '${match.isCompleted == true ? '${match.homeTeamScore} : ${match.awayTeamScore}' : '-'} ',
-                                            style: Theme.of(context).textTheme.titleLarge,
-                                          ),
-                                        ],
-                                      ),
+                                      child: SizedBox(
+  height: 80, // fixed height ensures vertical centering is meaningful
+  child: Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      /// LEFT SIDE
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (match.gameStage == GameStage.groupPhase)
+              Text(
+                match.group!.name!,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey),
+              ),
+            const SizedBox(height: 8),
+            Text(
+              '${match.homeTeam?.name ?? "?"} vs ${match.awayTeam?.name ?? "?"}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${DateFormat('dd.MM.yyyy HH:mm').format(match.dateAndTime!)} • ${match.stadium?.name ?? ""}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+      ),
+
+      /// RIGHT SIDE
+      Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              match.isCompleted == true
+                  ? '${match.homeTeamScore} : ${match.awayTeamScore}'
+                  : '-',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 1,
+              height: 40,
+              color: Colors.grey.shade300,
+            ),
+            const SizedBox(width: 12),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              tooltip: "Izbriši susret",
+              onPressed: () {
+                deleteEntity(
+                  context: context,
+                  deleteFunction: matchProvider.delete,
+                  entityId: match.matchId!,
+                  onDeleted: initForm
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+)
+
+
+
+
                                     ),
                                   );
                                 }).toList(),
@@ -223,28 +274,6 @@ class _MatchesTabState extends State<MatchesTab> {
         ],
       ),
     );
-  }
-  
-  void _deleteFixture(int fixtureId) async{
-    bool confirmed = await showConfirmDeleteDialog(context, content: 'Jeste li sigurni da želite izbrisati ovo kolo?\nSve utakmice iz ovog kola će također biti izbrisane!');
-    if(confirmed)
-    {
-      try {
-      await fixturesProvider.delete(fixtureId);
-      if(context.mounted)
-      {
-        showBottomRightNotification(context, 'Grupa uspješno obrisana');
-        initForm();
-      }
-      } catch (e) {
-        showDialog(
-          context: context, 
-          builder: (context) => AlertDialog(
-          title: const Text("Error"), 
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
-          content: Text(e.toString()),));
-      }
-    }
   }
   
   void _activateFixture(int fixtureId, bool status) async{

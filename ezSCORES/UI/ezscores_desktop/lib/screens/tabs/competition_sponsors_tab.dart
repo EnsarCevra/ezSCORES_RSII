@@ -47,15 +47,8 @@ class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
   } 
 
   Future initForm() async{
-    var filter = {
-      "competitionId" : widget.competitionId
-    };
     await _paginationController.loadPage();
-    var competitionsSponsorsData = await compeititonsSponsorsProvider.get(filter: filter);
-    setState(() {
-      competitionSponsorResult = competitionsSponsorsData;
-      _excludeAssignedSponsors();
-    });
+    await _loadCompetitionSponsors();
    }
 
 
@@ -199,6 +192,7 @@ class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
                                     onPressed: () async {
                                       await _assignSponsor(e);
                                       await _paginationController.loadPage(_paginationController.currentPage);
+                                      await _loadCompetitionSponsors();
                                     },
                                     child: const Text("Dodijeli"),
                                   ),
@@ -248,7 +242,7 @@ _buildAssignedSponsorsView() {
       spacing: 16,
       runSpacing: 16,
       children: assignedSponsors.map((e) {
-        final sponsor = e.sponsor;
+        final competitionSponsor = e;
 
         return Container(
           width: 150,
@@ -275,16 +269,16 @@ _buildAssignedSponsorsView() {
                   color: Colors.white,
                 ),
                 clipBehavior: Clip.hardEdge,
-                child: sponsor?.picture != null
+                child: competitionSponsor.sponsor?.picture != null
                     ? Image.memory(
-                        base64Decode(sponsor!.picture!),
+                        base64Decode(competitionSponsor.sponsor!.picture!),
                         fit: BoxFit.contain,
                       )
                     : const Icon(Icons.handshake, size: 40, color: Colors.grey),
               ),
               const SizedBox(height: 10),
               Text(
-                sponsor?.name ?? "",
+                competitionSponsor.sponsor?.name ?? "",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -294,7 +288,7 @@ _buildAssignedSponsorsView() {
               const SizedBox(height: 10),
               ElevatedButton.icon(
                 onPressed: () async {
-                  _removeSponsor(sponsor!.id!);
+                  _removeSponsor(competitionSponsor.id!);
                 },
                 icon: const Icon(Icons.remove_circle_outline),
                 label: const Text("Ukloni"),
@@ -345,7 +339,7 @@ _buildAssignedSponsorsView() {
       if(context.mounted)
       {
         showBottomRightNotification(context, 'Sponzor uspješno uklonjen!');
-        initForm(); 
+        initForm();
       }
     } catch (e) {
         showDialog(
@@ -360,5 +354,16 @@ _buildAssignedSponsorsView() {
   void _excludeAssignedSponsors() {
     excludedSponsors = competitionSponsorResult!.result.map((e) => e.sponsorId).toSet();
     _paginationController.items = _paginationController.items.where((ref)=> !excludedSponsors!.contains(ref.id)).toList();
+  }
+  
+  _loadCompetitionSponsors() async {
+    var filter = {
+      "competitionId" : widget.competitionId
+    };
+    var competitionsSponsorsData = await compeititonsSponsorsProvider.get(filter: filter);
+    setState(() {
+      competitionSponsorResult = competitionsSponsorsData;
+      _excludeAssignedSponsors();
+    });
   }
 }

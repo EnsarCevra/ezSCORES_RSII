@@ -61,7 +61,8 @@ class _UsersListScreenState extends State<UsersListScreen> {
   }
 
   Future initForm() async {
-    await _paginationController.loadPage();
+    int currentPage = _paginationController.items.length < 2 && _paginationController.currentPage > 0 ? _paginationController.currentPage - 1 : _paginationController.currentPage;
+    await _paginationController.loadPage(currentPage);
     var roleData = await roleProvider.get();
     setState(() {
       rolesResult = roleData;
@@ -226,6 +227,13 @@ Widget _buildResultView() {
                                 ),
                               ),
                             ),
+                            DataColumn(
+                              label: Text(
+                                "",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ],
                           rows: _paginationController.items.map((e) {
                             return DataRow(
@@ -252,6 +260,18 @@ Widget _buildResultView() {
                                 DataCell(Center(child: Text(e.lastName ?? ""))),
                                 DataCell(Center(child: Text(e.userName ?? ""))),
                                 DataCell(Center(child: Text(e.role?.name ?? ""))),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Obriši',
+                                    onPressed: () async{
+                                      await deleteEntity(context: context,
+                                      deleteFunction: userProvider.delete,
+                                      entityId: e.id!, 
+                                      onDeleted: initForm);
+                                    },)
+                                )),
                               ],
                             );
                           }).toList(),

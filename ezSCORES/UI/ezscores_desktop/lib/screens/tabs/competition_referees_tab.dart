@@ -49,14 +49,7 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
 
   Future initForm() async{
     await _paginationController.loadPage();
-    var filter = {
-          "competitionId" : widget.competitionId
-        };
-    var competitionsRefereesData = await competitionRefereeProvider.get(filter: filter);
-    setState(() {
-      competitionRefereeResult = competitionsRefereesData;
-      _excludeAssignedReferees();
-    });
+    await _loadCompetitionReferees();
    }
 
 
@@ -206,6 +199,7 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
                                     onPressed: () async {
                                       await _assignReferee(e);
                                       await _paginationController.loadPage(_paginationController.currentPage);
+                                      await _loadCompetitionReferees();
                                     },
                                     child: const Text("Dodijeli"),
                                   ),
@@ -255,7 +249,7 @@ _buildAssignedRefereesView() {
       spacing: 16,
       runSpacing: 16,
       children: assignedReferees.map((e) {
-        final referee = e.referee;
+        final competitionReferee = e;
 
         return Container(
           width: 200,
@@ -277,16 +271,16 @@ _buildAssignedRefereesView() {
               CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.transparent,
-                backgroundImage: referee?.picture != null
-                    ? MemoryImage(base64Decode(referee!.picture!))
+                backgroundImage: competitionReferee.referee?.picture != null
+                    ? MemoryImage(base64Decode(competitionReferee.referee!.picture!))
                     : null,
-                child: referee?.picture == null
+                child: competitionReferee.referee?.picture == null
                     ? const Icon(Icons.account_circle, size: 50)
                     : null,
               ),
               const SizedBox(height: 10),
               Text(
-                '${referee?.firstName ?? ""} ${referee?.lastName ?? ""}',
+                '${competitionReferee.referee?.firstName ?? ""} ${competitionReferee.referee?.lastName ?? ""}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -296,7 +290,7 @@ _buildAssignedRefereesView() {
               const SizedBox(height: 10),
               ElevatedButton.icon(
                 onPressed: () async {
-                  _unassignReferee(referee!.id!);
+                  _unassignReferee(competitionReferee.id!);
                 },
                 icon: const Icon(Icons.remove_circle_outline),
                 label: const Text("Ukloni"),
@@ -361,5 +355,16 @@ _buildAssignedRefereesView() {
   void _excludeAssignedReferees() {
     excludedReferees = competitionRefereeResult!.result.map((e) => e.refereeId).toSet();
     _paginationController.items = _paginationController.items.where((ref)=> !excludedReferees!.contains(ref.id)).toList();
+  }
+  
+  _loadCompetitionReferees() async {
+    var filter = {
+      "competitionId" : widget.competitionId
+    };
+    var competitionsRefereesData = await competitionRefereeProvider.get(filter: filter);
+    setState(() {
+      competitionRefereeResult = competitionsRefereesData;
+      _excludeAssignedReferees();
+    });
   }
 }

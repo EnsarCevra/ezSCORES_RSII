@@ -25,7 +25,6 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   late TeamProvider teamProvider;
   late SelectionProvider selectionProvider;
   SearchResult<Selections>? selectionResult;
-  //SearchResult<Teams>? teamsResult = null;
   late PaginationController<Teams> _paginationController;
    @override
   void didChangeDependencies()
@@ -52,11 +51,10 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
     initForm();
   }
   Future initForm() async{
-    //var teamData = await teamProvider.get();
-    await _paginationController.loadPage();
+    int currentPage = _paginationController.items.length < 2 && _paginationController.currentPage > 0 ? _paginationController.currentPage - 1 : _paginationController.currentPage;
+    await _paginationController.loadPage(currentPage);
     var selectionData = await selectionProvider.get(); 
     setState(() {
-      //teamsResult = teamData;
       selectionResult = selectionData;
     });
    }
@@ -103,14 +101,6 @@ Widget _buildSearch()
                   ),
       const SizedBox(width: 8,),            
       ElevatedButton(onPressed: () async{
-        // var filter = {
-        //   "name" : _ftsEditingController.text,
-        //   "selectionId" : selectedSelectionID
-        // };
-        // var data = await teamProvider.get(filter: filter);
-        // setState(() {
-        //   teamsResult = data;
-        // });
         await _paginationController.loadPage(0);
       }, child: const Icon(Icons.search)),
       const SizedBox(width: 8,),
@@ -177,6 +167,13 @@ Widget _buildResultView() {
                             textAlign: TextAlign.center,
                           ),
                         ),
+                        DataColumn(
+                          label: Text(
+                            "",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ],
                       rows: _paginationController.items
                           .map(
@@ -205,6 +202,18 @@ Widget _buildResultView() {
                                 DataCell(Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(e.selection?.name ?? ""),
+                                )),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Obriši',
+                                    onPressed: () async{
+                                      await deleteEntity(context: context,
+                                      deleteFunction: teamProvider.delete,
+                                      entityId: e.id!, 
+                                      onDeleted: initForm);
+                                    },)
                                 )),
                               ],
                             ),

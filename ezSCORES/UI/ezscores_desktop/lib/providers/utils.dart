@@ -219,5 +219,42 @@ Future<bool> showConfirmDeleteDialog(BuildContext context, {String? title, Strin
 
   return result ?? false;
 }
+Future<void> deleteEntity({
+  required BuildContext context,
+  required Future<void> Function(int id) deleteFunction,
+  required int entityId,
+  required VoidCallback onDeleted,
+}) async {
+  bool confirmed = await showConfirmDeleteDialog(
+    context,
+    content: 'Jeste li sigurni da želite izbrisati stavku?',
+  );
+
+  if (confirmed) {
+    try {
+      await deleteFunction(entityId);
+
+      if (context.mounted) {
+        showBottomRightNotification(context, 'Stavka uspješno obrisana');
+        onDeleted();
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Greška"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            )
+          ],
+        ),
+      );
+    }
+  }
+}
+String capitalize(String s) => s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1)}' : s;
 
 

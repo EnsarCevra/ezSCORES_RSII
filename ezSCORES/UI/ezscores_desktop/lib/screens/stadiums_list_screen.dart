@@ -44,7 +44,8 @@ class _StadiumsListScreenState extends State<StadiumsListScreen> {
   }
 
   Future initForm() async {
-    await _paginationController.loadPage();
+    int currentPage = _paginationController.items.length < 2 && _paginationController.currentPage > 0 ? _paginationController.currentPage - 1 : _paginationController.currentPage;
+    await _paginationController.loadPage(currentPage);
     setState(() {
     });
   }
@@ -141,6 +142,13 @@ class _StadiumsListScreenState extends State<StadiumsListScreen> {
                                     textAlign: TextAlign.left,
                                   )
                             ),
+                            DataColumn(
+                              label: Text(
+                                "",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ],
                           rows: _paginationController.items.map((e) {
                             return DataRow(
@@ -160,6 +168,18 @@ class _StadiumsListScreenState extends State<StadiumsListScreen> {
                                     child: Text(e.name ?? ""),
                                   ),
                                 ),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Obriši',
+                                    onPressed: () async{
+                                      await deleteEntity(context: context,
+                                      deleteFunction: stadiumProvider.delete,
+                                      entityId: e.id!, 
+                                      onDeleted: initForm);
+                                    },)
+                                )),
                               ],
                             );
                           }).toList(),

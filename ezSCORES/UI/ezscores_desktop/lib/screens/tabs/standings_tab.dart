@@ -136,7 +136,11 @@ Widget _buildTournamentGroups(List<GroupStandingsDTO> groups) {
                                 IconButton(
                                   icon: const Icon(Icons.delete_forever_outlined, color: Colors.red),
                                   onPressed: () {
-                                    _deleteGroup(group.groupId!);
+                                    deleteEntity(
+                                      context: context,
+                                      deleteFunction: groupProvider.delete,
+                                      entityId: group.groupId!,
+                                      onDeleted: _loadGroups);
                                   },
                                 ),
                               ],
@@ -285,26 +289,4 @@ Widget _buildTournamentGroups(List<GroupStandingsDTO> groups) {
       },
     );
   }
-  
-  void _deleteGroup(int id) async{
-    bool confirmed = await showConfirmDeleteDialog(context, content: 'Jeste li sigurni da želite izbrisati ovu grupu?');
-    if(confirmed)
-    {
-      try {
-      await groupProvider.delete(id);
-      if(context.mounted)
-      {
-        showBottomRightNotification(context, 'Grupa uspješno obrisana');
-        _loadGroups();
-      }
-      } catch (e) {
-        showDialog(
-          context: context, 
-          builder: (context) => AlertDialog(
-          title: const Text("Error"), 
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
-          content: Text(e.toString()),));
-      }
-    }
-    }
 }

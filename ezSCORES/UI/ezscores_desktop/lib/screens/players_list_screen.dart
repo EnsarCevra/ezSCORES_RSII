@@ -45,7 +45,8 @@ class _PlayerListScreen extends State<PlayersListScreen>
   } 
 
   Future initForm() async{
-    await _paginationController.loadPage();
+    int currentPage = _paginationController.items.length < 2 && _paginationController.currentPage > 0 ? _paginationController.currentPage - 1 : _paginationController.currentPage;
+    await _paginationController.loadPage(currentPage);
     setState(() {
     });
    }
@@ -84,7 +85,7 @@ class _PlayerListScreen extends State<PlayersListScreen>
           child: TextFormField(
             controller: _birthYearEditingController,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Godina rođenja',
               hintText: 'npr. 2002',
             ),
@@ -96,7 +97,7 @@ class _PlayerListScreen extends State<PlayersListScreen>
             ]),
           ),
         ),
-        SizedBox(width: 8,),
+        const SizedBox(width: 8,),
         SizedBox(
           width: 200,
           child: TextField(
@@ -111,13 +112,13 @@ class _PlayerListScreen extends State<PlayersListScreen>
                      _dateController.clear();
                   });
                 }, 
-                icon: Icon(Icons.clear)
+                icon: const Icon(Icons.clear)
                 ) : null,
             ),
             onTap: () => _pickDate(context),
           ),
         ),
-        SizedBox(width: 8,),
+        const SizedBox(width: 8,),
         ElevatedButton(onPressed: () async{
           await _paginationController.loadPage(0);
           setState(() {
@@ -138,7 +139,7 @@ class _PlayerListScreen extends State<PlayersListScreen>
                 {
                   initForm();
                 }
-            }, child: Text("Dodaj"))
+            }, child: const Text("Dodaj"))
           ],
         ),
     )
@@ -207,6 +208,13 @@ Widget _buildResultView() {
                                 ),
                               ),
                             ),
+                            DataColumn(
+                            label: Text(
+                              "",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                           ],
                           rows: _paginationController.items.map((e) => DataRow(
                             onSelectChanged: (_) => _handleRowTap(e),
@@ -246,6 +254,18 @@ Widget _buildResultView() {
                                   child: Center(child: Text(formatDateOnly(e.birthDate))),
                                 ),
                               ),
+                              DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Obriši',
+                                    onPressed: () async{
+                                      await deleteEntity(context: context,
+                                      deleteFunction: playerProvider.delete,
+                                      entityId: e.id!, 
+                                      onDeleted: initForm);
+                                    },)
+                                )),
                             ],
                           )).toList(),
                         ),

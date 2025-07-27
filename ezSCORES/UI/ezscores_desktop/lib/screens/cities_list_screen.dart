@@ -5,6 +5,7 @@ import 'package:ezscores_desktop/layouts/master_screen.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/cities.dart';
 import 'package:ezscores_desktop/providers/CitiesProvider.dart';
+import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -48,7 +49,8 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   }
 
   Future initForm() async {
-    await _paginationController.loadPage();
+    int currentPage = _paginationController.items.length < 2 && _paginationController.currentPage > 0 ? _paginationController.currentPage - 1 : _paginationController.currentPage;
+    await _paginationController.loadPage(currentPage);
     setState(() {
     });
   }
@@ -58,13 +60,11 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
     return MasterScreen(
       "Lista gradova",
       selectedIndex: widget.selectedIndex,
-      Container(
-        child: Column(
-          children: [
-            _buildSearch(),
-            AnimatedBuilder(animation: _paginationController, builder: (context, _) => _buildResultView(),),
-          ],
-        ),
+      Column(
+        children: [
+          _buildSearch(),
+          AnimatedBuilder(animation: _paginationController, builder: (context, _) => _buildResultView(),),
+        ],
       ),
     );
   }
@@ -137,11 +137,18 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                             ),
                             DataColumn(
                               label: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.8,
+                                width: MediaQuery.of(context).size.width * 0.6,
                                 child: Text(
                                   "Naziv",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                "",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ],
@@ -164,6 +171,18 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                                       child: Text(city.name ?? ""),
                                     ),
                                   ),
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      tooltip: 'Obriši',
+                                      onPressed: () async{
+                                        await deleteEntity(context: context,
+                                        deleteFunction: cityProvider.delete,
+                                        entityId: city.id!, 
+                                        onDeleted: initForm);
+                                      },)
+                                  )),
                                 ],
                               );
                             },
