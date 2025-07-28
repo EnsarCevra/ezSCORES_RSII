@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:ezscores_desktop/helpers/state_machine/competition_state_transitions.dart';
 import 'package:ezscores_desktop/models/cities.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
 import 'package:ezscores_desktop/models/enums/competitionStatus.dart';
@@ -93,6 +94,7 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if(widget.competition != null && widget.competition?.status != CompetitionStatus.finished)_buildStateNavigation(),
                 _buildForm(),
                 _saveRow(),
               ],
@@ -530,4 +532,141 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
       ),
     );
   }
+  
+Widget _buildStateNavigation() {
+  if (widget.competition == null || widget.competition!.status == null) return const SizedBox();
+
+  final current = widget.competition!.status!;
+  final availableTransitions = transitionActions[current] ?? {};
+  CompetitionStatus? previousState;
+  TransitionCallback? previousCallback;
+  CompetitionStatus? nextState;
+  TransitionCallback? nextCallback;
+
+  for (final entry in availableTransitions.entries) {
+  final target = entry.key;
+
+  // Choose the closest lower index for previous
+  if (target.index < current.index) {
+    if (previousState == null || target.index > previousState.index) {
+      previousState = target;
+      previousCallback = entry.value;
+    }
+  }
+
+  // Choose the closest higher index for next
+  if (target.index > current.index) {
+    if (nextState == null || target.index < nextState.index) {
+      nextState = target;
+      nextCallback = entry.value;
+    }
+  }
+}
+
+  return Padding(
+    padding: const EdgeInsets.only(top: 24.0),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 12.0),
+            child: Text(
+              "Upravljanje stanjem takmičenja",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // ◀ PREVIOUS STATE
+              if (previousState != null && previousCallback != null)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () async {
+                    try {
+                      await previousCallback!(widget.competition!.id!, context);
+                      setState(() {
+                        widget.competition!.status = previousState!;
+                      });
+                      showBottomRightNotification(context, 'Status vraćen na "${previousState!.displayName}".');
+                    } catch (e) {
+                      _showErrorDialog("Greška pri vraćanju statusa", e.toString());
+                    }
+                  },
+                  label: Text(previousState.displayName),
+                )
+              else
+                const SizedBox(width: 120),
+
+              // 🟡 CURRENT STATE DISPLAY
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.yellow[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange),
+                  ),
+                  child: Text(
+                    current.displayName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ),
+
+              // ▶ NEXT STATE
+              if (nextState != null && nextCallback != null)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.arrow_forward),
+                  onPressed: () async {
+                    try {
+                      await nextCallback!(widget.competition!.id!, context);
+                      setState(() {
+                        widget.competition!.status = nextState!;
+                      });
+                      showBottomRightNotification(context, 'Status promijenjen na "${nextState!.displayName}".');
+                    } catch (e) {
+                      _showErrorDialog("Greška pri promjeni statusa", e.toString());
+                    }
+                  },
+                  label: Text(nextState.displayName),
+                )
+              else
+                const SizedBox(width: 120),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+void _showErrorDialog(String title, String content) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK")),
+      ],
+    ),
+  );
+}
+
+
 }

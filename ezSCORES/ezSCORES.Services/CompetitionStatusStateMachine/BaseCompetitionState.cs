@@ -32,7 +32,7 @@ namespace ezSCORES.Services.CompetitionStatusStateMachine
 		{
 			throw new UserException("Method not allowed");
 		}
-		public virtual Model.Competitions Peparation(int id)
+		public virtual Model.Competitions Preparation(int id)
 		{
 			throw new UserException("Method not allowed");
 		}

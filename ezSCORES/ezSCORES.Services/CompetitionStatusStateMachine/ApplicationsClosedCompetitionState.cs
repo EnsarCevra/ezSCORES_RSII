@@ -16,11 +16,19 @@ namespace ezSCORES.Services.CompetitionStatusStateMachine
 		{
 		}
 
-		public override Competitions Peparation(int id)
+		public override Competitions Preparation(int id)
 		{
 			var set = Context.Set<Competition>();
 			var entity = set.Find(id);
 			entity.Status = Model.ENUMs.CompetitionStatus.Preparation;
+			Context.SaveChanges();
+			return Mapper.Map<Competitions>(entity);
+		}
+		public override Competitions OpenAplications(int id)
+		{
+			var set = Context.Set<Competition>();
+			var entity = set.Find(id);
+			entity.Status = Model.ENUMs.CompetitionStatus.ApplicationsOpen;
 			Context.SaveChanges();
 			return Mapper.Map<Competitions>(entity);
 		}

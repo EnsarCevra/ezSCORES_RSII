@@ -149,7 +149,7 @@ namespace ezSCORES.Services
 		{
 			var competition = Context.Competitions.Find(id);
 			var state = BaseCompetitionState.CreateState(competition.Status);
-			return state.Peparation(id);
+			return state.Preparation(id);
 		}
 
 		public Competitions OpenAplications(int id)

@@ -1,5 +1,6 @@
 import 'package:ezscores_desktop/models/competitions.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
+import 'package:http/http.dart' as http;
 
 class CompetitionProvider extends BaseProvider<Competitions>
 {
@@ -7,7 +8,43 @@ class CompetitionProvider extends BaseProvider<Competitions>
 
   @override
   Competitions fromJson(data) {
-    // TODO: implement fromJson
     return Competitions.fromJson(data);
   }
+
+  Future<void> preparation(int competitionId) async {
+    await _patchCompetitionStatus(competitionId, 'preparation');
+  }
+  Future<void> openApplications(int competitionId) async {
+    await _patchCompetitionStatus(competitionId, 'applications-open');
+  }
+
+  Future<void> closeApplications(int competitionId) async {
+    await _patchCompetitionStatus(competitionId, 'applications-closed');
+  }
+
+  Future<void> startCompetition(int competitionId) async {
+    await _patchCompetitionStatus(competitionId, 'start-competition');
+  }
+
+  Future<void> finishCompetition(int competitionId) async {
+    await _patchCompetitionStatus(competitionId, 'finish-competition');
+  }
+
+  Future<void> _patchCompetitionStatus(int id, String action) async {
+    final url = "${BaseProvider.baseUrl}Competitions/$id/$action";
+    final uri = Uri.parse(url);
+    final headers = createHeaders();
+
+    http.Response response;
+    try {
+      response = await http.patch(uri, headers: headers);
+    } on UserException catch (e) {
+      rethrow;
+    }
+
+    if (!isValidResponse(response)) {
+      throw UserException("Neuspješna promjena statusa.");
+    }
+  }
+
 }
