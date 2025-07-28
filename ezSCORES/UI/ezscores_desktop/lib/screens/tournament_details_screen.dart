@@ -109,7 +109,7 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
 
   Widget _buildInfoContent()
   {
-    return CompetitionDetailsTab(competition: widget.competition,);
+    return CompetitionDetailsTab(competition: widget.competition, onStateChanged: (){setState(() {});},);
   }
   Widget _buildApplicationsContent()
   {

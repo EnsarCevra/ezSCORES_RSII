@@ -21,7 +21,8 @@ import 'package:provider/provider.dart';
 
 class CompetitionDetailsTab extends StatefulWidget {
   Competitions? competition;
-  CompetitionDetailsTab({super.key, this.competition});
+  final void Function()? onStateChanged;
+  CompetitionDetailsTab({super.key, this.competition, this.onStateChanged});
 
   @override
   _CompetitionDetailsTabState createState() => _CompetitionDetailsTabState();
@@ -588,7 +589,6 @@ Widget _buildStateNavigation() {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // ◀ PREVIOUS STATE
               if (previousState != null && previousCallback != null)
                 ElevatedButton.icon(
                   icon: const Icon(Icons.arrow_back),
@@ -598,6 +598,7 @@ Widget _buildStateNavigation() {
                       setState(() {
                         widget.competition!.status = previousState!;
                       });
+                      widget.onStateChanged?.call();
                       showBottomRightNotification(context, 'Status vraćen na "${previousState!.displayName}".');
                     } catch (e) {
                       _showErrorDialog("Greška pri vraćanju statusa", e.toString());
@@ -608,7 +609,6 @@ Widget _buildStateNavigation() {
               else
                 const SizedBox(width: 120),
 
-              // 🟡 CURRENT STATE DISPLAY
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
@@ -628,7 +628,6 @@ Widget _buildStateNavigation() {
                 ),
               ),
 
-              // ▶ NEXT STATE
               if (nextState != null && nextCallback != null)
                 ElevatedButton.icon(
                   icon: const Icon(Icons.arrow_forward),
@@ -638,6 +637,7 @@ Widget _buildStateNavigation() {
                       setState(() {
                         widget.competition!.status = nextState!;
                       });
+                      widget.onStateChanged?.call();
                       showBottomRightNotification(context, 'Status promijenjen na "${nextState!.displayName}".');
                     } catch (e) {
                       _showErrorDialog("Greška pri promjeni statusa", e.toString());
