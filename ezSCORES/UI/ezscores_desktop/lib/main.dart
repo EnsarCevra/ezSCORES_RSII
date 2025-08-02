@@ -28,6 +28,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => CompetitionProvider()),
     ChangeNotifierProvider(create: (_) => TeamProvider()),

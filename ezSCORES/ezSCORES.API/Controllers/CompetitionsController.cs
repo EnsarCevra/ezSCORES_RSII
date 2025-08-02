@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
@@ -49,6 +50,11 @@ namespace ezSCORES.API.Controllers
 		public Competitions FinishCompetition(int id)
 		{
 			return (_service as ICompetitionsService).FinishCompetition(id);
+		}
+		[HttpGet("get-admin-dashboard-info")]
+		public AdminDashboardDTO GetAdminDashboardInfo([FromQuery] AdminDashboardSearchObject searchObject)
+		{
+			return (_service as ICompetitionsService).GetAdminDashboardInfo(searchObject);
 		}
 	}
 }

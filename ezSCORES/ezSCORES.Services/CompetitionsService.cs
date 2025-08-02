@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.DTOs;
 using ezSCORES.Model.ENUMs;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
@@ -178,6 +179,38 @@ namespace ezSCORES.Services
 			var competition = Context.Competitions.Find(id);
 			var state = BaseCompetitionState.CreateState(competition.Status);
 			return state.FinishCompetition(id);
+		}
+
+		public AdminDashboardDTO GetAdminDashboardInfo(AdminDashboardSearchObject searchObject)
+		{
+			var dto = new AdminDashboardDTO()
+			{
+				Competitions = Context.Competitions.Count(),
+				Teams = Context.Teams.Count(),
+				Players = Context.Players.Count(),
+				CompetitionsByStatus = new CompetitionsByStatusCountDTO
+				{
+					PreparationCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.Preparation).Count(),
+					ApplicationsOpenedCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.ApplicationsOpen).Count(),
+					ApplicationsClosedCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.ApplicationsClosed).Count(),
+					UnderwayCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.Underway).Count(),
+					FinishedCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.Finished).Count(),
+				},
+				CompetitionsByMonth = GetCompetitionsByMonth(searchObject.Year)
+			};
+
+			return dto;
+		}
+
+		private Dictionary<int, int> GetCompetitionsByMonth(int? selectedYear)
+		{
+			var rawData = Context.Competitions
+					.Where(c => c.StartDate.Year == (selectedYear ?? DateTime.Now.Year))
+					.GroupBy(c => c.StartDate.Month)
+					.ToDictionary(g => g.Key, g => g.Count());
+			var fullYearData = Enumerable.Range(1, 12)
+				.ToDictionary(month => month, month => rawData.ContainsKey(month) ? rawData[month] : 0);
+			return fullYearData;
 		}
 	}
 }

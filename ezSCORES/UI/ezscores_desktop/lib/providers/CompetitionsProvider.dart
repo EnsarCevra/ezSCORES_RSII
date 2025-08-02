@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:ezscores_desktop/models/DTOs/adminCardsDto.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:http/http.dart' as http;
@@ -45,6 +48,25 @@ class CompetitionProvider extends BaseProvider<Competitions>
     if (!isValidResponse(response)) {
       throw UserException("Neuspješna promjena statusa.");
     }
+  }
+  Future<AdminDashboardCardsDTO> getDashboardCardStats(int? selectedYear) async {
+    final url = "${BaseProvider.baseUrl}Competitions/get-admin-dashboard-info?Year=$selectedYear";
+    final uri = Uri.parse(url);
+    final headers = createHeaders();
+
+    http.Response response;
+    try {
+      response = await http.get(uri, headers: headers);
+    } on UserException catch (e) {
+      rethrow;
+    }
+
+    if (!isValidResponse(response)) {
+      throw UserException("Neuspješno dohvaćanje podataka za dashboard.");
+    }
+
+    final data = jsonDecode(response.body);
+    return AdminDashboardCardsDTO.fromJson(data);
   }
 
 }

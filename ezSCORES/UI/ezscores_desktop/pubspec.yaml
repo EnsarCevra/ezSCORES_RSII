@@ -42,6 +42,11 @@ dependencies:
   form_builder_validators: ^9.1.0
   intl: ^0.18.1
   file_picker: ^8.0.5
+  fl_chart: ^0.69.0
+  pdf: ^3.10.4
+  path_provider: ^2.1.2
+  file_selector: ^1.0.3
+  file_selector_windows: ^0.9.3
 
 dev_dependencies:
   flutter_test:
