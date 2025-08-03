@@ -5,6 +5,7 @@ import 'package:ezscores_desktop/models/enums/competitionStatus.dart';
 import 'package:ezscores_desktop/models/enums/competitionType.dart';
 import 'package:ezscores_desktop/models/enums/competitions_status_converter.dart';
 import 'package:ezscores_desktop/models/enums/competitions_type_converter.dart';
+import 'package:ezscores_desktop/models/reviews.dart';
 import 'package:ezscores_desktop/models/rewards.dart';
 import 'package:ezscores_desktop/models/selections.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -35,6 +36,7 @@ class Competitions {
   List<CompetitionsReferees>? competitionsReferees;
   List<CompetitionsSponsors>? competitionsSponsors;
   List<Rewards>? rewards;
+  List<Reviews>? reviews;
  
 	Competitions();
 

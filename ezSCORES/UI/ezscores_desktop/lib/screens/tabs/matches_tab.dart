@@ -10,8 +10,9 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class MatchesTab extends StatefulWidget {
+  final int selectedIndex;
   final int competitionId;
-  const MatchesTab({super.key, required this.competitionId});
+  const MatchesTab({super.key, required this.competitionId, required this.selectedIndex});
 
   @override
   State<MatchesTab> createState() => _MatchesTabState();
@@ -42,7 +43,6 @@ class _MatchesTabState extends State<MatchesTab> {
     var fixtureData = await fixturesProvider.getByCompetitionId(widget.competitionId);
     setState(() {
       fixtures = fixtureData;
-      //nextInSequence = fixtures!.where((element) => element.isCurrentlyActive == true).first.sequenceNumber! + 1;
       try {
         activeFixtureId = fixtures!.firstWhere((element) => element.isCurrentlyActive == true).id;
       } catch (e) {
@@ -150,7 +150,7 @@ class _MatchesTabState extends State<MatchesTab> {
                             if(fixtureLimitReached(fixture)) ElevatedButton(onPressed: () async {
                               final actionResult = await Navigator.of(context).push(
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competitionId,),
+                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competitionId,selectedIndex: widget.selectedIndex,),
                                         transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                           return FadeTransition(opacity: animation, child: child);
                                         },
@@ -172,7 +172,7 @@ class _MatchesTabState extends State<MatchesTab> {
                                     onTap: () async{
                                       final actionResult = await Navigator.of(context).push(
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(matchID: match.matchId, fixture: fixture, competitionId: widget.competitionId,),
+                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(matchID: match.matchId, fixture: fixture, competitionId: widget.competitionId,selectedIndex: widget.selectedIndex,),
                                         transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                           return FadeTransition(opacity: animation, child: child);
                                         },

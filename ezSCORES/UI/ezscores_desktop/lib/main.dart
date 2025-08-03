@@ -186,7 +186,7 @@ class _LoginPageState extends State<LoginPage>
                             AuthProvider.roleID = user.role?.id;
                             AuthProvider.roleName = user.role?.name;
                             AuthProvider.roleDecription = user.role?.description;
-                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => AdminDashboardScreen()));
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => AdminDashboardScreen(selectedIndex: 0,)));
                           }on UserException catch(exception)
                           {
                             showDialog(

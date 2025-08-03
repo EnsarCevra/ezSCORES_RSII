@@ -42,6 +42,9 @@ Competitions _$CompetitionsFromJson(Map<String, dynamic> json) => Competitions()
       .toList()
   ..rewards = (json['rewards'] as List<dynamic>?)
       ?.map((e) => Rewards.fromJson(e as Map<String, dynamic>))
+      .toList()
+  ..reviews = (json['reviews'] as List<dynamic>?)
+      ?.map((e) => Reviews.fromJson(e as Map<String, dynamic>))
       .toList();
 
 Map<String, dynamic> _$CompetitionsToJson(Competitions instance) =>
@@ -69,4 +72,5 @@ Map<String, dynamic> _$CompetitionsToJson(Competitions instance) =>
       'competitionsSponsors':
           instance.competitionsSponsors?.map((e) => e.toJson()).toList(),
       'rewards': instance.rewards?.map((e) => e.toJson()).toList(),
+      'reviews': instance.reviews?.map((e) => e.toJson()).toList(),
     };

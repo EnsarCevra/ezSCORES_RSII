@@ -5,6 +5,7 @@ import 'package:ezscores_desktop/models/cities.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
 import 'package:ezscores_desktop/models/enums/competitionStatus.dart';
 import 'package:ezscores_desktop/models/enums/competitionType.dart';
+import 'package:ezscores_desktop/models/reviews.dart';
 import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/models/selections.dart';
 import 'package:ezscores_desktop/providers/CitiesProvider.dart';
@@ -66,6 +67,7 @@ class _CompetitionListScreenState extends State<CompetitionsListScreen>
           "status": selectedStatus,
           "competitionType" : selectedCompetitionType,
           "selectionId": selectedSelectionID,
+          "IsReviewsIncluded" : true,
           "page": page,
           "pageSize": pageSize,
         };
@@ -316,6 +318,7 @@ Widget _buildResultView() {
                               columns: const [
                                 DataColumn(label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold))))),
                                 DataColumn(label: Flexible(child: Center(child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold))))),
+                                DataColumn(label: Flexible(child: Center(child: Text("Ocjena", style: TextStyle(fontWeight: FontWeight.bold))))),
                                 DataColumn(label: Flexible(child: Center(child: Text("Tip", style: TextStyle(fontWeight: FontWeight.bold))))),
                                 DataColumn(label: Flexible(child: Center(child: Text("Status", style: TextStyle(fontWeight: FontWeight.bold))))),
                                 DataColumn(label: Flexible(child: Center(child: Text("Selekcija/uzrast", style: TextStyle(fontWeight: FontWeight.bold))))),
@@ -341,6 +344,11 @@ Widget _buildResultView() {
                                     ),
                                   )),
                                   DataCell(Center(child: Text(e.name ?? ""))),
+                                  DataCell(Center(
+                                    child: Text(
+                                      _getAverageRating(e.reviews).toStringAsFixed(1),
+                                    ),
+                                  )),
                                   DataCell(Center(child: Text(e.competitionType?.displayName ?? '-'))),
                                   DataCell(Center(child: Text(e.status?.displayName ?? '-'))),
                                   DataCell(Center(child: Text(e.selection?.name ?? '-'))),
@@ -380,6 +388,16 @@ Widget _buildResultView() {
     initForm();
   }
   }
+  double _getAverageRating(List<Reviews>? reviews) {
+  if (reviews == null) return 0;
+
+  final validReviews = reviews.where((r) => r.rating != null).toList();
+  if (validReviews.isEmpty) return 0;
+
+  final total = validReviews.map((r) => r.rating!).reduce((a, b) => a + b);
+  return total / validReviews.length;
+}
+
   
   // Future<void> _pickDate(BuildContext context) async{
   //   final DateTime? picked = await showDatePicker(

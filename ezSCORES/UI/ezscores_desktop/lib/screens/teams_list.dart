@@ -106,7 +106,7 @@ Widget _buildSearch()
       const SizedBox(width: 8,),
       ElevatedButton(onPressed: () async{
        final actionResult = await Navigator.of(context).push(PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(selectedIndex: widget.selectedIndex,),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,
@@ -237,7 +237,7 @@ Widget _buildResultView() {
   _handleRowTap(Teams selectedTeam) async{
     final actionResult = await Navigator.of(context).push(
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(team: selectedTeam),
+      pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(team: selectedTeam, selectedIndex: widget.selectedIndex,),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(opacity: animation, child: child);
       },

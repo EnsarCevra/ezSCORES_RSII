@@ -25,10 +25,11 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
+  final int selectedIndex;
   int competitionId;
   int? matchID;
   FixtureDTO fixture;
-  MatchDetailsScreen({super.key, this.matchID, required this.fixture, required this.competitionId});
+  MatchDetailsScreen({super.key, this.matchID, required this.fixture, required this.competitionId, required this.selectedIndex});
 
   @override
   State<MatchDetailsScreen> createState() => _MatchDetailsScreenState();
@@ -81,14 +82,14 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
     if (widget.matchID != null && match == null) {
       return MasterScreen(
         "Detalji utakmice",
-        selectedIndex: 1,
+        selectedIndex: widget.selectedIndex,
         const Center(child: CircularProgressIndicator()),
       );
     }
 
     return MasterScreen(
       "Detalji utakmice",
-      selectedIndex: 1,
+      selectedIndex: widget.selectedIndex,
       SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(50.0),

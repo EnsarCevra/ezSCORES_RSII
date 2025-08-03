@@ -21,5 +21,6 @@ namespace ezSCORES.Model.SearchObjects
 		public CompetitionStatus? Status { get; set; }
 		public bool? IsCompetitionRefereesIncluded { get; set; }
 		public bool? OnlyUserCompettions { get; set; }
+		public bool? IsReviewsIncluded { get; set; }
 	}
 }

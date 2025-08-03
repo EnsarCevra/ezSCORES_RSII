@@ -77,6 +77,10 @@ namespace ezSCORES.Services
 			{
 				query = query.Include(x => x.City);
 			}
+			if (search.IsReviewsIncluded == true)
+			{
+				query = query.Include(x => x.Reviews);
+			}
 			if (search.IsCompetitionRefereesIncluded == true)
 			{
 				query = query.Include(x => x.CompetitionsReferees).ThenInclude(x=>x.Referee);

@@ -61,62 +61,6 @@ class _ApplicationsTabState extends State<ApplicationsTab> {
       ),
     );
   }
-
-// Widget _buildSearch()
-// {
-//   return selectionResult == null ? const SizedBox.shrink() : Padding(
-//     padding: const EdgeInsets.all(15),
-//     child: Row(
-//     children: [
-//       Expanded(child: TextField(controller: _ftsEditingController,decoration: InputDecoration(labelText: "Naziv"),)),
-//       SizedBox(width: 8,),
-//       Expanded(
-//                   child: FormBuilderDropdown(
-//                     name: "selectionId",
-//                     decoration: InputDecoration(
-//                       labelText: "Selekcija",
-//                     ),
-//                     focusColor: Colors.transparent,
-//                     items: [DropdownMenuItem(value: "all", child: Text("Sve"),), ...selectionResult?.result.map((item) => 
-//                     DropdownMenuItem(value: item.id.toString(), child: Text(item.name ?? ""),)).toList() ?? [],],
-//                     onChanged: (value){
-//                       setState(() {
-//                         value == "all" ? selectedSelectionID = null : selectedSelectionID = value.toString();
-//                       });
-//                     },
-//                     )
-//                   ),
-//       SizedBox(width: 8,),            
-//       ElevatedButton(onPressed: () async{
-//         var filter = {
-//           "name" : _ftsEditingController.text,
-//           "selectionId" : selectedSelectionID
-//         };
-//         var data = await teamProvider.get(filter: filter);
-//         setState(() {
-//           teamsResult = data;
-//         });
-//       }, child: Icon(Icons.search)),
-//       SizedBox(width: 8,),
-//       ElevatedButton(onPressed: () async{
-//        final actionResult = await Navigator.of(context).push(PageRouteBuilder(
-//         pageBuilder: (context, animation, secondaryAnimation) => TeamsDetailsScreen(),
-//         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-//           return FadeTransition(
-//             opacity: animation,
-//             child: child,
-//           );
-//             },
-//           ));
-//           if(actionResult == true)
-//           {
-//             initForm();
-//           }
-//       }, child: Text("Dodaj"))
-//     ],
-//   )
-//   );
-// }
 Widget _buildResultView() {
   return Expanded(
     child: Column(

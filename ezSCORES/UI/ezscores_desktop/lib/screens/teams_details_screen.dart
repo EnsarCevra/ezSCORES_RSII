@@ -18,8 +18,9 @@ import 'package:provider/provider.dart';
 
 class TeamsDetailsScreen extends StatefulWidget
 {
+  final int selectedIndex;
   Teams? team;
-  TeamsDetailsScreen({super.key, this.team});
+  TeamsDetailsScreen({super.key, this.team, required this.selectedIndex});
 
    @override
     State<TeamsDetailsScreen> createState() => _TeamDetailsScreenState();
@@ -59,7 +60,7 @@ class _TeamDetailsScreenState extends State<TeamsDetailsScreen> {
    }
   @override
    Widget build(BuildContext context) {
-    return MasterScreen("Detalji", selectedIndex: 2,
+    return MasterScreen("Detalji", selectedIndex: widget.selectedIndex,
     Column(
       children: [
         _buildForm(),

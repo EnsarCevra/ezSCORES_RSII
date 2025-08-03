@@ -127,7 +127,7 @@ class _PlayerListScreen extends State<PlayersListScreen>
          const SizedBox(width: 8,),
          ElevatedButton(onPressed: () async{
             final actionResult = await Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(),
+              pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(selectedIndex: widget.selectedIndex,),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
                   opacity: animation,
@@ -287,7 +287,7 @@ Widget _buildResultView() {
   _handleRowTap(Players selectedPlayer) async{
     final actionResult = await Navigator.of(context).push(
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(player: selectedPlayer),
+      pageBuilder: (context, animation, secondaryAnimation) => PlayersDetailsScreen(player: selectedPlayer, selectedIndex: widget.selectedIndex,),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(opacity: animation, child: child);
       },

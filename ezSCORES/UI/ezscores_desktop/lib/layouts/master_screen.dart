@@ -31,7 +31,7 @@ class _MasterScreenState extends State<MasterScreen> {
 
   Widget? screenToPush;
   switch (index) {
-    case 0: screenToPush = const AdminDashboardScreen();
+    case 0: screenToPush = AdminDashboardScreen(selectedIndex: index,);
     case 1: screenToPush = CompetitionsListScreen(selectedIndex: index,);
     case 5: screenToPush = AdminSettingsScreen(selectedIndex: index,);
     case 6:  screenToPush = UsersListScreen(selectedIndex: index,);

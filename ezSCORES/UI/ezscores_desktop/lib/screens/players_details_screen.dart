@@ -14,8 +14,9 @@ import 'package:provider/provider.dart';
 
 class PlayersDetailsScreen extends StatefulWidget
 {
+  final int selectedIndex;
   Players? player;
-  PlayersDetailsScreen({super.key, this.player});
+  PlayersDetailsScreen({super.key, this.player, required this.selectedIndex});
   
   @override
   State<StatefulWidget> createState() => _PlayerDetailsScreenState();

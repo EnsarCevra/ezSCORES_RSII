@@ -14,12 +14,12 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:file_selector/file_selector.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
-  const AdminDashboardScreen({super.key});
+  final int selectedIndex;
+  const AdminDashboardScreen({super.key, required this.selectedIndex});
 
   @override
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
-
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   late CompetitionProvider competitionProvider;
   AdminDashboardCardsDTO? stats;
@@ -125,7 +125,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ],
               )
       ),
-      selectedIndex: 0,
+      selectedIndex: widget.selectedIndex,
     );
   }
   Future<void> _generateStatusReportPdf() async {
