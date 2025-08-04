@@ -15,7 +15,7 @@ AdminDashboardCardsDTO _$AdminDashboardCardsDTOFromJson(
       CompetitionsByStatusCountDTO.fromJson(
           json['competitionsByStatus'] as Map<String, dynamic>),
       Map<String, int>.from(json['competitionsByMonth'] as Map),
-    );
+    )..totalFeeAmount = (json['totalFeeAmount'] as num?)?.toDouble();
 
 Map<String, dynamic> _$AdminDashboardCardsDTOToJson(
         AdminDashboardCardsDTO instance) =>
@@ -23,6 +23,7 @@ Map<String, dynamic> _$AdminDashboardCardsDTOToJson(
       'competitions': instance.competitions,
       'teams': instance.teams,
       'players': instance.players,
+      'totalFeeAmount': instance.totalFeeAmount,
       'competitionsByStatus': instance.competitionsByStatus,
       'competitionsByMonth': instance.competitionsByMonth,
     };

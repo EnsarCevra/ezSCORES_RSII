@@ -563,7 +563,34 @@ Widget _buildStateNavigation() {
     }
   }
 }
-
+void _goToNextStage() async {
+    await nextCallback!(widget.competition!.id!, context);
+      setState(() {
+        widget.competition!.status = nextState!;
+      });
+      widget.onStateChanged?.call();
+      showBottomRightNotification(context, 'Status promijenjen na "${nextState!.displayName}".');
+}
+Future<void> _showConfirmStateChangeDialog(String message) async
+{
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Upozorenje"),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Odustani"),
+        ),
+        ElevatedButton( 
+          onPressed: _goToNextStage,
+          child: const Text("Nastavi"),
+        ),
+      ],
+    ),
+  );
+}
   return Padding(
     padding: const EdgeInsets.only(top: 24.0),
     child: Container(
@@ -633,12 +660,21 @@ Widget _buildStateNavigation() {
                   icon: const Icon(Icons.arrow_forward),
                   onPressed: () async {
                     try {
-                      await nextCallback!(widget.competition!.id!, context);
-                      setState(() {
-                        widget.competition!.status = nextState!;
-                      });
-                      widget.onStateChanged?.call();
-                      showBottomRightNotification(context, 'Status promijenjen na "${nextState!.displayName}".');
+                      if(nextState == CompetitionStatus.finished)
+                      {
+                        var message = 'Jeste li sigurni da želite završiti takmičenje?\nOvo je nepovratna akcija!';
+                        _showConfirmStateChangeDialog(message);
+                        
+                      }
+                      else if(nextState == CompetitionStatus.underway)
+                      {
+                        var message = 'Jeste li sigurni da želite započeti takmičenje?\n\nUređivanje osnovnih infomacija neće biti dozvoljeno!\n\nOvo je nepovratna akcija!';
+                        _showConfirmStateChangeDialog(message);
+                      }
+                      else
+                      {
+                        _goToNextStage();
+                      }
                     } catch (e) {
                       _showErrorDialog("Greška pri promjeni statusa", e.toString());
                     }
@@ -667,6 +703,4 @@ void _showErrorDialog(String title, String content) {
     ),
   );
 }
-
-
 }

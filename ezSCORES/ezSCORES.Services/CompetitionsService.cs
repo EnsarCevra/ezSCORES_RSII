@@ -1,4 +1,5 @@
 ﻿using ezSCORES.Model;
+using ezSCORES.Model.Constants;
 using ezSCORES.Model.DTOs;
 using ezSCORES.Model.ENUMs;
 using ezSCORES.Model.Requests.CompetitionRequests;
@@ -187,31 +188,57 @@ namespace ezSCORES.Services
 
 		public AdminDashboardDTO GetAdminDashboardInfo(AdminDashboardSearchObject searchObject)
 		{
-			var dto = new AdminDashboardDTO()
+			var dto = new AdminDashboardDTO();
+			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Admin)
 			{
-				Competitions = Context.Competitions.Count(),
-				Teams = Context.Teams.Count(),
-				Players = Context.Players.Count(),
-				CompetitionsByStatus = new CompetitionsByStatusCountDTO
+				dto.Competitions = Context.Competitions.Count();
+				dto.Teams = Context.Teams.Count();
+				dto.Players = Context.Players.Count();
+				dto.TotalFeeAmount = Context.Applications.Where(x => x.IsPaId).Sum(x => x.PaIdAmount);
+				dto.CompetitionsByStatus = new CompetitionsByStatusCountDTO
 				{
-					PreparationCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.Preparation).Count(),
-					ApplicationsOpenedCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.ApplicationsOpen).Count(),
-					ApplicationsClosedCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.ApplicationsClosed).Count(),
-					UnderwayCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.Underway).Count(),
-					FinishedCount = Context.Competitions.Where(x=>x.Status == CompetitionStatus.Finished).Count(),
-				},
-				CompetitionsByMonth = GetCompetitionsByMonth(searchObject.Year)
-			};
-
+					PreparationCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.Preparation).Count(),
+					ApplicationsOpenedCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.ApplicationsOpen).Count(),
+					ApplicationsClosedCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.ApplicationsClosed).Count(),
+					UnderwayCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.Underway).Count(),
+					FinishedCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.Finished).Count(),
+				};
+				dto.CompetitionsByMonth = GetCompetitionsByMonth(searchObject.Year);
+			}
+			else
+			{
+				dto.Competitions = Context.Competitions.Where(x=>x.UserId == _activeUserService.GetActiveUserId()).Count();
+				dto.TotalFeeAmount = Context.Applications.Where(x=>x.Competition.UserId == _activeUserService.GetActiveUserId() && x.IsPaId).Sum(x=>x.PaIdAmount);
+				dto.CompetitionsByStatus = new CompetitionsByStatusCountDTO
+				{
+					PreparationCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.Preparation && x.UserId == _activeUserService.GetActiveUserId()).Count(),
+					ApplicationsOpenedCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.ApplicationsOpen && x.UserId == _activeUserService.GetActiveUserId()).Count(),
+					ApplicationsClosedCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.ApplicationsClosed && x.UserId == _activeUserService.GetActiveUserId()).Count(),
+					UnderwayCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.Underway && x.UserId == _activeUserService.GetActiveUserId()).Count(),
+					FinishedCount = Context.Competitions.Where(x => x.Status == CompetitionStatus.Finished && x.UserId == _activeUserService.GetActiveUserId()).Count(),
+				};
+				dto.CompetitionsByMonth = GetCompetitionsByMonth(searchObject.Year);
+			}
 			return dto;
 		}
 
 		private Dictionary<int, int> GetCompetitionsByMonth(int? selectedYear)
 		{
-			var rawData = Context.Competitions
+			var rawData = new Dictionary<int, int>();
+			if(_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Admin)
+			{
+				rawData = Context.Competitions
 					.Where(c => c.StartDate.Year == (selectedYear ?? DateTime.Now.Year))
 					.GroupBy(c => c.StartDate.Month)
 					.ToDictionary(g => g.Key, g => g.Count());
+			}
+			else
+			{
+				rawData = Context.Competitions
+					.Where(c => c.StartDate.Year == (selectedYear ?? DateTime.Now.Year) && c.UserId == _activeUserService.GetActiveUserId())
+					.GroupBy(c => c.StartDate.Month)
+					.ToDictionary(g => g.Key, g => g.Count());
+			}
 			var fullYearData = Enumerable.Range(1, 12)
 				.ToDictionary(month => month, month => rawData.ContainsKey(month) ? rawData[month] : 0);
 			return fullYearData;

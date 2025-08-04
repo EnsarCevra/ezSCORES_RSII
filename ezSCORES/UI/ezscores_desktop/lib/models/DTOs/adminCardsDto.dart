@@ -7,6 +7,7 @@ class AdminDashboardCardsDTO {
 	int competitions;
 	int teams;
 	int players;
+  double? totalFeeAmount;
   CompetitionsByStatusCountDTO competitionsByStatus;
   Map<String, int> competitionsByMonth;
 

@@ -71,7 +71,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 padding: const EdgeInsets.all(16),
                 children: [
                   Text(
-                    "Dobrodošao ${AuthProvider.firstName} na admin panel",
+                    "Dobrodošao ${AuthProvider.firstName} na ${AuthProvider.roleID == 3 ? 'admin' : 'organizator'} panel",
                     style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 30),
@@ -79,9 +79,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     children: [
                       MetricCard(title: "Takmičenja", value: "${stats?.competitions ?? 0}", icon: Icons.sports_soccer),
                       const SizedBox(width: 16),
-                      MetricCard(title: "Timovi", value: "${stats?.teams ?? 0}", icon: Icons.groups),
+                      MetricCard(title: "Ukupno uplaćeno", value: "${stats?.totalFeeAmount ?? 0} KM", icon: Icons.sports_soccer),
                       const SizedBox(width: 16),
-                      MetricCard(title: "Igrači", value: "${stats?.players ?? 0}", icon: Icons.person),
+                      if(AuthProvider.roleID == 3) MetricCard(title: "Timovi", value: "${stats?.teams ?? 0}", icon: Icons.groups),
+                      const SizedBox(width: 16),
+                      if(AuthProvider.roleID == 3) MetricCard(title: "Igrači", value: "${stats?.players ?? 0}", icon: Icons.person),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -159,6 +161,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
                 pw.SizedBox(height: 24),
                 pw.Text('Ukupan broj takmicenja: $total', style: const pw.TextStyle(fontSize: 16)),
+                pw.Text(
+                  'Ukupno uplaceno: ${stats?.totalFeeAmount} KM',
+                  style: const pw.TextStyle(fontSize: 16),
+                ),
                 pw.SizedBox(height: 16),
                 // ignore: deprecated_member_use
                 pw.Table.fromTextArray(
@@ -230,6 +236,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
                 pw.Text(
                   'Ukupan broj takmicenja: $total',
+                  style: const pw.TextStyle(fontSize: 16),
+                ),
+                pw.Text(
+                  'Ukupno uplaceno: ${stats?.totalFeeAmount} KM',
                   style: const pw.TextStyle(fontSize: 16),
                 ),
                 pw.SizedBox(height: 16),

@@ -9,6 +9,7 @@ namespace ezSCORES.Model.DTOs
 		public int Competitions { get; set; }
 		public int Teams {  get; set; }
 		public int Players { get; set; }
+		public float? TotalFeeAmount { get; set; }
 		public CompetitionsByStatusCountDTO CompetitionsByStatus { get; set; }
 		public Dictionary<int, int> CompetitionsByMonth { get; set; }
 	}
