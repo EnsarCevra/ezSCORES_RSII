@@ -1,12 +1,76 @@
+import 'dart:io';
+
+import 'package:ezscores_mobile/providers/ApplicationsProvider.dart';
+import 'package:ezscores_mobile/providers/CitiesProvider.dart';
+import 'package:ezscores_mobile/providers/CompetitionRefereeProvider.dart';
+import 'package:ezscores_mobile/providers/CompetitionSponsorsProvider.dart';
+import 'package:ezscores_mobile/providers/CompetitionTeamPlayerProvider.dart';
+import 'package:ezscores_mobile/providers/CompetitionTeamsProvider.dart';
+import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
+import 'package:ezscores_mobile/providers/CompetitionsRefereesMatchesProvider.dart';
+import 'package:ezscores_mobile/providers/FixturesProvider.dart';
+import 'package:ezscores_mobile/providers/GoalProvider.dart';
+import 'package:ezscores_mobile/providers/MatchesProvider.dart';
+import 'package:ezscores_mobile/providers/PlayersProvider.dart';
+import 'package:ezscores_mobile/providers/RefereesProvider.dart';
+import 'package:ezscores_mobile/providers/RewardsProvider.dart';
+import 'package:ezscores_mobile/providers/RolesProvider.dart';
+import 'package:ezscores_mobile/providers/SelectionProvider.dart';
+import 'package:ezscores_mobile/providers/SponsorsProvider.dart';
+import 'package:ezscores_mobile/providers/StadiumsProvider.dart';
+import 'package:ezscores_mobile/providers/TeamProvider.dart';
+import 'package:ezscores_mobile/providers/GroupsProvider.dart';
+import 'package:ezscores_mobile/providers/UserProvider.dart';
+import 'package:ezscores_mobile/providers/auth_provider.dart';
+import 'package:ezscores_mobile/providers/base_provider.dart';
+//import 'package:ezscores_mobile/screens/admin_dashboard_screen.dart';
+//import 'package:ezscores_mobile/screens/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:window_size/window_size.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows) {
+    setWindowTitle('Mobile Simulation');
+    setWindowMinSize(const Size(450, 844));
+    setWindowMaxSize(const Size(450, 844));
+  }
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => CompetitionProvider()),
+    ChangeNotifierProvider(create: (_) => TeamProvider()),
+    ChangeNotifierProvider(create: (_) => SelectionProvider()),
+    ChangeNotifierProvider(create: (_) => UserProvider()),
+    ChangeNotifierProvider(create: (_) => PlayerProvider()),
+    ChangeNotifierProvider(create: (_) => RolesProvider()),
+    ChangeNotifierProvider(create: (_) => CityProvider()),
+    ChangeNotifierProvider(create: (_) => StadiumProvider()),
+    ChangeNotifierProvider(create: (_) => SponsorProvider()),
+    ChangeNotifierProvider(create: (_) => ApplicationProvider()),
+    ChangeNotifierProvider(create: (_) => CompetitionTeamsProvider()),
+    ChangeNotifierProvider(create: (_) => GroupProvider()),
+    ChangeNotifierProvider(create: (_) => RefereeProvider()),
+    ChangeNotifierProvider(create: (_) => CompetitionsRefereesProvider()),
+    ChangeNotifierProvider(create: (_) => CompetitionsSponsorsProvider()),
+    ChangeNotifierProvider(create: (_) => RewardProvider()),
+    ChangeNotifierProvider(create: (_) => FixtureProvider()),
+    ChangeNotifierProvider(create: (_) => MatchesProvider()),
+    ChangeNotifierProvider(create: (_) => CompeititionRefereeMatchProvider()),
+    ChangeNotifierProvider(create: (_) => GoalProvider()),
+    ChangeNotifierProvider(create: (_) => CompetitionsTeamsPlayersProvider()),
+
+
+
+
+
+
+
+  ], child: const MyApp(),));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -28,66 +92,43 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white
+          )),
         colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 38, 208, 47)),
         useMaterial3: true,
       ),
-      home: const SearchExample(),
+      home: LoginPage(),
     );
   }
 }
-
-class LayoutExample extends StatelessWidget{
-  const LayoutExample({super.key});
+class LoginPage extends StatefulWidget{
+  LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context){
-    return Column(
-      children: [
-        Container(
-          height: 150,
-          color: Colors.red,
-          child: Center(child:
-            Container(
-            height: 100,
-            color: Colors.blue
-          ),
-          )
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-       children: [
-        Text("1"),
-        Text("2"),
-        Text("3")
-       ], 
-      ),
-      Container(
-        height: 100,
-        color: Colors.blue,
-        padding: EdgeInsets.all(10),
-        child: Center(child: Text("Test", style: TextStyle(color: Colors.black),),)
-      )
-      ],
-    );
-  }
+  State<LoginPage> createState() => _LoginPageState();
 }
-class LoginPage extends StatelessWidget
+class _LoginPageState extends State<LoginPage>
 {
-  const LoginPage({super.key});
-
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController  = TextEditingController();
+  bool _obscurePassword = true;
    @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(title: Text("ezSCORES"), backgroundColor: Colors.green,),
+      appBar: AppBar(title: const Text("ezSCORES"), backgroundColor: Colors.green,),
       body: Center(
         child: Center(
           child: Container(
             constraints: BoxConstraints(maxHeight: 400, maxWidth: 300),
             child: Card(
+              child: Padding(padding: EdgeInsets.all(10),
               child: Column(
                 children: [
                   SizedBox(height: 20,),
-                  Image.network("https://ezscores.ba/assets/ezLogo5.png", height: 100, width: 100,),
+                  Image.asset("assets/images/ezlogo5.png", height: 100, width: 100,),
                   SizedBox(height: 50,),
                   Container(
                     height: 200,
@@ -95,22 +136,74 @@ class LoginPage extends StatelessWidget
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextField(
-                          decoration: InputDecoration(
+                          controller: _usernameController,
+                          decoration: const InputDecoration(
                             labelText: "Korisničko ime",
-                            prefixIcon: Icon(Icons.email)
+                            prefixIcon: Icon(Icons.supervised_user_circle)
                           ),
                         ),
                         TextField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             labelText: "Lozinka",
-                            prefixIcon: Icon(Icons.password)
+                            prefixIcon: Icon(Icons.password),
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                              icon: _obscurePassword ? const Icon(Icons.visibility_outlined) : const Icon(Icons.visibility_off_outlined)),
+                          ),
+                        ),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              // Navigator.of(context).push(
+                              //   MaterialPageRoute(builder: (context) => RegisterScreen()),
+                              // );
+                            },
+                            child: const Text(
+                              "Nemate račun? Kreirajte ga ovdje!",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
                           ),
                         ),
                         ElevatedButton(
-                          style: ButtonStyle(
+                          style: const ButtonStyle(
                           ),
-                        onPressed: (){
-                          print("Login attempt");
+                        onPressed: () async {
+                          AuthProvider.username = _usernameController.text;
+                          AuthProvider.password = _passwordController.text;
+                          try{
+                            var userProvider = UserProvider();
+                            var user = await userProvider.login(AuthProvider.username, AuthProvider.password);
+                            AuthProvider.id = user.id;
+                            AuthProvider.firstName = user.firstName;
+                            AuthProvider.lastName = user.lastName;
+                            AuthProvider.userName = user.userName;
+                            AuthProvider.picture = user.picture;
+                            AuthProvider.email = user.email;
+                            AuthProvider.phoneNumber = user.phoneNumber;
+                            AuthProvider.organization = user.organization;
+                            AuthProvider.roleID = user.role?.id;
+                            AuthProvider.roleName = user.role?.name;
+                            AuthProvider.roleDecription = user.role?.description;
+                            //Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => AdminDashboardScreen(selectedIndex: 0,)));
+                          }on UserException catch(exception)
+                          {
+                            showDialog(
+                              context: context, 
+                              builder: (context) => AlertDialog(
+                                title: Text("Greška prilikom prijave"), 
+                                actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("OK"))], 
+                                content: Text(exception.exMessage),));
+                          }
                         },
                          child: Text("Prijavi se"))
                       ],
@@ -118,45 +211,12 @@ class LoginPage extends StatelessWidget
                   )
                 ],
               ),
+              )
             ),
           ),
         ),)
     );
   }
-}
-
-class SearchExample extends StatelessWidget{
-  const SearchExample({super.key});
-
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Pretraga"),),
-        body: Column(
-          children: [
-            _buildSearch(),
-            _buidlResultView()
-          ],
-        ),
-    );
- }
-}
-
-Widget _buildSearch()
-{
-  return Padding(
-    padding: EdgeInsets.all(8.0),
-    child: Row(
-    children: [
-      Expanded(child: TextField(decoration: InputDecoration(labelText: "Naziv"),))
-    ],
-  )
-  );
-}
-Widget _buidlResultView()
-{
-  return Placeholder();
 }
 
 class MyHomePage extends StatefulWidget {
