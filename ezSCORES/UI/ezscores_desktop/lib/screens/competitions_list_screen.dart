@@ -280,7 +280,7 @@ Widget _buildSearch() {
                     initForm();
                   }
                 },
-                child: Text("Dodaj"),
+                child: const Text("Dodaj"),
               ),
             ],
           ),
@@ -316,6 +316,7 @@ Widget _buildResultView() {
                               columnSpacing: 16.0,
                               showCheckboxColumn: false,
                               columns: const [
+                                DataColumn(label: Flexible(child: Center(child: Text("", style: TextStyle(fontWeight: FontWeight.bold))))),
                                 DataColumn(label: Flexible(child: Center(child: Text("Slika", style: TextStyle(fontWeight: FontWeight.bold))))),
                                 DataColumn(label: Flexible(child: Center(child: Text("Naziv", style: TextStyle(fontWeight: FontWeight.bold))))),
                                 DataColumn(label: Flexible(child: Center(child: Text("Ocjena", style: TextStyle(fontWeight: FontWeight.bold))))),
@@ -328,6 +329,20 @@ Widget _buildResultView() {
                               rows: _paginationController.items.map((e) => DataRow(
                                 onSelectChanged: (_) => _handleRowTap(e),
                                 cells: [
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      tooltip: 'Obriši',
+                                      onPressed: () async{
+                                        await deleteEntity(context: context,
+                                        deleteFunction: competitionProvider.delete,
+                                        entityId: e.id!, 
+                                        onDeleted: (){
+                                          _paginationController.loadPage(_paginationController.currentPage);
+                                        });
+                                      },)
+                                  )),
                                   DataCell(Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Center(

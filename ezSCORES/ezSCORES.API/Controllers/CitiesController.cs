@@ -22,5 +22,25 @@ namespace ezSCORES.API.Controllers
 		{
 			return base.GetList(searchObject);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin)]
+		public override Cities Insert(CityUpsertRequest request)
+		{
+			return base.Insert(request);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin)]
+		public override Cities Update(int id, CityUpsertRequest request)
+		{
+			return base.Update(id, request);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin)]
+		public override void Delete(int id)
+		{
+			base.Delete(id);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin)]
+		public override Cities GetById(int id)
+		{
+			return base.GetById(id);
+		}
 	}
 }

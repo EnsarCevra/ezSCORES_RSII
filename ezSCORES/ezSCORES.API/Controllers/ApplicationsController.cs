@@ -25,15 +25,37 @@ namespace ezSCORES.API.Controllers
 		{
 			return (_service as IApplicationService).ToogleStatus(id, request);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpPost("validate-team")]
 		public void ValidateTeam(ValidateTeamRequest request)
 		{
 			(_service as IApplicationService).ValidateTeam(request.TeamId, request.CompetitionId);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer + "," + Model.Constants.Roles.Manager)]
 		[HttpPost("validate-players")]
 		public void ValidatePlayers(ValidatePlayersRequest request)
 		{
 			(_service as IApplicationService).ValidatePlayers(request.PlayerIds, request.CompetitionId);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		public override PagedResult<Applications> GetList([FromQuery] ApplicationSearchObject searchObject)
+		{
+			return base.GetList(searchObject);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		public override Applications Insert(ApplicationInsertRequest request)
+		{
+			return base.Insert(request);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		public override Applications Update(int id, ApplicationUpdateRequest request)
+		{
+			return base.Update(id, request);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		public override void Delete(int id)
+		{
+			base.Delete(id);
 		}
 	}
 }

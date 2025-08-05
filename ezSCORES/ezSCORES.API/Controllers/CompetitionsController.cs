@@ -16,6 +16,8 @@ namespace ezSCORES.API.Controllers
 		public CompetitionsController(ICompetitionsService service) : base(service)
 		{
 		}
+
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpPatch("/toggle-competition-status{id}")]
 		public Competitions ToggleCompetitionStatus(int id, ToggleCompetitionStatusRequest request)
 		{
@@ -26,31 +28,52 @@ namespace ezSCORES.API.Controllers
 		{
 			return base.GetList(searchObject);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		public override Competitions Insert(CompetitionsInsertRequest request)
+		{
+			return base.Insert(request);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		public override Competitions Update(int id, CompetitionsUpdateRequest request)
+		{
+			return base.Update(id, request);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		public override void Delete(int id)
+		{
+			base.Delete(id);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpPatch("{id}/preparation")]
 		public Competitions PreparationsState(int id)
 		{
 			return (_service as ICompetitionsService).PreparationState(id);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpPatch("{id}/applications-open")]
 		public Competitions OpenApplications(int id)
 		{
 			return (_service as ICompetitionsService).OpenAplications(id);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpPatch("{id}/applications-closed")]
 		public Competitions CloseApplications(int id)
 		{
 			return (_service as ICompetitionsService).CloseApplications(id);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpPatch("{id}/start-competition")]
 		public Competitions StartCompetition(int id)
 		{
 			return (_service as ICompetitionsService).StartCompetition(id);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpPatch("{id}/finish-competition")]
 		public Competitions FinishCompetition(int id)
 		{
 			return (_service as ICompetitionsService).FinishCompetition(id);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		[HttpGet("get-admin-dashboard-info")]
 		public AdminDashboardDTO GetAdminDashboardInfo([FromQuery] AdminDashboardSearchObject searchObject)
 		{

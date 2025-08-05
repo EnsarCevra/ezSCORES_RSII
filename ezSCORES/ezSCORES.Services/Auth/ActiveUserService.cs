@@ -43,7 +43,8 @@ namespace ezSCORES.Services.Auth
 
 		public string GetActiveUserUsername()
 		{
-			throw new NotImplementedException();
+			var activeUser = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			return activeUser;
 		}
 	}
 }
