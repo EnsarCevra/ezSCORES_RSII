@@ -1,9 +1,11 @@
+import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
 import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/enums/competitionStatus.dart';
 import 'package:ezscores_mobile/models/enums/competitionType.dart';
 import 'package:ezscores_mobile/models/reviews.dart';
 import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
+import 'package:ezscores_mobile/screens/competition_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -21,24 +23,44 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
   int? selectedStatus;
   int? selectedCompetitionType;
 
+  late PaginationController<Competitions> _paginationController;
+  final ScrollController _scrollController = ScrollController();
+
   void initState() {
     super.initState();
-    competitionProvider = context.read<CompetitionProvider>();
-    _loadData();
-  }
-   Future<void> _loadData() async
-   {
-      final filters = {
-        "name": _searchController.text,
-        "status": selectedStatus,
-        "competitionType": selectedCompetitionType,
-        "isReviewsIncluded" : true,
-      };
-      var competitionData = await competitionProvider.get(filter: filters);
-      setState(() {
-      competitionsResult = competitionData;
+    _searchController.addListener(() {
+      setState(() {});
     });
-   }
+    competitionProvider = context.read<CompetitionProvider>();
+    _paginationController = PaginationController<Competitions>(
+      fetchPage: (page, pageSize) {
+        var filter = {
+          "name": _searchController.text,
+          "page": page,
+          "pageSize": pageSize,
+        };
+        return competitionProvider.get(filter: filter);
+      },
+    );
+    _paginationController.addListener(() {
+      setState(() {});
+    });
+
+    _paginationController.loadPage();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100) {
+        _paginationController.loadMore();
+      }
+    });
+  }
+   @override
+  void dispose() {
+    _searchController.dispose();
+    _paginationController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +87,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
                     vertical: 10,
                   ),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  suffixIcon: _searchController.text.isNotEmpty
+                  suffixIcon: _searchController.text != ""
                         ? IconButton(
                             icon: const Icon(Icons.clear),
                             onPressed: () {
@@ -164,7 +186,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: _loadData,
+                    onPressed: _paginationController.loadPage,
                     icon: const Icon(Icons.filter_alt, size: 18),
                     label: const Text("Filtriraj", style: TextStyle(fontSize: 13)),
                     style: ElevatedButton.styleFrom(
@@ -176,7 +198,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
 
               const SizedBox(height: 8),
 
-              _buildCompetitionsResultView(),
+              Expanded(child: _buildCompetitionsResultView()),
             ],
           ),
         ),
@@ -185,115 +207,133 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
   }
   
   _buildCompetitionsResultView() {
-    return Expanded(
-      child: competitionsResult == null
-          ? const Center(child: CircularProgressIndicator())
-          : competitionsResult!.result.isEmpty
-              ? const Center(
-                  child: Text(
-                    "Nema rezultata.",
-                  ),
-                )
-              : ListView.separated(
-                  itemCount: competitionsResult!.result.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final competition = competitionsResult!.result[index];
-                    return _buildCompetitionCard(context, competition);
-                  },
-                ),
+    return AnimatedBuilder(
+      animation: _paginationController,
+      builder: (context, _) {
+        if (_paginationController.isLoading && _paginationController.items.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (_paginationController.items.isEmpty) {
+          return const Center(child: Text("Nema podataka"));
+        }
+
+        return ListView.builder(
+            controller: _scrollController,
+            itemCount: _paginationController.items.length + (_paginationController.hasNext ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index < _paginationController.items.length) {
+                final competition = _paginationController.items[index];
+                return _buildCompetitionCard(context, competition);
+              } else {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+            },
+          );
+      },
     );
   }
   _buildCompetitionCard(BuildContext context, Competitions competition) {
         final textTheme = Theme.of(context).textTheme;
 
-        return Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                // Competition image (placeholder)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: competition.picture == null || competition.picture!.isEmpty
-                      ? Container(
-                          width: 60,
-                          height: 60,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.emoji_events, size: 30, color: Colors.grey),
-                        )
-                      : Image.network(
-                          competition.picture!,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 60,
-                              height: 60,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.emoji_events, size: 30, color: Colors.grey),
-                            );
-                          },
-                        ),
-                ),
-                const SizedBox(width: 12),
-                // Title and subtitle
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        competition.name ?? "Nepoznato takmičenje",
-                        style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        competition.competitionType?.displayName ?? "",
-                        style: textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.star, size: 16, color: Colors.amber),
-                          const SizedBox(width: 2),
-                          Text(
-                            "${_getAverageRating(competition.reviews)}"
-                            " (${competition.reviews?.length ?? 0} ${(competition.reviews?.length == 2 || competition.reviews?.length == 3 || competition.reviews?.length == 4)?'ocjene' : 'ocjena' })",
-                            style: textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+        return InkWell(
+          onTap: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: ((context) => CompetitionsDetailsScreen()
+                )
+              )
+            );
+          },
+          child: Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: competition.picture == null || competition.picture!.isEmpty
+                        ? Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.emoji_events, size: 30, color: Colors.grey),
+                          )
+                        : Image.network(
+                            competition.picture!,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 60,
+                                height: 60,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.emoji_events, size: 30, color: Colors.grey),
+                              );
+                            },
                           ),
-                        ],
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          competition.name ?? "Nepoznato takmičenje",
+                          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          competition.competitionType?.displayName ?? "",
+                          style: textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.star, size: 16, color: Colors.amber),
+                            const SizedBox(width: 2),
+                            Text(
+                              "${_getAverageRating(competition.reviews)}"
+                              " (${competition.reviews?.length ?? 0} ${(competition.reviews?.length == 2 || competition.reviews?.length == 3 || competition.reviews?.length == 4)?'ocjene' : 'ocjena' })",
+                              style: textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 60,
+                        child: Text(
+                          competition.status?.displayName.toUpperCase() ?? "",
+                          style: textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w500,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.right,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                        ),
                       ),
+                      const SizedBox(height: 8),
+                      const Icon(Icons.star, color: Colors.amber),
                     ],
                   ),
-                ),
-                // Status and favorite icon
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 60,
-                      child: Text(
-                        competition.status?.displayName.toUpperCase() ?? "",
-                        style: textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
-                          fontSize: 10,
-                        ),
-                        textAlign: TextAlign.right,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: true,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Icon(Icons.star, color: Colors.amber),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

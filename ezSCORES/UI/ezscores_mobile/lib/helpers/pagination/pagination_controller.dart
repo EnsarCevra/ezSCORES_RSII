@@ -41,6 +41,20 @@ class PaginationController<T> extends ChangeNotifier {
   Future<void> previousPage() async {
     if (hasPrevious) await loadPage(currentPage - 1);
   }
+  Future<void> loadMore() async {
+    if (isLoading || !hasNext) return;
+
+    isLoading = true;
+    notifyListeners();
+
+    currentPage += 1;
+    final result = await fetchPage(currentPage, pageSize);
+    items.addAll(result.result);
+    totalCount = result.count;
+
+    isLoading = false;
+    notifyListeners();
+  }
 
   void reset() {
     currentPage = 0;

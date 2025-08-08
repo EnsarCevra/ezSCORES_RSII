@@ -27,7 +27,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         index: _selectedIndex,
         children: _screens,
       ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey.withOpacity(0.3), // Light and subtle border
+              width: 0.5, // Thin border
+            ),
+          ),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6),
         child: GNav(
           gap: 8,
@@ -41,7 +50,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           tabs: const [
             GButton(icon: Icons.home),
             GButton(icon: Icons.emoji_events),
-            GButton(icon: Icons.people,),
+            GButton(icon: Icons.people),
             GButton(icon: Icons.person),
           ],
         ),
