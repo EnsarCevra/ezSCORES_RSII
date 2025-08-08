@@ -28,10 +28,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: _screens,
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6),
         child: GNav(
           gap: 8,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
           backgroundColor: Colors.white,
           color: Colors.grey[700],
           activeColor: Colors.white,
