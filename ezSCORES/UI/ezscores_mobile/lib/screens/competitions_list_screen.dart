@@ -5,6 +5,7 @@ import 'package:ezscores_mobile/models/enums/competitionType.dart';
 import 'package:ezscores_mobile/models/reviews.dart';
 import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
+import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:ezscores_mobile/screens/competition_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -36,6 +37,8 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
       fetchPage: (page, pageSize) {
         var filter = {
           "name": _searchController.text,
+          "status" : selectedStatus,
+          "competitionType" : selectedCompetitionType,
           "page": page,
           "pageSize": pageSize,
         };
@@ -244,7 +247,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: ((context) => CompetitionsDetailsScreen()
+                builder: ((context) => CompetitionsDetailsScreen(competition.id)
                 )
               )
             );
@@ -258,27 +261,14 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: competition.picture == null || competition.picture!.isEmpty
-                        ? Container(
+                    child: Container(
                             width: 60,
                             height: 60,
                             color: Colors.grey[300],
-                            child: const Icon(Icons.emoji_events, size: 30, color: Colors.grey),
+                            child: competition.picture == null || competition.picture!.isEmpty ?
+                             const Icon(Icons.emoji_events, size: 30, color: Colors.grey) :
+                             imageFromString(competition.picture!)
                           )
-                        : Image.network(
-                            competition.picture!,
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: 60,
-                                height: 60,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.emoji_events, size: 30, color: Colors.grey),
-                              );
-                            },
-                          ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

@@ -20,7 +20,7 @@ String formatNumber(dynamic)
 
 Image imageFromString(String input)
 {
-  return Image.memory(base64Decode(input));
+  return Image.memory(base64Decode(input), fit: BoxFit.contain,);
 }
 
 String formatDate(String date) {
