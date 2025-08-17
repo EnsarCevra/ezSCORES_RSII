@@ -5,6 +5,7 @@ import 'package:ezscores_mobile/models/enums/competitionStatus.dart';
 import 'package:ezscores_mobile/models/enums/competitionType.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/standings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,8 +43,6 @@ class _CompetitionsDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     if (competition == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -60,50 +59,10 @@ class _CompetitionsDetailsScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header section
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                borderRadius: BorderRadius.circular(30), 
-                child: Container(
-                            width: 60,
-                            height: 60,
-                            color: Colors.grey[300],
-                            child: competition!.picture == null || competition!.picture!.isEmpty ?
-                             const Icon(Icons.emoji_events, size: 30, color: Colors.grey) :
-                             imageFromString(competition!.picture!)
-                          )
-                  ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        competition!.name ?? '',
-                        style: textTheme.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Organizator: ${competition!.city?.name ?? 'Nepoznato'}",
-                        style: textTheme.bodyMedium
-                            ?.copyWith(color: Colors.grey[700]),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Status: ${competition?.status?.displayName}",
-                        style: textTheme.bodySmall
-                            ?.copyWith(color: Colors.blueGrey),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+            _buildHeader(),
             const SizedBox(height: 5),
             Divider(
-              height: 5, // space around line
+              height: 5,
               thickness: 0.5,
               color: Colors.grey.withOpacity(0.5),
             ),
@@ -120,7 +79,7 @@ class _CompetitionsDetailsScreenState
                           // Navigate to Scores
                         },
                         icon: const Icon(Icons.sports_soccer),
-                        label: const Text('Scores'),
+                        label: const Text('Rezultati'),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -133,10 +92,17 @@ class _CompetitionsDetailsScreenState
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          // Navigate to Standings
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => StandingsScreen(competition: competition!,),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(opacity: animation, child: child);
+                              },
+                            ),
+                          );
                         },
                         icon: const Icon(Icons.leaderboard),
-                        label: const Text('Standings'),
+                        label: const Text('Poredak'),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -218,6 +184,25 @@ class _CompetitionsDetailsScreenState
           ],
         ),
       ),
+      bottomNavigationBar: competition!.status == CompetitionStatus.applicationsOpen ? SizedBox(
+      width: double.infinity,
+      height: 44,
+      child: ElevatedButton(
+        onPressed: () {
+          // Handle apply logic
+        },
+        style: ElevatedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+          backgroundColor: Colors.green,
+          padding: EdgeInsets.zero,
+        ),
+        child: const Text(
+          "Prijavi ekipu",
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ),) : null
     );
   }
 
@@ -400,5 +385,50 @@ class _CompetitionsDetailsScreenState
         ),
       ],
     );
+  }
+  
+  _buildHeader() {
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                borderRadius: BorderRadius.circular(30), 
+                child: Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.grey[300],
+                            child: competition!.picture == null || competition!.picture!.isEmpty ?
+                             const Icon(Icons.emoji_events, size: 30, color: Colors.grey) :
+                             imageFromString(competition!.picture!)
+                          )
+                  ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        competition!.name ?? '',
+                        style: textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Organizator: ${competition!.city?.name ?? 'Nepoznato'}",
+                        style: textTheme.bodyMedium
+                            ?.copyWith(color: Colors.grey[700]),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Status: ${competition?.status?.displayName}",
+                        style: textTheme.bodySmall
+                            ?.copyWith(color: Colors.blueGrey),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            );
   }
 }
