@@ -5,6 +5,7 @@ import 'package:ezscores_mobile/models/enums/competitionStatus.dart';
 import 'package:ezscores_mobile/models/enums/competitionType.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/scores_screen.dart';
 import 'package:ezscores_mobile/screens/standings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +52,7 @@ class _CompetitionsDetailsScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(competition!.name ?? "Detalji takmičenja"),
+        title: Text(competition!.name ?? "Detalji takmičenja", style: TextStyle(fontSize: 15),),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -76,7 +77,14 @@ class _CompetitionsDetailsScreenState
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          // Navigate to Scores
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => ResultsScreen(competition: competition!,),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(opacity: animation, child: child);
+                              },
+                            ),
+                          );
                         },
                         icon: const Icon(Icons.sports_soccer),
                         label: const Text('Rezultati'),

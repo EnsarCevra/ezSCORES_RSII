@@ -46,10 +46,10 @@ class _StandingsScreenState extends State<StandingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.competition.name ?? "Detalji takmičenja"),
+        title: Text(widget.competition.name ?? "Poredak", style: const TextStyle(fontSize: 15),),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             _buildHeader(),
