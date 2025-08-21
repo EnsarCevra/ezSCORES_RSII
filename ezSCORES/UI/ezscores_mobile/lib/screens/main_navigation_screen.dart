@@ -1,5 +1,5 @@
 import 'package:ezscores_mobile/screens/competitions_list_screen.dart';
-import 'package:ezscores_mobile/screens/favorites_list_screen.dart';
+import 'package:ezscores_mobile/screens/profile_screen.dart';
 import 'package:ezscores_mobile/screens/home_screen.dart';
 import 'package:ezscores_mobile/screens/teams_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     HomeScreen(),
     CompetitionsListScreen(),
     TeamsListScreen(),
-    FavoritesScreen(),
+    ProfileScreen(),
   ];
 
   @override
@@ -32,8 +32,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           color: Colors.white,
           border: Border(
             top: BorderSide(
-              color: Colors.grey.withOpacity(0.3), // Light and subtle border
-              width: 0.5, // Thin border
+              color: Colors.grey.withOpacity(0.3),
+              width: 0.5,
             ),
           ),
         ),
