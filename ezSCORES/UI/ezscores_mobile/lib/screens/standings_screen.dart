@@ -1,3 +1,4 @@
+import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/models/DTOs/groupStandingsDto.dart';
 import 'package:ezscores_mobile/models/DTOs/teamStandingsDto.dart';
 import 'package:ezscores_mobile/models/competitions.dart';
@@ -41,7 +42,7 @@ class _StandingsScreenState extends State<StandingsScreen> {
   @override
   Widget build(BuildContext context) {
     if (groupStandings == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const AppLoading();
     }
 
     return Scaffold(
@@ -49,7 +50,7 @@ class _StandingsScreenState extends State<StandingsScreen> {
         title: Text(widget.competition.name ?? "Poredak", style: const TextStyle(fontSize: 15),),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Column(
           children: [
             _buildHeader(),
@@ -63,6 +64,18 @@ class _StandingsScreenState extends State<StandingsScreen> {
             ? _buildLeagueTable(groupStandings!)
             : _buildTournamentGroups(groupStandings!))
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          color: Colors.grey.shade200,
+          padding: const EdgeInsets.all(8),
+          child: Text(
+            "${widget.competition.name} • ${widget.competition.season}",
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
         ),
       ),
     );

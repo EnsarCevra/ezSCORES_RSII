@@ -1,3 +1,4 @@
+import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
 import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/enums/competitionStatus.dart';
@@ -214,7 +215,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
       animation: _paginationController,
       builder: (context, _) {
         if (_paginationController.isLoading && _paginationController.items.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppLoading();
         }
 
         if (_paginationController.items.isEmpty) {
@@ -231,7 +232,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
               } else {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: AppLoading(),
                 );
               }
             },

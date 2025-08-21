@@ -1,3 +1,4 @@
+import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/competitionsReferees.dart';
 import 'package:ezscores_mobile/models/competitionsSponsors.dart';
@@ -45,9 +46,7 @@ class _CompetitionsDetailsScreenState
   @override
   Widget build(BuildContext context) {
     if (competition == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const AppLoading();
     }
 
     return Scaffold(
