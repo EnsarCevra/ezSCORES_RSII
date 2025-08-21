@@ -81,7 +81,6 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
           key: _formKey,
           child: Column(
             children: [
-              const SizedBox(height: 20,),
               TextField(
                 controller: _searchController,
                 style: textTheme.bodySmall,
