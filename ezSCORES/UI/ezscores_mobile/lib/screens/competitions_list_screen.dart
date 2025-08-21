@@ -71,6 +71,10 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Takmičenja",
+        style: TextStyle(fontSize: 15),),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: FormBuilder(
@@ -104,7 +108,6 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-
               Row(
                 children: [
                   Expanded(
