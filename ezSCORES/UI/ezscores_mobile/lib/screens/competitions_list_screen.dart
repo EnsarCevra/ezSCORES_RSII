@@ -4,7 +4,6 @@ import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/enums/competitionStatus.dart';
 import 'package:ezscores_mobile/models/enums/competitionType.dart';
 import 'package:ezscores_mobile/models/reviews.dart';
-import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:ezscores_mobile/screens/competition_details_screen.dart';
@@ -21,7 +20,6 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _searchController = TextEditingController();
   late CompetitionProvider competitionProvider;
-  SearchResult<Competitions>? competitionsResult;
   int? selectedStatus;
   int? selectedCompetitionType;
 
