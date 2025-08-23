@@ -6,6 +6,7 @@ import 'package:ezscores_mobile/models/teams.dart';
 import 'package:ezscores_mobile/providers/SelectionProvider.dart';
 import 'package:ezscores_mobile/providers/TeamProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/teams_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -88,6 +89,22 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
             ]
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        onPressed: () async {
+          final created = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const TeamsDetailsScreen(),
+            ),
+          );
+
+          if (created == true) {
+            _paginationController.loadPage();
+          }
+        },
+        child: const Icon(Icons.add, size: 28, color: Colors.white,),
       ),
     );
   }
@@ -225,8 +242,18 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return InkWell(
-      onTap: () {
-        // navigate to team details if needed
+      onTap: () async {
+        final shouldReload = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: ((context) => TeamsDetailsScreen(team: team,)
+                )
+              )
+            );
+        if(shouldReload != null && shouldReload == true)
+        {
+          _paginationController.loadPage();
+        }
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
