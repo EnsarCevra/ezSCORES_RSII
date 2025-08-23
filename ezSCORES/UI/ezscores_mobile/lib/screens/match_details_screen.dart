@@ -250,14 +250,17 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                   _buildPlayersView(match?.awayTeam?.players, isHome: false),
                 ]
               ),
-              _buildSubHeader("Sudije"),
-              _buildRefereesView(match?.referees),
+              if(match?.referees?.isEmpty == false)_buildRefereesView(match?.referees),
             ],
           ),
         );
       }
       
         _buildStrikersTab() {
+          if(match!.isCompleted == false && match!.isCompleted == false)
+          {
+            return const Center(child: Text("Meč još nije započeo"));
+          }
           if(match!.goals!.isEmpty)
           {
             return const Center(child: Text("Meč nema pogodaka"));
@@ -330,32 +333,31 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
   }
 
   _buildRefereesView(List<RefereeDTO>? referees) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...referees!.map(
-              (referee) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.sports_soccer,
-                      size: 15,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      referee.name!,
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  ],
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSubHeader("Sudije"),
+        SizedBox(height: 10,),
+        ...referees!.map(
+            (referee) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.sports_soccer,
+                    size: 15,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    referee.name!,
+                    textAlign: TextAlign.start,
+                    style: const TextStyle(fontSize: 10),
+                  ),
+                ],
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
   
