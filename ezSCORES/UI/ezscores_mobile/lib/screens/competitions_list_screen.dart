@@ -72,6 +72,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
       appBar: AppBar(
         title: const Text("Takmičenja",
         style: TextStyle(fontSize: 15),),
+        actions: const [LogoutButton()],
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),

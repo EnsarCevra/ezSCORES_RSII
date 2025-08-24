@@ -1,10 +1,12 @@
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_mobile/main.dart';
 import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/models/selections.dart';
 import 'package:ezscores_mobile/models/teams.dart';
 import 'package:ezscores_mobile/providers/SelectionProvider.dart';
 import 'package:ezscores_mobile/providers/TeamProvider.dart';
+import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:ezscores_mobile/screens/teams_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +78,9 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
       appBar: AppBar(
         title: const Text("Moje ekipe",
         style: TextStyle(fontSize: 15),),
+        actions: const [
+          LogoutButton()
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),

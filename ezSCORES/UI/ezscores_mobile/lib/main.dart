@@ -24,12 +24,8 @@ import 'package:ezscores_mobile/providers/UserProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/base_provider.dart';
 import 'package:ezscores_mobile/screens/main_navigation_screen.dart';
-//import 'package:ezscores_mobile/screens/admin_dashboard_screen.dart';
-//import 'package:ezscores_mobile/screens/register_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:window_size/window_size.dart';
 
 void main() {

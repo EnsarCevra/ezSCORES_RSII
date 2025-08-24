@@ -5,6 +5,7 @@ import 'package:ezscores_mobile/dialogs/success_dialog.dart';
 import 'package:ezscores_mobile/main.dart';
 import 'package:ezscores_mobile/providers/UserProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
+import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -78,7 +79,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text("Postavke profila")),
+      appBar: AppBar(
+        title: const Text("Postavke profila", style: TextStyle(fontSize: 15),),
+        actions: const [LogoutButton()],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

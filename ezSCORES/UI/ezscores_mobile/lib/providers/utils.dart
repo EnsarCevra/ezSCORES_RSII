@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:ezscores_mobile/main.dart';
 import 'package:ezscores_mobile/models/cities.dart';
 import 'package:ezscores_mobile/providers/CitiesProvider.dart';
+import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -261,5 +263,40 @@ Future<void> deleteEntity({
   }
 }
 String capitalize(String s) => s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1)}' : s;
+
+class LogoutButton extends StatelessWidget {
+  const LogoutButton({Key? key}) : super(key: key);
+
+  void _logout(BuildContext context) {
+    AuthProvider.username = "";
+    AuthProvider.password = "";
+    AuthProvider.id = null;
+    AuthProvider.firstName = null;
+    AuthProvider.lastName = null;
+    AuthProvider.userName = null;
+    AuthProvider.picture = null;
+    AuthProvider.email = null;
+    AuthProvider.phoneNumber = null;
+    AuthProvider.organization = null;
+    AuthProvider.roleID = null;
+    AuthProvider.roleDecription = null;
+    AuthProvider.roleName = null;
+
+    // navigate back to root
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const MyApp()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.logout),
+      tooltip: "Logout",
+      onPressed: () => _logout(context),
+    );
+  }
+}
+
 
 
