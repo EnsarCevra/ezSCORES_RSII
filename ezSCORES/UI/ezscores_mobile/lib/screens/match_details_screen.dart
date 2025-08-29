@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
-import 'package:ezscores_mobile/models/DTOs/fixtureDto.dart';
 import 'package:ezscores_mobile/models/DTOs/matchDto.dart';
 import 'package:ezscores_mobile/models/DTOs/playerDto.dart';
 import 'package:ezscores_mobile/models/DTOs/refereeDto.dart';
 import 'package:ezscores_mobile/models/DTOs/teamDto.dart';
 import 'package:ezscores_mobile/models/enums/gameStage.dart';
+import 'package:ezscores_mobile/models/fixtures.dart';
+import 'package:ezscores_mobile/providers/FixturesProvider.dart';
 import 'package:ezscores_mobile/providers/MatchesProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +18,8 @@ class MatchDetailsScreen extends StatefulWidget {
   String competitionName;
   String competitionSeason;
   int? matchID;
-  FixtureDTO fixture;
-  MatchDetailsScreen({super.key, required this.matchID, required this.fixture, required this.competitionId, required this.competitionName, required this.competitionSeason});
+  int fixtureId;
+  MatchDetailsScreen({super.key, required this.matchID, required this.fixtureId, required this.competitionId, required this.competitionName, required this.competitionSeason});
 
   @override
   State<MatchDetailsScreen> createState() => _MatchDetailsScreenState();
@@ -26,15 +27,19 @@ class MatchDetailsScreen extends StatefulWidget {
 
 class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
   late MatchesProvider matchesProvider;
+  late FixtureProvider fixtureProvider;
    MatchDTO? match;
+   Fixtures? fixture;
   
   @override
   void initState() {
     matchesProvider = context.read<MatchesProvider>();
+    fixtureProvider = context.read<FixtureProvider>();
     super.initState();
     initForm();
   }
   Future initForm() async {
+    fixture = await fixtureProvider.getById(widget.fixtureId);
     if (widget.matchID != null) {
       await _loadMatch(widget.matchID!);
     }
@@ -108,12 +113,12 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
     final bool isUnderway = match?.isUnderway ?? false;
 
     // Main fixture info
-    String fixtureInfo = widget.fixture.gameStage!.displayName;
-    if (widget.fixture.gameStage == GameStage.league ||
-        widget.fixture.gameStage == GameStage.groupPhase) {
-      fixtureInfo += " • ${widget.fixture.sequenceNumber! + 1}. kolo";
+    String fixtureInfo = fixture!.gameStage!.displayName;
+    if (fixture?.gameStage == GameStage.league ||
+        fixture?.gameStage == GameStage.groupPhase) {
+      fixtureInfo += " • ${fixture!.sequenceNumber! + 1}. kolo";
     }
-    if (widget.fixture.gameStage == GameStage.groupPhase) {
+    if (fixture?.gameStage == GameStage.groupPhase) {
       fixtureInfo +=
           " • ${match?.group?.name}";
     }

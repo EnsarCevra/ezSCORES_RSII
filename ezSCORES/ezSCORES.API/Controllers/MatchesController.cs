@@ -33,5 +33,10 @@ namespace ezSCORES.API.Controllers
 		{
 			(_service as IMatchesService).FinishMatch(id, request);
 		}
+		[HttpGet("get-matches-by-date")]
+		public PagedResult<MatchesByDateDTO> GetMatchesByDate([FromQuery]MatchesByDateSearchObject search)
+		{
+			return (_service as IMatchesService).GetMatchesByDate(search);
+		}
 	}
 }

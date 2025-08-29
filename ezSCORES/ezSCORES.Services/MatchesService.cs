@@ -1,4 +1,5 @@
-﻿using ezSCORES.Model;
+﻿using Azure;
+using ezSCORES.Model;
 using ezSCORES.Model.DTOs;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.MatchRequests;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ezSCORES.Services
 {
@@ -38,6 +40,11 @@ namespace ezSCORES.Services
 			if(search.DateAndTime != null)
 			{
 				query = query.Where(x => x.DateAndTime.Date == search.DateAndTime.Value.Date);
+				query = query
+					.Include(x => x.HomeTeam.Team)
+					.Include(x => x.AwayTeam.Team)
+					.Include(x => x.Fixture).ThenInclude(x => x.Competition)
+					.Include(x => x.Goals);
 			}
 			return base.AddFilter(search, query);
 		}
@@ -204,6 +211,88 @@ namespace ezSCORES.Services
 			if (match.Group != null && match.GameStage != Model.ENUMs.GameStage.GroupPhase && match.GameStage == Model.ENUMs.GameStage.League)
 				match.Group = null;//if it's not group stage, group name will not be displayed
 			return match;
+		}
+
+		public PagedResult<MatchesByDateDTO> GetMatchesByDate(MatchesByDateSearchObject search)
+		{
+			// 1) Base query
+			var query = Context.Matches
+				.Include(m => m.HomeTeam.Team)
+				.Include(m => m.AwayTeam.Team)
+				.Include(m => m.Fixture).ThenInclude(f => f.Competition)
+				.Include(m => m.Goals)
+				.AsQueryable();
+
+			// 2) Filter by date
+			if (search?.DateTime != null)
+			{
+				var date = search.DateTime.Date;
+				query = query.Where(m => m.DateAndTime.Date == date);
+			}
+
+			// 3) Group by competition
+			var grouped = query
+				.GroupBy(m => m.Fixture.Competition)
+				.Select(g => new MatchesByDateDTO
+				{
+					CompetitionId = g.Key.Id,
+					CompetitionName = g.Key.Name,
+					Matches = g
+						.OrderBy(m => m.DateAndTime)
+						.Select(m => new MatchDTO
+						{
+							MatchId = m.Id,
+							DateAndTime = m.DateAndTime,
+							GameStage = m.Fixture.GameStage,
+							FixtureSequenceNumber = m.Fixture.SequenceNumber,
+							IsCompleted = m.IsCompleted,
+							IsUnderway = m.IsUnderway,
+							HomeTeam = new TeamDTO
+							{
+								Id = m.HomeTeam.Id,
+								Name = m.HomeTeam.Team.Name,
+								Picture = m.HomeTeam.Team.Picture,
+								Players = m.HomeTeam.CompetitionsTeamsPlayers.Select(p => new PlayerDTO
+								{
+									Id = p.Id,
+									Name = p.Player.FirstName + " " + p.Player.LastName
+								}).ToList()
+							},
+							AwayTeam = new TeamDTO
+							{
+								Id = m.AwayTeam.Id,
+								Name = m.AwayTeam.Team.Name,
+								Picture = m.AwayTeam.Team.Picture,
+								Players = m.AwayTeam.CompetitionsTeamsPlayers.Select(p => new PlayerDTO
+								{
+									Id = p.Id,
+									Name = p.Player.FirstName + " " + p.Player.LastName
+								}).ToList()
+							},
+							FixtureId = m.Fixture.Id,
+							HomeTeamScore = m.IsCompleted ? Context.Goals.Count(g => g.MatchId == m.Id && g.IsHomeGoal) : null,
+							AwayTeamScore = m.IsCompleted ? Context.Goals.Count(g => g.MatchId == m.Id && !g.IsHomeGoal) : null
+						}).ToList()
+				});
+
+
+			// 5) Apply pagination
+			if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
+			{
+				grouped = grouped
+					.Skip(search.Page.Value * search.PageSize.Value)
+					.Take(search.PageSize.Value);
+			}
+			int count = query.Count();
+			// 6) Execute
+			var resultList = grouped.ToList();
+
+			// 7) Wrap in PagedResult
+			return new PagedResult<MatchesByDateDTO>
+			{
+				Count = count,
+				ResultList = resultList
+			};
 		}
 	}
 }

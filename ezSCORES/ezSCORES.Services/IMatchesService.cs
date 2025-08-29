@@ -17,5 +17,7 @@ namespace ezSCORES.Services
 		void StartMatch(int id);
 		void FinishMatch(int id, FinishMatchRequest request);
 		MatchDTO GetMatchDetails(int id);
+
+		PagedResult<MatchesByDateDTO> GetMatchesByDate(MatchesByDateSearchObject search);
 	}
 }

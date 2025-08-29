@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:ezscores_mobile/models/DTOs/matchDto.dart';
+import 'package:ezscores_mobile/models/DTOs/matchesByDateDto.dart';
 import 'package:ezscores_mobile/models/matches.dart';
+import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/providers/base_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,6 +31,33 @@ class MatchesProvider extends BaseProvider<Matches>
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
       return MatchDTO.fromJson(data);
+    } else {
+      throw UserException("Unknown error.");
+    }
+  }
+  Future<SearchResult<MatchesByDateDTO>> getMatchesByDate({dynamic filter}) async {
+    var url =
+        "${BaseProvider.baseUrl}Matches/get-matches-by-date";
+
+     if (filter != null) {
+      var queryString = getQueryString(filter);
+      url = "$url?$queryString";
+    }
+
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.get(uri, headers: headers);
+    if (isValidResponse(response)) {
+      var data = jsonDecode(response.body);
+      var result = SearchResult<MatchesByDateDTO>();
+
+      result.count = data['count'];
+
+      for (var item in data['resultList']) {
+        result.result.add(MatchesByDateDTO.fromJson(item));
+      }
+      return result;
     } else {
       throw UserException("Unknown error.");
     }

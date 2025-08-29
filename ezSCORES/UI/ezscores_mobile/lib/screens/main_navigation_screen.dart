@@ -12,6 +12,7 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
+  int _previousIndex = 0;
 
   final List<Widget> _screens = [
     HomeScreen(),
@@ -23,9 +24,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        transitionBuilder: (child, animation) {
+          final isForward = _selectedIndex >= _previousIndex;
+          final offsetAnimation = Tween<Offset>(
+            begin: Offset(isForward ? 1 : -1, 0),
+            end: Offset.zero,
+          ).animate(animation);
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
+        child: _screens[_selectedIndex],
+        layoutBuilder: (currentChild, previousChildren) {
+          return Stack(
+            children: <Widget>[
+              ...previousChildren,
+              if (currentChild != null) currentChild,
+            ],
+          );
+        },
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -46,7 +66,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           activeColor: Colors.white,
           tabBackgroundColor: Colors.blue,
           selectedIndex: _selectedIndex,
-          onTabChange: (index) => setState(() => _selectedIndex = index),
+          onTabChange: (index) {
+            setState(() {
+              _previousIndex = _selectedIndex;
+              _selectedIndex = index;
+            });
+          },
           tabs: const [
             GButton(icon: Icons.home),
             GButton(icon: Icons.emoji_events),
