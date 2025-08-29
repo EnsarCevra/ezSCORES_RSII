@@ -331,12 +331,12 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
         );
       }
     double _getAverageRating(List<Reviews>? reviews) {
-    if (reviews == null) return 0;
+      if (reviews == null) return 0;
 
-    final validReviews = reviews.where((r) => r.rating != null).toList();
-    if (validReviews.isEmpty) return 0;
+      final validReviews = reviews.where((r) => r.rating != null).toList();
+      if (validReviews.isEmpty) return 0;
 
-    final total = validReviews.map((r) => r.rating!).reduce((a, b) => a + b);
-    return total / validReviews.length;
-  }
+      final total = validReviews.map((r) => r.rating!).reduce((a, b) => a + b);
+      return total / validReviews.length;
+    }
 }

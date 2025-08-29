@@ -4,6 +4,7 @@ import 'package:ezscores_mobile/models/DTOs/matchesByDateDto.dart';
 import 'package:ezscores_mobile/models/matches.dart';
 import 'package:ezscores_mobile/providers/MatchesProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
+import 'package:ezscores_mobile/screens/favorites_screen.dart';
 import 'package:ezscores_mobile/screens/match_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
@@ -104,7 +105,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         ElevatedButton(
           onPressed: () {
-            // TODO: Navigate to Favoriti screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: ((context) => FavoriteCompetitionsListScreen()
+                )
+              )
+            );
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(

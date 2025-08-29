@@ -8,6 +8,7 @@ import 'package:ezscores_mobile/providers/CompetitionTeamPlayerProvider.dart';
 import 'package:ezscores_mobile/providers/CompetitionTeamsProvider.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
 import 'package:ezscores_mobile/providers/CompetitionsRefereesMatchesProvider.dart';
+import 'package:ezscores_mobile/providers/FavoriteCompetitionsProvider.dart';
 import 'package:ezscores_mobile/providers/FixturesProvider.dart';
 import 'package:ezscores_mobile/providers/GoalProvider.dart';
 import 'package:ezscores_mobile/providers/MatchesProvider.dart';
@@ -57,6 +58,7 @@ void main() {
     ChangeNotifierProvider(create: (_) => CompeititionRefereeMatchProvider()),
     ChangeNotifierProvider(create: (_) => GoalProvider()),
     ChangeNotifierProvider(create: (_) => CompetitionsTeamsPlayersProvider()),
+    ChangeNotifierProvider(create: (_) => FavoriteCompetitionsProvider()),
 
 
 

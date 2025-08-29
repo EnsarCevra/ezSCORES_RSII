@@ -9,6 +9,7 @@ using ezSCORES.Services.Auth;
 using ezSCORES.Services.Database;
 using Mapster;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace ezSCORES.Services
 		public override IQueryable<FavoriteCompetition> AddFilter(BaseSearchObject search, IQueryable<FavoriteCompetition> query)
 		{
 			query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId());
+			query = query.Include(x => x.Competition);
 			return base.AddFilter(search, query);
 		}
 	}

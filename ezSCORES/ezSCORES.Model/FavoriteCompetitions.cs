@@ -11,5 +11,6 @@ namespace ezSCORES.Model
 		public int UserId { get; set; }
 
 		public int CompetitionId { get; set; }
+		public virtual Competitions? Competition { get; set; }
 	}
 }
