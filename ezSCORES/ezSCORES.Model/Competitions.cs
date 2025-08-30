@@ -34,6 +34,7 @@ namespace ezSCORES.Model
 		public CompetitionStatus Status { get; set; } = ENUMs.CompetitionStatus.Preparation;
 
 		public int MaxPlayersPerTeam { get; set; }
+		public virtual Users User { get; set; } = null!;
 		public virtual ICollection<CompetitionsReferees> CompetitionsReferees { get; set; } = new List<CompetitionsReferees>();
 		public virtual ICollection<CompetitionsSponsors> CompetitionsSponsors { get; set; } = new List<CompetitionsSponsors>();
 		public virtual ICollection<Rewards> Rewards { get; set; } = new List<Rewards>();

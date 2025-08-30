@@ -104,7 +104,8 @@ namespace ezSCORES.Services
 						.ThenInclude(x => x.Sponsor)
 						.Include(x => x.Rewards)
 						.Include(x => x.City)
-						.Include(x => x.Selection).FirstOrDefault();
+						.Include(x => x.Selection)
+						.Include(x=>x.User).FirstOrDefault();
 		}
 		public override void BeforeInsert(CompetitionsInsertRequest request, Competition entity)
 		{

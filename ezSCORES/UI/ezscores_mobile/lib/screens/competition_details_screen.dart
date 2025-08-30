@@ -168,18 +168,7 @@ class _CompetitionsDetailsScreenState
             const SizedBox(height: 24),
 
             // Contact Info
-            _buildSectionTitle("Kontakt informacije"),
-            const SizedBox(height: 8),
-            _buildInfoRow(
-              icon: Icons.email,
-              label: "Email",
-              value: "N/A",
-            ),
-            _buildInfoRow(
-              icon: Icons.phone,
-              label: "Telefon",
-              value: "N/A",
-            ),
+            if(competition!.user != null)_buildContactInfo(),
 
             const SizedBox(height: 24),
             
@@ -422,7 +411,7 @@ class _CompetitionsDetailsScreenState
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Organizator: ${competition!.city?.name ?? 'Nepoznato'}",
+                        "Organizator: ${competition!.user?.organization ?? 'Nepoznato'}",
                         style: textTheme.bodyMedium
                             ?.copyWith(color: Colors.grey[700]),
                       ),
@@ -437,5 +426,25 @@ class _CompetitionsDetailsScreenState
                 )
               ],
             );
+  }
+  
+  _buildContactInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle("Kontakt informacije"),
+        const SizedBox(height: 8),
+        if(competition!.user != null)_buildInfoRow(
+          icon: Icons.email,
+          label: "Email",
+          value: competition!.user!.email!,
+        ),
+        _buildInfoRow(
+          icon: Icons.phone,
+          label: "Telefon",
+          value: competition!.user!.phoneNumber!,
+        ),
+      ],
+    );
   }
 }

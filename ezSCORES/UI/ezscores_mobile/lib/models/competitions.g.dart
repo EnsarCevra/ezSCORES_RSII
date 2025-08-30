@@ -8,7 +8,6 @@ part of 'competitions.dart';
 
 Competitions _$CompetitionsFromJson(Map<String, dynamic> json) => Competitions()
   ..id = (json['id'] as num?)?.toInt()
-  ..userId = (json['userId'] as num?)?.toInt()
   ..selectionId = (json['selectionId'] as num?)?.toInt()
   ..season = json['season'] as String?
   ..cityId = (json['cityId'] as num?)?.toInt()
@@ -24,6 +23,9 @@ Competitions _$CompetitionsFromJson(Map<String, dynamic> json) => Competitions()
       : DateTime.parse(json['applicationEndDate'] as String)
   ..fee = (json['fee'] as num?)?.toInt()
   ..maxPlayersPerTeam = (json['maxPlayersPerTeam'] as num?)?.toInt()
+  ..user = json['user'] == null
+      ? null
+      : Users.fromJson(json['user'] as Map<String, dynamic>)
   ..competitionType = const CompetitionTypeConverter()
       .fromJson((json['competitionType'] as num?)?.toInt())
   ..status = const CompetitionStatusConverter()
@@ -50,7 +52,6 @@ Competitions _$CompetitionsFromJson(Map<String, dynamic> json) => Competitions()
 Map<String, dynamic> _$CompetitionsToJson(Competitions instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
       'selectionId': instance.selectionId,
       'season': instance.season,
       'cityId': instance.cityId,
@@ -62,6 +63,7 @@ Map<String, dynamic> _$CompetitionsToJson(Competitions instance) =>
       'applicationEndDate': instance.applicationEndDate?.toIso8601String(),
       'fee': instance.fee,
       'maxPlayersPerTeam': instance.maxPlayersPerTeam,
+      'user': instance.user?.toJson(),
       'competitionType':
           const CompetitionTypeConverter().toJson(instance.competitionType),
       'status': const CompetitionStatusConverter().toJson(instance.status),

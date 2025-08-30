@@ -8,6 +8,7 @@ import 'package:ezscores_mobile/models/enums/competitions_type_converter.dart';
 import 'package:ezscores_mobile/models/reviews.dart';
 import 'package:ezscores_mobile/models/rewards.dart';
 import 'package:ezscores_mobile/models/selections.dart';
+import 'package:ezscores_mobile/models/users.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'competitions.g.dart';
@@ -17,7 +18,6 @@ part 'competitions.g.dart';
 @CompetitionStatusConverter()
 class Competitions {
 	int? id;
-	int? userId;
 	int? selectionId;
 	String? season;
 	int? cityId;
@@ -29,6 +29,7 @@ class Competitions {
 	DateTime? applicationEndDate;
 	int? fee;
 	int? maxPlayersPerTeam;
+  Users? user;
   CompetitionType? competitionType;
   CompetitionStatus? status;
   Cities? city;
