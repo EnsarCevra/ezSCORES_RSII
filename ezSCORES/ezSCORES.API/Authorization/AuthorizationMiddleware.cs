@@ -134,7 +134,7 @@ namespace ezSCORES.API.Authorization
 							return;
 						}
 					}
-					if (httpContext.Request.Path.StartsWithSegments("/api/Fixtures"))
+					if (httpContext.Request.Path.StartsWithSegments("/api/Fixtures") && httpContext.Request.Method != "GET")
 					{
 						if (!await authorizationService.CanUserAccessFixtureAsync(currentUserId, id))
 						{
@@ -161,16 +161,7 @@ namespace ezSCORES.API.Authorization
 							return;
 						}
 					}
-					if (httpContext.Request.Path.StartsWithSegments("/api/Matches"))
-					{
-						if (!await authorizationService.CanUserAccessMatchAsync(currentUserId, id))
-						{
-							httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-							await httpContext.Response.WriteAsync("Niste autorizovani za ovu akciju!");
-							return;
-						}
-					}
-					if (httpContext.Request.Path.StartsWithSegments("/api/Matches"))
+					if (httpContext.Request.Path.StartsWithSegments("/api/Matches/") && httpContext.Request.Method != "GET")
 					{
 						if (!await authorizationService.CanUserAccessMatchAsync(currentUserId, id))
 						{

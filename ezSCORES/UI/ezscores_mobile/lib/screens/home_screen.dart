@@ -81,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _buildHeader(),
           _buildNavigationButtons(),
-          //const SizedBox(height: 20),
           const Divider(),
           _buildMainContent(),
         ],
@@ -259,11 +258,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Competition Header
         const SizedBox(height: 8),
-        _buildSubHeader(dto.competitionName!),
-    
-        // Matches list inside
+        _buildSubHeader(dto.competition!.name!),
         Column(
           children: dto.matches!.map((match) {
             return Padding(
@@ -275,9 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       pageBuilder: (context, animation, secondaryAnimation) =>
                           MatchDetailsScreen(
                         matchID: match.matchId,
-                        competitionId: dto.competitionId!,
-                        competitionName: dto.competitionName!,
-                        competitionSeason: "", // not available in DTO
+                        competition: dto.competition!,
                         fixtureId: match.fixtureId!,
                       ),
                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -297,7 +291,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      /// Match time
                       SizedBox(
                         width: 55,
                         child: Text(
@@ -313,7 +306,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   
                       const SizedBox(width: 12),
                   
-                      /// Teams
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +348,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      /// Scores
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [

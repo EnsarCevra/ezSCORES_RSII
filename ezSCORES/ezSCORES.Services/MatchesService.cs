@@ -235,8 +235,19 @@ namespace ezSCORES.Services
 				.GroupBy(m => m.Fixture.Competition)
 				.Select(g => new MatchesByDateDTO
 				{
-					CompetitionId = g.Key.Id,
-					CompetitionName = g.Key.Name,
+					Competition = new Competitions
+					{
+						Id = g.Key.Id,
+						Name = g.Key.Name,
+						Picture = g.Key.Picture,
+						Season = g.Key.Season,
+						CompetitionType = g.Key.CompetitionType,
+						Status = g.Key.Status,
+						CityId = g.Key.CityId,
+						UserId = g.Key.UserId,
+						StartDate = g.Key.StartDate,
+						ApplicationEndDate = g.Key.ApplicationEndDate,
+					},
 					Matches = g
 						.OrderBy(m => m.DateAndTime)
 						.Select(m => new MatchDTO

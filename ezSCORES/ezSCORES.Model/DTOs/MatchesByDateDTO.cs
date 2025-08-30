@@ -6,8 +6,7 @@ namespace ezSCORES.Model.DTOs
 {
 	public  class MatchesByDateDTO
 	{
-		public int CompetitionId { get; set; }
-		public string CompetitionName { get; set;}
+		public Competitions Competition { get; set; }
 		public List<MatchDTO> Matches { get; set; }
 	}
 }

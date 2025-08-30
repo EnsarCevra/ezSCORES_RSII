@@ -8,8 +8,9 @@ part of 'matchesByDateDto.dart';
 
 MatchesByDateDTO _$MatchesByDateDTOFromJson(Map<String, dynamic> json) =>
     MatchesByDateDTO(
-      (json['competitionId'] as num?)?.toInt(),
-      json['competitionName'] as String?,
+      json['competition'] == null
+          ? null
+          : Competitions.fromJson(json['competition'] as Map<String, dynamic>),
       (json['matches'] as List<dynamic>?)
           ?.map((e) => MatchDTO.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -17,7 +18,6 @@ MatchesByDateDTO _$MatchesByDateDTOFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$MatchesByDateDTOToJson(MatchesByDateDTO instance) =>
     <String, dynamic>{
-      'competitionId': instance.competitionId,
-      'competitionName': instance.competitionName,
+      'competition': instance.competition,
       'matches': instance.matches,
     };

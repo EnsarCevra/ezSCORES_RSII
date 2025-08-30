@@ -5,21 +5,23 @@ import 'package:ezscores_mobile/models/DTOs/matchDto.dart';
 import 'package:ezscores_mobile/models/DTOs/playerDto.dart';
 import 'package:ezscores_mobile/models/DTOs/refereeDto.dart';
 import 'package:ezscores_mobile/models/DTOs/teamDto.dart';
+import 'package:ezscores_mobile/models/competitions.dart';
+import 'package:ezscores_mobile/models/enums/competitionType.dart';
 import 'package:ezscores_mobile/models/enums/gameStage.dart';
 import 'package:ezscores_mobile/models/fixtures.dart';
 import 'package:ezscores_mobile/providers/FixturesProvider.dart';
 import 'package:ezscores_mobile/providers/MatchesProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/competition_details_screen.dart';
+import 'package:ezscores_mobile/screens/standings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
-  int competitionId;
-  String competitionName;
-  String competitionSeason;
+  Competitions competition;
   int? matchID;
   int fixtureId;
-  MatchDetailsScreen({super.key, required this.matchID, required this.fixtureId, required this.competitionId, required this.competitionName, required this.competitionSeason});
+  MatchDetailsScreen({super.key, required this.matchID, required this.fixtureId, required this.competition});
 
   @override
   State<MatchDetailsScreen> createState() => _MatchDetailsScreenState();
@@ -65,14 +67,25 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
         style: TextStyle(fontSize: 15),),
       ),
       body: _buildMatchDetails(),
-      bottomNavigationBar: Container(
-        color: Colors.grey.shade200,
-        padding: const EdgeInsets.all(8),
-        child: SafeArea(
-          child: Text(
-            "${widget.competitionName} • ${widget.competitionSeason}",
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+      bottomNavigationBar: GestureDetector(
+        onTap: (){
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: ((context) => CompetitionsDetailsScreen(fixture?.competitionId)
+                )
+              )
+            );
+        },
+        child: Container(
+          color: Colors.grey.shade200,
+          padding: const EdgeInsets.all(8),
+          child: SafeArea(
+            child: Text(
+              "${widget.competition.name} • ${widget.competition.season}",
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ),
         ),
       ),
@@ -112,7 +125,6 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
     final bool isFinished = match?.isCompleted ?? false;
     final bool isUnderway = match?.isUnderway ?? false;
 
-    // Main fixture info
     String fixtureInfo = fixture!.gameStage!.displayName;
     if (fixture?.gameStage == GameStage.league ||
         fixture?.gameStage == GameStage.groupPhase) {
@@ -122,9 +134,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
       fixtureInfo +=
           " • ${match?.group?.name}";
     }
-    //Date and time
     final String dateTimeText = formatDateTime(match!.dateAndTime);
-    // Score or VS
     final String centerText =
         (isFinished || isUnderway)
             ? "${match?.homeTeamScore ?? 0} : ${match?.awayTeamScore ?? 0}"
@@ -132,11 +142,10 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Fixture info
           if (fixtureInfo.isNotEmpty)
             Text(
               fixtureInfo,
@@ -144,7 +153,6 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           const SizedBox(height: 6),
-          // Date & time
           if (dateTimeText.isNotEmpty)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -153,44 +161,50 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                 const SizedBox(width: 6),
                 Text(
                   dateTimeText,
-                  style: const TextStyle(fontSize: 14),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 6),
+                const Text("•", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 6),
+                const Icon(Icons.stadium, size: 18),
+                Flexible(
+                  child: Text(
+                    match?.stadium?.name ?? "—",
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 14),
+                  ),
                 ),
               ],
             ),
           const SizedBox(height: 14),
-          // Stadium
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.stadium, size: 18),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  match?.stadium?.name ?? "—",
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          // Teams and score / VS
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Home team
               _buildTeam(match?.homeTeam),
               const SizedBox(width: 12),
-              // Center score or VS
               Text(
                 centerText,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 12),
-              // Away team
               _buildTeam(match?.awayTeam, isHome: false)
             ],
           ),
+          const SizedBox(height: 10),
+          if(widget.competition.competitionType == CompetitionType.league || widget.competition.competitionType == CompetitionType.tournament)
+          ElevatedButton(
+            onPressed: (){
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => StandingsScreen(competition: widget.competition,),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
+              );
+            },
+            child: const Text('Poredak')
+          )
         ],
       ),
     );

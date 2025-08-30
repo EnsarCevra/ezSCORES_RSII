@@ -107,7 +107,7 @@ Widget build(BuildContext context) {
               onTap: (){
                 Navigator.of(context).push(
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(matchID: match.matchId, competitionId: widget.competition.id!, competitionName: widget.competition.name!, competitionSeason: widget.competition.season!, fixtureId: fixture.id!,),
+                    pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(matchID: match.matchId, competition: widget.competition, fixtureId: fixture.id!,),
                     transitionsBuilder: (context, animation, secondaryAnimation, child) {
                       return FadeTransition(opacity: animation, child: child);
                     },

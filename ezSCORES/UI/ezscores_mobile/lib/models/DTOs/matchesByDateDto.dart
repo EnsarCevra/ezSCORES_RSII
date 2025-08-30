@@ -1,15 +1,15 @@
 import 'package:ezscores_mobile/models/DTOs/matchDto.dart';
+import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'matchesByDateDto.g.dart';
 
 @JsonSerializable()
 class MatchesByDateDTO {
-	int? competitionId;
-	String? competitionName;
+	Competitions? competition;
 	List<MatchDTO>? matches;
 
-	MatchesByDateDTO(this.competitionId,this.competitionName,this.matches,);
+	MatchesByDateDTO(this.competition,this.matches,);
 
 	factory MatchesByDateDTO.fromJson(Map<String, dynamic> json) => _$MatchesByDateDTOFromJson(json);
 
