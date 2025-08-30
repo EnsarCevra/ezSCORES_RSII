@@ -3,8 +3,12 @@ import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
 import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/enums/competitionStatus.dart';
 import 'package:ezscores_mobile/models/enums/competitionType.dart';
+import 'package:ezscores_mobile/models/favoriteCompetitions.dart';
 import 'package:ezscores_mobile/models/reviews.dart';
+import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
+import 'package:ezscores_mobile/providers/FavoriteCompetitionsProvider.dart';
+import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:ezscores_mobile/screens/competition_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +24,10 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _searchController = TextEditingController();
   late CompetitionProvider competitionProvider;
+
+  late FavoriteCompetitionsProvider favoritesProvider;
+  SearchResult<FavoriteCompetitions>? favoriteCompetitionsResult;
+
   int? selectedStatus;
   int? selectedCompetitionType;
 
@@ -32,6 +40,8 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
       setState(() {});
     });
     competitionProvider = context.read<CompetitionProvider>();
+    favoritesProvider = context.read<FavoriteCompetitionsProvider>();
+    _loadFavoriteCompetitionsForUser();
     _paginationController = PaginationController<Competitions>(
       fetchPage: (page, pageSize) {
         var filter = {
@@ -243,7 +253,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
   }
   _buildCompetitionCard(BuildContext context, Competitions competition) {
         final textTheme = Theme.of(context).textTheme;
-
+        final isFavouriteCompetition = favoriteCompetitionsResult?.result.any((element) => element.competition?.id == competition.id) ?? false; 
         return InkWell(
           onTap: (){
             Navigator.push(
@@ -321,7 +331,14 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Icon(Icons.star, color: Colors.amber),
+                      GestureDetector(
+                        onTap: () {
+                          _addRemoveFavoriteCompetition(competition);
+                        },
+                        child:
+                         Icon(
+                          isFavouriteCompetition ? Icons.favorite : Icons.favorite_border, color: Colors.red)
+                        ),
                     ],
                   ),
                 ],
@@ -339,4 +356,30 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
       final total = validReviews.map((r) => r.rating!).reduce((a, b) => a + b);
       return total / validReviews.length;
     }
+    
+  Future<void> _loadFavoriteCompetitionsForUser() async{
+    final result = await favoritesProvider.get();
+
+    setState(() {
+      favoriteCompetitionsResult = result;
+    });
+  }
+      
+  void _addRemoveFavoriteCompetition(Competitions competition) async{
+    final isFavouriteCompetition = favoriteCompetitionsResult?.result.any((element) => element.competition?.id == competition.id) ?? false;
+    if(isFavouriteCompetition)
+    {
+      var favoriteCompetition = favoriteCompetitionsResult!.result.firstWhere((element) => element.competition?.id == competition.id);
+      await favoritesProvider.delete(favoriteCompetition.id!);
+    }
+    else
+    {
+      var request = {
+        'userId' : AuthProvider.id,
+        'competitionId' : competition.id
+      };
+      await favoritesProvider.insert(request);
+    }
+      await _loadFavoriteCompetitionsForUser();
+  }
 }

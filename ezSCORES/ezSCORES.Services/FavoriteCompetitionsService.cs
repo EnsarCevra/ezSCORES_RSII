@@ -30,6 +30,10 @@ namespace ezSCORES.Services
 		{
 			query = query.Where(x => x.UserId == _activeUserService.GetActiveUserId());
 			query = query.Include(x => x.Competition);
+			if(search.Name != null)
+			{
+				query = query.Where(x => x.Competition.Name.ToLower().StartsWith(search.Name.ToLower()));
+			}
 			return base.AddFilter(search, query);
 		}
 	}

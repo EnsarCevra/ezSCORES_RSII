@@ -8,6 +8,7 @@ import 'package:ezscores_mobile/providers/FavoriteCompetitionsProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:ezscores_mobile/screens/competition_details_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
 class FavoriteCompetitionsListScreen extends StatefulWidget {
@@ -16,7 +17,9 @@ class FavoriteCompetitionsListScreen extends StatefulWidget {
 }
 
 class _FavoriteCompetitionsListScreenState extends State<FavoriteCompetitionsListScreen> {
+  final _formKey = GlobalKey<FormBuilderState>();
   final TextEditingController _searchController = TextEditingController();
+  
   late FavoriteCompetitionsProvider favoriteCompetitionsProvider;
   int? selectedStatus;
   int? selectedCompetitionType;
@@ -72,8 +75,47 @@ class _FavoriteCompetitionsListScreenState extends State<FavoriteCompetitionsLis
         padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
         child: Column(
           children: [
+            _buildSearch(),
             Expanded(child: _buildCompetitionsResultView())
           ],
+        ),
+      ),
+    );
+  }
+  _buildSearch()
+  {
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: FormBuilder(
+        key: _formKey,
+        child: TextField(
+          controller: _searchController,
+          style: textTheme.bodySmall,
+          decoration: InputDecoration(
+            labelText: "Naziv takmičenja",
+            labelStyle: textTheme.bodySmall,
+            prefixIcon: const Icon(Icons.search, size: 18),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            suffixIcon: _searchController.text != ""
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        _paginationController.loadPage();
+                      },
+                    )
+                  : null,
+          ),
+          onChanged: (value){
+            _searchController.text = value;
+            _paginationController.loadPage();
+          },
         ),
       ),
     );
@@ -110,7 +152,7 @@ class _FavoriteCompetitionsListScreenState extends State<FavoriteCompetitionsLis
   }
   _buildCompetitionCard(BuildContext context, FavoriteCompetitions favoriteCompetitions) {
         final textTheme = Theme.of(context).textTheme;
-
+        final isFavouriteCompetition = _paginationController.items.any((element) => element.competition?.id == favoriteCompetitions.competition?.id); 
         return InkWell(
           onTap: (){
             Navigator.push(
@@ -188,7 +230,14 @@ class _FavoriteCompetitionsListScreenState extends State<FavoriteCompetitionsLis
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Icon(Icons.star, color: Colors.amber),
+                      GestureDetector(
+                        onTap: () {
+                          _removeFavoriteCompetition(favoriteCompetitions);
+                        },
+                        child:
+                         Icon(
+                          isFavouriteCompetition ? Icons.favorite : Icons.favorite_border, color: Colors.red)
+                        ),
                     ],
                   ),
                 ],
@@ -206,4 +255,9 @@ class _FavoriteCompetitionsListScreenState extends State<FavoriteCompetitionsLis
       final total = validReviews.map((r) => r.rating!).reduce((a, b) => a + b);
       return total / validReviews.length;
     }
+    
+      void _removeFavoriteCompetition(FavoriteCompetitions favoriteCompetition) async{
+        await favoriteCompetitionsProvider.delete(favoriteCompetition.id!);
+        _paginationController.loadPage();
+      }
 }
