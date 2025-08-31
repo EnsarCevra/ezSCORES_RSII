@@ -4,7 +4,6 @@ import 'package:ezscores_mobile/models/cities.dart';
 import 'package:ezscores_mobile/providers/CitiesProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
@@ -44,47 +43,73 @@ String formatTimeOnly(DateTime? date) {
   return DateFormat('HH:mm').format(date.toLocal());
 }
 
-void showBottomRightNotification(BuildContext context, String message) {
-   final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        bottom: 20,
-        right: 20,
-        child: Material(
-          color: Colors.transparent,
-          child: AnimatedOpacity(
-            duration: Duration(milliseconds: 300),
-            opacity: 1,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 8,
-                    offset: Offset(2, 2),
-                  ),
-                ],
-              ),
-              child: Text(
-                message,
-                style: TextStyle(color: Colors.white),
+void showMobileNotification(BuildContext context, String message) {
+  final overlay = Overlay.of(context);
+  late OverlayEntry overlayEntry;
+  late AnimationController controller;
+  late Animation<Offset> offsetAnimation;
+
+  controller = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: Navigator.of(context), // Use Navigator's TickerProvider
+  );
+
+  offsetAnimation = Tween<Offset>(
+    begin: const Offset(0, 1), // starts just below screen
+    end: const Offset(0, 0),   // slides into place
+  ).animate(CurvedAnimation(
+    parent: controller,
+    curve: Curves.easeOut,
+  ));
+
+  overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      bottom: 40,
+      left: 20,
+      right: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: SlideTransition(
+          position: offsetAnimation,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
               ),
             ),
           ),
         ),
       ),
-    );
+    ),
+  );
 
   overlay.insert(overlayEntry);
+  controller.forward(); // start the animation
 
-  // Remove it after 3 seconds
-  Future.delayed(Duration(seconds: 5), () {
+  // Remove after 3 seconds with reverse animation
+  Future.delayed(const Duration(seconds: 3), () async {
+    await controller.reverse();
     overlayEntry.remove();
+    controller.dispose();
   });
 }
+
+
 
 void showErrorBottomNotification(BuildContext context, String message) {
   final overlay = Overlay.of(context);
@@ -95,14 +120,14 @@ void showErrorBottomNotification(BuildContext context, String message) {
         child: Material(
           color: Colors.transparent,
           child: AnimatedOpacity(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             opacity: 1,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.red,
                 borderRadius: BorderRadius.circular(8),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 8,
@@ -112,7 +137,7 @@ void showErrorBottomNotification(BuildContext context, String message) {
               ),
               child: Text(
                 message,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
@@ -123,7 +148,7 @@ void showErrorBottomNotification(BuildContext context, String message) {
   overlay.insert(overlayEntry);
 
   // Remove it after 3 seconds
-  Future.delayed(Duration(seconds: 5), () {
+  Future.delayed(const Duration(seconds: 5), () {
     overlayEntry.remove();
   });
 }
@@ -172,7 +197,7 @@ Widget buildCityTypeAheadField({
                 errorText: field.errorText,
                 suffixIcon: selectedCity != null
                     ? IconButton(
-                        icon: Icon(Icons.clear),
+                        icon: const Icon(Icons.clear),
                         onPressed: () {
                           controller.clear();
                           onChanged(null);
@@ -242,7 +267,7 @@ Future<void> deleteEntity({
       await deleteFunction(entityId);
 
       if (context.mounted) {
-        showBottomRightNotification(context, 'Stavka uspješno obrisana');
+        showMobileNotification(context, 'Stavka uspješno obrisana');
         onDeleted();
       }
     } catch (e) {

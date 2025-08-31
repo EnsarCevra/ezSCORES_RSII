@@ -4,7 +4,10 @@ import 'package:ezscores_mobile/models/competitionsReferees.dart';
 import 'package:ezscores_mobile/models/competitionsSponsors.dart';
 import 'package:ezscores_mobile/models/enums/competitionStatus.dart';
 import 'package:ezscores_mobile/models/enums/competitionType.dart';
+import 'package:ezscores_mobile/models/reviews.dart';
 import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
+import 'package:ezscores_mobile/providers/ReviewsProvider.dart';
+import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:ezscores_mobile/screens/scores_screen.dart';
 import 'package:ezscores_mobile/screens/standings_screen.dart';
@@ -26,20 +29,38 @@ class _CompetitionsDetailsScreenState
   late CompetitionProvider competitionProvider;
   Competitions? competition;
 
+  late ReviewsProvider reviewsProvider;
+  Reviews? currentUserReview;
+  int _selectedRating = 0;
+
   @override
   void initState() {
     super.initState();
     competitionProvider = context.read<CompetitionProvider>();
+    reviewsProvider = context.read<ReviewsProvider>();
     initForm();
   }
 
   Future<void> initForm() async {
     if (widget.competitionId != null) {
-      var competitionData =
-          await competitionProvider.getById(widget.competitionId!);
-      setState(() {
-        competition = competitionData;
-      });
+      
+      var competitionData = await competitionProvider.getById(widget.competitionId!);
+      currentUserReview = competitionData.reviews?.where(
+        (element) => element.userId == AuthProvider.id,
+      ).firstOrNull;
+      if(currentUserReview != null)
+      {
+        setState(() {
+          competition = competitionData;
+          _selectedRating = currentUserReview!.rating!.toInt();
+        });
+      }
+      else
+      {
+        setState(() {
+          competition = competitionData;
+        });
+      }
     }
   }
 
@@ -51,14 +72,13 @@ class _CompetitionsDetailsScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(competition!.name ?? "Detalji takmičenja", style: TextStyle(fontSize: 15),),
+        title: Text(competition!.name ?? "Detalji takmičenja", style: const TextStyle(fontSize: 15))
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header section
             _buildHeader(),
             const SizedBox(height: 5),
             Divider(
@@ -66,116 +86,20 @@ class _CompetitionsDetailsScreenState
               thickness: 0.5,
               color: Colors.grey.withOpacity(0.5),
             ),
-            // General Info
-            if (competition!.status == CompetitionStatus.underway) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) => ResultsScreen(competition: competition!,),
-                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                return FadeTransition(opacity: animation, child: child);
-                              },
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.sports_soccer),
-                        label: const Text('Rezultati'),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) => StandingsScreen(competition: competition!,),
-                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                return FadeTransition(opacity: animation, child: child);
-                              },
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.leaderboard),
-                        label: const Text('Poredak'),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (competition!.status == CompetitionStatus.underway
+             || competition!.status == CompetitionStatus.finished) ...[
+              _buildDetailsButtons(),
             ],
+            if( (competition!.status == CompetitionStatus.underway
+             || competition!.status == CompetitionStatus.finished)
+             && AuthProvider.id != null)_buildReviewController(),
             const SizedBox(height: 10),
-            _buildSectionTitle("Opšte informacije"),
-            const SizedBox(height: 8),
-            _buildInfoRow(
-              icon: Icons.calendar_today,
-              label: "Prijave do",
-              value: formatDateOnly(competition!.applicationEndDate),
-            ),
-            _buildInfoRow(
-              icon: Icons.calendar_today,
-              label: "Datum početka",
-              value: formatDateOnly(competition!.startDate),
-            ),
-            _buildInfoRow(
-              icon: Icons.sports,
-              label: "Tip takmičenja",
-              value: competition!.competitionType!.displayName,
-            ),
-            _buildInfoRow(
-              icon: Icons.numbers,
-              label: "Broj timova",
-              value: competition!.maxTeamCount.toString(),
-            ),
-            _buildInfoRow(
-              icon: Icons.numbers,
-              label: "Max igrača po timu",
-              value: competition!.maxPlayersPerTeam.toString(),
-            ),
-            _buildInfoRow(
-              icon: Icons.monetization_on,
-              label: "Kotizacija",
-              value: "${competition!.fee.toString()} KM"
-            ),
-            _buildInfoRow(
-              icon: Icons.group_add,
-              label: "Selekcija",
-              value: competition!.selection!.name!
-            ),
-            _buildInfoRow(
-              icon: Icons.location_city,
-              label: "Grad",
-              value: competition!.city!.name!
-            ),
+            _buildGeneralInfo(),
             const SizedBox(height: 24),
-
-            // Contact Info
             if(competition!.user != null)_buildContactInfo(),
-
             const SizedBox(height: 24),
-            
             buildSponsorsSection(competition!.competitionsSponsors!),
-
             const SizedBox(height: 24),
-
             buildRefereesSection(competition!.competitionsReferees!)
           ],
         ),
@@ -445,6 +369,156 @@ class _CompetitionsDetailsScreenState
           value: competition!.user!.phoneNumber!,
         ),
       ],
+    );
+  }
+  
+  _buildGeneralInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle("Opšte informacije"),
+        const SizedBox(height: 8),
+        _buildInfoRow(
+          icon: Icons.calendar_today,
+          label: "Prijave do",
+          value: formatDateOnly(competition!.applicationEndDate),
+        ),
+        _buildInfoRow(
+          icon: Icons.calendar_today,
+          label: "Datum početka",
+          value: formatDateOnly(competition!.startDate),
+        ),
+        _buildInfoRow(
+          icon: Icons.sports,
+          label: "Tip takmičenja",
+          value: competition!.competitionType!.displayName,
+        ),
+        _buildInfoRow(
+          icon: Icons.numbers,
+          label: "Broj timova",
+          value: competition!.maxTeamCount.toString(),
+        ),
+        _buildInfoRow(
+          icon: Icons.numbers,
+          label: "Max igrača po timu",
+          value: competition!.maxPlayersPerTeam.toString(),
+        ),
+        _buildInfoRow(
+          icon: Icons.monetization_on,
+          label: "Kotizacija",
+          value: "${competition!.fee.toString()} KM"
+        ),
+        _buildInfoRow(
+          icon: Icons.group_add,
+          label: "Selekcija",
+          value: competition!.selection!.name!
+        ),
+        _buildInfoRow(
+          icon: Icons.location_city,
+          label: "Grad",
+          value: competition!.city!.name!
+        )
+      ],
+    );
+  }
+  
+  Widget _buildReviewController() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle("Ocjeni takmičenje"),
+        const SizedBox(height: 8),
+        Row(
+          children: List.generate(5, (index) {
+            final starIndex = index + 1;
+            return IconButton(
+              onPressed: () async{
+                var request = {"rating": starIndex};
+                if(currentUserReview == null)
+                {
+                  request['userId'] = AuthProvider.id!;
+                  request['competitionId'] = widget.competitionId!;
+                  await reviewsProvider.insert(request);
+                  showMobileNotification(context, 'Ocjena dodana');
+                }
+                else{
+                  //if its the same rating there is no need to update
+                  if(currentUserReview!.rating!.toInt() != starIndex)
+                  {
+                    await reviewsProvider.update(currentUserReview!.id!, request);
+                    currentUserReview!.rating = starIndex.toDouble();//update model without API call
+                    showMobileNotification(context, 'Ocjena ažurirana');
+                  }
+                }
+                setState(() {
+                  _selectedRating = starIndex;
+                });
+              },
+              icon: Icon(
+                _selectedRating >= starIndex ? Icons.star : Icons.star_border,
+                color: Colors.amber,
+                size: 32,
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+  
+  _buildDetailsButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => ResultsScreen(competition: competition!,),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ),
+                );
+              },
+              icon: const Icon(Icons.sports_soccer),
+              label: const Text('Rezultati'),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => StandingsScreen(competition: competition!,),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ),
+                );
+              },
+              icon: const Icon(Icons.leaderboard),
+              label: const Text('Poredak'),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

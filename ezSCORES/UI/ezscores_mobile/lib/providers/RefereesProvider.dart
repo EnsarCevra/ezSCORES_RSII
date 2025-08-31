@@ -7,7 +7,6 @@ class RefereeProvider extends BaseProvider<Referees>
 
   @override
   Referees fromJson(data) {
-    // TODO: implement fromJson
     return Referees.fromJson(data);
   }
 }

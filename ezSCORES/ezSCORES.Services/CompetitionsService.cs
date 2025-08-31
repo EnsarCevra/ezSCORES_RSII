@@ -103,6 +103,7 @@ namespace ezSCORES.Services
 						.Include(x => x.CompetitionsSponsors)
 						.ThenInclude(x => x.Sponsor)
 						.Include(x => x.Rewards)
+						.Include(x => x.Reviews)
 						.Include(x => x.City)
 						.Include(x => x.Selection)
 						.Include(x=>x.User).FirstOrDefault();

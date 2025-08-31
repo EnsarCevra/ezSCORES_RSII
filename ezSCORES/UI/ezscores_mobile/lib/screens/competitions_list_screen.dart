@@ -48,6 +48,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
           "name": _searchController.text,
           "status" : selectedStatus,
           "competitionType" : selectedCompetitionType,
+          "isReviewsIncluded" : true,
           "page": page,
           "pageSize": pageSize,
         };
