@@ -1,4 +1,5 @@
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
+import 'package:ezscores_mobile/helpers/not_logged_in_widget.dart';
 import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
 import 'package:ezscores_mobile/main.dart';
 import 'package:ezscores_mobile/models/search_result.dart';
@@ -8,6 +9,7 @@ import 'package:ezscores_mobile/providers/SelectionProvider.dart';
 import 'package:ezscores_mobile/providers/TeamProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/login_screen.dart';
 import 'package:ezscores_mobile/screens/teams_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -82,7 +84,11 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
           LogoutButton()
         ],
       ),
-      body: Padding(
+      body: !AuthProvider.isLoggedIn() ? NotLoggedInWidget(onLogin: (){
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginPage()));
+      })
+      : Padding(
         padding: const EdgeInsets.all(12.0),
         child: FormBuilder(
           key: _formKey,
@@ -95,7 +101,8 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: !AuthProvider.isLoggedIn() ? const SizedBox.shrink()
+      : FloatingActionButton(
         backgroundColor: Colors.blue,
         onPressed: () async {
           final created = await Navigator.push(

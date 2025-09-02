@@ -8,6 +8,7 @@ using ezSCORES.Model.Requests.GroupRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,6 +33,12 @@ namespace ezSCORES.API.Controllers
 		{
 			(_service as IFixturesService).FinishFixture(id);
 		}
+		[AllowAnonymous]
+		public override Fixtures GetById(int id)
+		{
+			return base.GetById(id);
+		}
+		[AllowAnonymous]
 		[HttpGet("get-fixtures-by-competition")]
 		public List<FixtureDTO> GetFixturesByCompetition([FromQuery] GetFixturesByCompetitionRequest request)
 		{

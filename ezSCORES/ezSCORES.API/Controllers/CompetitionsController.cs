@@ -28,6 +28,11 @@ namespace ezSCORES.API.Controllers
 		{
 			return base.GetList(searchObject);
 		}
+		[AllowAnonymous]
+		public override Competitions GetById(int id)
+		{
+			return base.GetById(id);
+		}
 		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
 		public override Competitions Insert(CompetitionsInsertRequest request)
 		{

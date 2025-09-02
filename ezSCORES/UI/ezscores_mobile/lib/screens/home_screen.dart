@@ -79,8 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(),
-          _buildNavigationButtons(),
+          if(AuthProvider.isLoggedIn())_buildHeader(),
+          if(AuthProvider.isLoggedIn())_buildNavigationButtons(),
           const Divider(),
           _buildMainContent(),
         ],

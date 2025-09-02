@@ -13,4 +13,5 @@ class AuthProvider
   static int? roleID;
   static String? roleName;
   static String? roleDecription;
+  static isLoggedIn(){return id == null ? false : true;}
 }

@@ -5,6 +5,7 @@ using ezSCORES.Model.Requests.GroupRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ namespace ezSCORES.API.Controllers
 		public GroupsController(IGroupsService service) : base (service)
 		{
 		}
+		[AllowAnonymous]
 		[HttpGet("{competitionId}/get-group-standings")]
 		public List<GroupStandingsDTO> GetGroupStandings(int competitionId)
 		{

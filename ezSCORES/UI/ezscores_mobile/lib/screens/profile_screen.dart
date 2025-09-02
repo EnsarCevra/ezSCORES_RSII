@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:ezscores_mobile/dialogs/success_dialog.dart';
-import 'package:ezscores_mobile/main.dart';
+import 'package:ezscores_mobile/helpers/not_logged_in_widget.dart';
 import 'package:ezscores_mobile/providers/UserProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/login_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -33,8 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     userProvider = context.read<UserProvider>();
-
-    // Fill user with current auth if null
     widget.user = Users(
       id: AuthProvider.id,
       firstName: AuthProvider.firstName,
@@ -61,29 +60,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //if user is not logged in
-    if(AuthProvider.id == null)
-    {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Center(child: Text("Niste logirani!"),),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-            }, child: const Text("Prijavi se"))
-        ],
-      );
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text("Postavke profila", style: TextStyle(fontSize: 15),),
         actions: const [LogoutButton()],
       ),
-      body: SingleChildScrollView(
+      body: !AuthProvider.isLoggedIn() ? NotLoggedInWidget(onLogin: (){
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginPage()));
+      })
+      : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [

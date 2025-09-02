@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:ezscores_mobile/main.dart';
 import 'package:ezscores_mobile/models/cities.dart';
 import 'package:ezscores_mobile/providers/CitiesProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
+import 'package:ezscores_mobile/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -307,19 +307,20 @@ class LogoutButton extends StatelessWidget {
     AuthProvider.roleDecription = null;
     AuthProvider.roleName = null;
 
-    // navigate back to root
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const MyApp()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.logout),
-      tooltip: "Logout",
-      onPressed: () => _logout(context),
-    );
+    return AuthProvider.isLoggedIn()
+      ? IconButton(
+          icon: const Icon(Icons.logout),
+          tooltip: "Logout",
+          onPressed: () => _logout(context),
+        )
+      : const SizedBox.shrink();
   }
 }
 

@@ -5,6 +5,7 @@ using ezSCORES.Model.Requests.MatchRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ namespace ezSCORES.API.Controllers
 		public MatchesController(IMatchesService service) : base (service)
 		{
 		}
+		[AllowAnonymous]
 		[HttpGet("get-match-details/{id}")]
 		public MatchDTO GetMatchDetails(int id)
 		{
@@ -33,6 +35,7 @@ namespace ezSCORES.API.Controllers
 		{
 			(_service as IMatchesService).FinishMatch(id, request);
 		}
+		[AllowAnonymous]
 		[HttpGet("get-matches-by-date")]
 		public PagedResult<MatchesByDateDTO> GetMatchesByDate([FromQuery]MatchesByDateSearchObject search)
 		{

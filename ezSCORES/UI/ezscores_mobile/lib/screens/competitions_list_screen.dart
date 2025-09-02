@@ -332,7 +332,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      GestureDetector(
+                      if(AuthProvider.isLoggedIn())GestureDetector(
                         onTap: () {
                           _addRemoveFavoriteCompetition(competition);
                         },
@@ -359,11 +359,14 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
     }
     
   Future<void> _loadFavoriteCompetitionsForUser() async{
-    final result = await favoritesProvider.get();
+    if(AuthProvider.isLoggedIn())
+    {
+      final result = await favoritesProvider.get();
 
-    setState(() {
-      favoriteCompetitionsResult = result;
-    });
+      setState(() {
+        favoriteCompetitionsResult = result;
+      });
+    }
   }
       
   void _addRemoveFavoriteCompetition(Competitions competition) async{

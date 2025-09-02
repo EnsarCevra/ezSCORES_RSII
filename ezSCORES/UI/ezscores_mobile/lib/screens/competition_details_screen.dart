@@ -45,9 +45,12 @@ class _CompetitionsDetailsScreenState
     if (widget.competitionId != null) {
       
       var competitionData = await competitionProvider.getById(widget.competitionId!);
-      currentUserReview = competitionData.reviews?.where(
-        (element) => element.userId == AuthProvider.id,
-      ).firstOrNull;
+      if(AuthProvider.isLoggedIn())
+      {
+        currentUserReview = competitionData.reviews?.where(
+          (element) => element.userId == AuthProvider.id,
+        ).firstOrNull;
+      }
       if(currentUserReview != null)
       {
         setState(() {
@@ -92,7 +95,7 @@ class _CompetitionsDetailsScreenState
             ],
             if( (competition!.status == CompetitionStatus.underway
              || competition!.status == CompetitionStatus.finished)
-             && AuthProvider.id != null)_buildReviewController(),
+             && AuthProvider.isLoggedIn())_buildReviewController(),
             const SizedBox(height: 10),
             _buildGeneralInfo(),
             const SizedBox(height: 24),
@@ -104,7 +107,8 @@ class _CompetitionsDetailsScreenState
           ],
         ),
       ),
-      bottomNavigationBar: competition!.status == CompetitionStatus.applicationsOpen ? SizedBox(
+      bottomNavigationBar: competition!.status == CompetitionStatus.applicationsOpen 
+      && AuthProvider.isLoggedIn() ? SizedBox(
       width: double.infinity,
       height: 44,
       child: ElevatedButton(
