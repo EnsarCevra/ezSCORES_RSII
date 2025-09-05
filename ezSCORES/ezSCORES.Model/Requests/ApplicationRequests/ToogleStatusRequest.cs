@@ -6,6 +6,6 @@ namespace ezSCORES.Model.Requests.ApplicationRequests
 {
 	public class ToogleStatusRequest
 	{
-		public bool Status { get; set; }
+		public bool isAccepted { get; set; }
 	}
 }

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class NotLoggedInWidget extends StatelessWidget {
   final VoidCallback onLogin;
+  final String text;
 
-  const NotLoggedInWidget({super.key, required this.onLogin});
+  const NotLoggedInWidget({super.key, required this.text, required this.onLogin});
 
   @override
   @override
@@ -14,10 +15,10 @@ class NotLoggedInWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              "Niste prijavljeni, ne možete pristupiti ovom sadržaju.",
+            Text(
+              text,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),

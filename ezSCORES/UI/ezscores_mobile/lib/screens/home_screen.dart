@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        ElevatedButton(
+        if(AuthProvider.roleName == 'Manager')ElevatedButton(
           onPressed: () {
             // TODO: Navigate to Prijave screen
           },

@@ -84,7 +84,9 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
           LogoutButton()
         ],
       ),
-      body: !AuthProvider.isLoggedIn() ? NotLoggedInWidget(onLogin: (){
+      body: !AuthProvider.isLoggedIn() || AuthProvider.roleName == 'Spectator' ? NotLoggedInWidget(
+        text: 'Prijavite se kao Menadžer da biste pristupili ovom sadržaju!',
+        onLogin: (){
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const LoginPage()));
       })
@@ -101,7 +103,7 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
           ),
         ),
       ),
-      floatingActionButton: !AuthProvider.isLoggedIn() ? const SizedBox.shrink()
+      floatingActionButton: !AuthProvider.isLoggedIn() || AuthProvider.roleName == 'Spectator' ? const SizedBox.shrink()
       : FloatingActionButton(
         backgroundColor: Colors.blue,
         onPressed: () async {

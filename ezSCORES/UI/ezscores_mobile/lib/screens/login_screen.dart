@@ -1,8 +1,8 @@
 import 'package:ezscores_mobile/providers/UserProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/base_provider.dart';
-import 'package:ezscores_mobile/screens/home_screen.dart';
 import 'package:ezscores_mobile/screens/main_navigation_screen.dart';
+import 'package:ezscores_mobile/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget{
@@ -134,7 +134,9 @@ class _LoginPageState extends State<LoginPage>
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: () {
-                  
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => RegisterScreen()),
+                  );
                 },
                 child: const Text(
                   "Nemate račun? Kreirajte ga ovdje!",

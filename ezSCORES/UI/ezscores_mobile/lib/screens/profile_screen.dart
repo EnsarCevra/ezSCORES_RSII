@@ -65,7 +65,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text("Postavke profila", style: TextStyle(fontSize: 15),),
         actions: const [LogoutButton()],
       ),
-      body: !AuthProvider.isLoggedIn() ? NotLoggedInWidget(onLogin: (){
+      body: !AuthProvider.isLoggedIn() ? NotLoggedInWidget(
+        text: 'Niste prijavljeni, ne možete pristupiti ovom sadržaju!',
+        onLogin: (){
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const LoginPage()));
       })
