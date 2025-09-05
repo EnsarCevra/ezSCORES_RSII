@@ -114,66 +114,66 @@ class _TeamsDetailsScreenState extends State<TeamsDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.team == null ? "Nova ekipa" : "Detalji ekipe",
-        style: const TextStyle(fontSize: 15),),
+        title: Text(
+          widget.team == null ? "Nova ekipa" : "Detalji ekipe",
+          style: const TextStyle(fontSize: 15),
+        ),
       ),
       body: _isLoading
           ? const AppLoading()
-          : Padding(
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: FormBuilder(
                 key: _formKey,
                 initialValue: _initialValue,
-                child: ListView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    /// Team image
                     FormBuilderField<String>(
                       name: "imageId",
                       builder: (field) => Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _base64Image != null
-                                ? Center(
-                                  child: Image.memory(
-                                      base64Decode(_base64Image!),
-                                      height: 150,
-                                      fit: BoxFit.cover,
-                                    ),
-                                )
-                                : Center(
-                                  child: Image.asset(
-                                      'assets/images/team_placeholder.png',
-                                      height: 150,
-                                      fit: BoxFit.cover,
-                                    ),
+                                ? Image.memory(
+                                    base64Decode(_base64Image!),
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/images/team_placeholder.png',
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  ),
+                            const SizedBox(height: 12),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final result = await _pickImage();
+                                if (result != null) {
+                                  field.didChange(result);
+                                  setState(() {});
+                                }
+                              },
+                              icon: const Icon(Icons.image),
+                              label: Text(_base64Image == null
+                                  ? "Odaberi sliku"
+                                  : "Promijeni sliku"),
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                            const SizedBox(height: 8),
-                            Center(
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  final result = await _pickImage();
-                                  if (result != null) {
-                                    field.didChange(result);
-                                    setState(() {});
-                                  }
-                                },
-                                icon: const Icon(Icons.image),
-                                label: Text(_base64Image == null
-                                    ? "Odaberi sliku"
-                                    : "Promijeni sliku"),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    /// Team name
+                    const SizedBox(height: 20),
                     FormBuilderTextField(
                       name: "name",
-                      decoration: const InputDecoration(labelText: "Naziv"),
+                      decoration: _inputDecoration("Naziv"),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(
@@ -182,16 +182,12 @@ class _TeamsDetailsScreenState extends State<TeamsDetailsScreen> {
                             errorText: 'Naziv mora imati barem 2 slova'),
                       ]),
                     ),
-                    const SizedBox(height: 16),
-
-                    /// Selection dropdown
+                    const SizedBox(height: 20),
                     FormBuilderDropdown<int>(
                       name: "selectionId",
-                      decoration: const InputDecoration(labelText: "Selekcija"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(
-                            errorText: 'Selekcija je obavezna'),
-                      ]),
+                      decoration: _inputDecoration("Selekcija"),
+                      validator: FormBuilderValidators.required(
+                          errorText: 'Selekcija je obavezna'),
                       items: selectionResult?.result
                               .map((item) => DropdownMenuItem(
                                     value: item.id,
@@ -200,20 +196,50 @@ class _TeamsDetailsScreenState extends State<TeamsDetailsScreen> {
                               .toList() ??
                           [],
                     ),
-                    const SizedBox(height: 32),
-
-                    /// Save button
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: _saveTeam,
-                        child: const Text("Sačuvaj"),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: _saveTeam,
+                      child: const Text(
+                        "Sačuvaj",
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Colors.grey,
+      ),
+      filled: true,
+      fillColor: Colors.grey.shade100,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.blue.shade400, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      errorMaxLines: 3,
     );
   }
 }
