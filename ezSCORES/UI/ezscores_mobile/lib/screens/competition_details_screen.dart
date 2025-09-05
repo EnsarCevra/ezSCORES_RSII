@@ -9,6 +9,7 @@ import 'package:ezscores_mobile/providers/CompetitionsProvider.dart';
 import 'package:ezscores_mobile/providers/ReviewsProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/apply_step_one_screen.dart';
 import 'package:ezscores_mobile/screens/scores_screen.dart';
 import 'package:ezscores_mobile/screens/standings_screen.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,14 @@ class _CompetitionsDetailsScreenState
       height: 44,
       child: ElevatedButton(
         onPressed: () {
-          // Handle apply logic
+          Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => ApplyStepOneScreen(competition: competition!,),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ),
+                );
         },
         style: ElevatedButton.styleFrom(
           shape: const RoundedRectangleBorder(

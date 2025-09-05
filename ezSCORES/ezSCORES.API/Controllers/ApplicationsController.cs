@@ -25,7 +25,7 @@ namespace ezSCORES.API.Controllers
 		{
 			return (_service as IApplicationService).ToogleStatus(id, request);
 		}
-		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer + "," + Model.Constants.Roles.Manager)]
 		[HttpPost("validate-team")]
 		public void ValidateTeam(ValidateTeamRequest request)
 		{

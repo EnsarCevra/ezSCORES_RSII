@@ -24,7 +24,7 @@ class ApplicationProvider extends BaseProvider<Applications>
     http.Response response;
     try {
       response = await http.patch(uri, headers: headers, body: body);
-    } on UserException catch (e) {
+    } on UserException {
       rethrow;
     }
     if (isValidResponse(response)) {
@@ -32,6 +32,43 @@ class ApplicationProvider extends BaseProvider<Applications>
       return fromJson(data);
     } else {
       throw UserException("Unknown error.");
+    }
+  }
+
+  Future<void> validateTeam([dynamic request]) async {
+    var url = "${BaseProvider.baseUrl}Applications/validate-team";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+    
+    var jsonRequest = jsonEncode(request);
+
+    http.Response response;
+    try {
+      response = await http.post(uri, headers: headers, body: jsonRequest);
+    } on UserException {
+      rethrow;
+    }
+
+    if (!isValidResponse(response)) {
+      throw UserException("Unknown error while validating team.");
+    }
+  }
+  Future<void> validatePlayers([dynamic request]) async {
+    var url = "${BaseProvider.baseUrl}Applications/validate-players";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+    
+    var jsonRequest = jsonEncode(request);
+
+    http.Response response;
+    try {
+      response = await http.post(uri, headers: headers, body: jsonRequest);
+    } on UserException {
+      rethrow;
+    }
+
+    if (!isValidResponse(response)) {
+      throw UserException("Unknown error while validating players.");
     }
   }
 }

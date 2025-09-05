@@ -51,12 +51,12 @@ void showMobileNotification(BuildContext context, String message) {
 
   controller = AnimationController(
     duration: const Duration(milliseconds: 300),
-    vsync: Navigator.of(context), // Use Navigator's TickerProvider
+    vsync: Navigator.of(context),
   );
 
   offsetAnimation = Tween<Offset>(
-    begin: const Offset(0, 1), // starts just below screen
-    end: const Offset(0, 0),   // slides into place
+    begin: const Offset(0, 1),
+    end: const Offset(0, 0),
   ).animate(CurvedAnimation(
     parent: controller,
     curve: Curves.easeOut,
@@ -99,9 +99,73 @@ void showMobileNotification(BuildContext context, String message) {
   );
 
   overlay.insert(overlayEntry);
-  controller.forward(); // start the animation
+  controller.forward();
 
-  // Remove after 3 seconds with reverse animation
+  Future.delayed(const Duration(seconds: 3), () async {
+    await controller.reverse();
+    overlayEntry.remove();
+    controller.dispose();
+  });
+}
+
+void showMobileErrorNotification(BuildContext context, String message) {
+  final overlay = Overlay.of(context);
+  late OverlayEntry overlayEntry;
+  late AnimationController controller;
+  late Animation<Offset> offsetAnimation;
+
+  controller = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: Navigator.of(context),
+  );
+
+  offsetAnimation = Tween<Offset>(
+    begin: const Offset(0, 1),
+    end: const Offset(0, 0),
+  ).animate(CurvedAnimation(
+    parent: controller,
+    curve: Curves.easeOut,
+  ));
+
+  overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      bottom: 40,
+      left: 20,
+      right: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: SlideTransition(
+          position: offsetAnimation,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+  controller.forward();
+
   Future.delayed(const Duration(seconds: 3), () async {
     await controller.reverse();
     overlayEntry.remove();

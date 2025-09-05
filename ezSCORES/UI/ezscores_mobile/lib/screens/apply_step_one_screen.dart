@@ -1,25 +1,25 @@
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
-import 'package:ezscores_mobile/helpers/not_logged_in_widget.dart';
 import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/models/selections.dart';
 import 'package:ezscores_mobile/models/teams.dart';
+import 'package:ezscores_mobile/providers/ApplicationsProvider.dart';
 import 'package:ezscores_mobile/providers/SelectionProvider.dart';
 import 'package:ezscores_mobile/providers/TeamProvider.dart';
-import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
-import 'package:ezscores_mobile/screens/login_screen.dart';
-import 'package:ezscores_mobile/screens/teams_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
-class TeamsListScreen extends StatefulWidget {
+class ApplyStepOneScreen extends StatefulWidget {
+  final Competitions competition;
+  const ApplyStepOneScreen({super.key, required this.competition});
   @override
-  State<TeamsListScreen> createState() => _TeamsListScreenState();
+  State<ApplyStepOneScreen> createState() => _ApplyStepOneScreenState();
 }
 
-class _TeamsListScreenState extends State<TeamsListScreen> {
+class _ApplyStepOneScreenState extends State<ApplyStepOneScreen> {
   int? _selectedSelectionID;
   late TeamProvider teamProvider;
   late SelectionProvider selectionProvider;
@@ -30,6 +30,10 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   late PaginationController<Teams> _paginationController;
   final ScrollController _scrollController = ScrollController();
 
+
+  late ApplicationProvider applicationProvider;
+  Teams? selectedTeam;
+
   void initState() {
     super.initState();
     _searchController.addListener(() {
@@ -37,6 +41,7 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
     });
     teamProvider = context.read<TeamProvider>();
     selectionProvider = context.read<SelectionProvider>();
+    applicationProvider = context.read<ApplicationProvider>();
     _loadSelections();
     _paginationController = PaginationController<Teams>(
       fetchPage: (page, pageSize) {
@@ -77,19 +82,13 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Moje ekipe",
+        title: const Text("Prijava na takmičenje",
         style: TextStyle(fontSize: 15),),
         actions: const [
           LogoutButton()
         ],
       ),
-      body: !AuthProvider.isLoggedIn() || AuthProvider.roleName == 'Spectator' ? NotLoggedInWidget(
-        text: 'Prijavite se kao Menadžer da biste pristupili ovom sadržaju!',
-        onLogin: (){
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginPage()));
-      })
-      : Padding(
+      body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: FormBuilder(
           key: _formKey,
@@ -102,29 +101,49 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
           ),
         ),
       ),
-      floatingActionButton: !AuthProvider.isLoggedIn() || AuthProvider.roleName == 'Spectator' ? const SizedBox.shrink()
+      floatingActionButton: selectedTeam == null ? const SizedBox.shrink()
       : FloatingActionButton(
         backgroundColor: Colors.blue,
         onPressed: () async {
-          final created = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const TeamsDetailsScreen(),
-            ),
-          );
-
-          if (created == true) {
-            _paginationController.loadPage();
-          }
+        try {
+          var request = {
+            "teamId": selectedTeam!.id,
+            "competitionId": widget.competition.id
+          };
+          await applicationProvider.validateTeam(request);
+          //if validated navigate to the next screen
+        } on Exception catch (e) {
+          showMobileErrorNotification(context, e.toString());
+        }
         },
-        child: const Icon(Icons.add, size: 28, color: Colors.white,),
+        child: const Icon(Icons.next_plan, size: 28, color: Colors.white,),
       ),
     );
   }
   _buildSearch(){
     final textTheme = Theme.of(context).textTheme;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            const Icon(Icons.emoji_events),
+            const SizedBox(width: 20,),
+            Text(
+              '${widget.competition.name!} - ${widget.competition.selection?.name}'
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            const Icon(Icons.people),
+            const SizedBox(width: 20,),
+            Text(
+              '${selectedTeam?.name != null ? selectedTeam?.name! : ''}'
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
         TextField(
           controller: _searchController,
           style: textTheme.bodySmall,
@@ -144,77 +163,23 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
                     onPressed: () {
                       setState(() {
                         _searchController.clear();
+                        _paginationController.loadPage();
                       });
                     },
                   )
                 : null,
           ),
-        ),
-
-        const SizedBox(height: 10),
-
-        Row(
-          children: [
-            Expanded(
-              child: FormBuilderDropdown<int>(
-                name: "selectionId",
-                decoration: InputDecoration(
-                  labelText: "Selekcija",
-                  labelStyle: textTheme.bodySmall,
-                  isDense: true,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  suffixIcon: _selectedSelectionID != null
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              _selectedSelectionID = null;
-                              _formKey.currentState
-                                  ?.fields['selectionId']
-                                  ?.reset();
-                            });
-                          },
-                        )
-                      : null,
-                ),
-                items: [
-                  ...?selectionResult?.result.map(
-                    (item) => DropdownMenuItem(
-                      value: item.id,
-                      child: Text(item.name ?? "", style: textTheme.bodySmall,),
-                    ),
-                  )
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedSelectionID = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12),
-
-        /// Filter button
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ElevatedButton.icon(
-              onPressed: _paginationController.loadPage,
-              icon: const Icon(Icons.filter_alt, size: 18),
-              label: const Text(
-                "Filtriraj",
-                style: TextStyle(fontSize: 13),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-            ),
-          ],
+          onChanged: (value) async{
+            _searchController.text = value;
+            await _paginationController.loadPage();
+            var isSelectedTeamInSearchResult = _paginationController.items.any((element) => element.id == selectedTeam?.id);
+            if(!isSelectedTeamInSearchResult)
+            {
+              setState(() {
+                selectedTeam = null;
+              });
+            }
+          },
         ),
       ],
     );
@@ -253,24 +218,18 @@ class _TeamsListScreenState extends State<TeamsListScreen> {
 
   Widget _buildTeamCard(BuildContext context, Teams team) {
     final textTheme = Theme.of(context).textTheme;
+    final bool isSelected = selectedTeam?.id == team.id;
 
     return InkWell(
-      onTap: () async {
-        final shouldReload = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: ((context) => TeamsDetailsScreen(team: team,)
-                )
-              )
-            );
-        if(shouldReload != null && shouldReload == true)
-        {
-          _paginationController.loadPage();
-        }
+      onTap: () {
+        setState(() {
+          selectedTeam = team;
+        });
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 2,
+        color: isSelected ? Colors.blue.shade100 : Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Row(
