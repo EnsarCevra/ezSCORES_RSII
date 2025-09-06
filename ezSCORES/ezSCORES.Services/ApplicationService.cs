@@ -112,7 +112,7 @@ namespace ezSCORES.Services
 				{
 					throw new UserException("Status prijave možete mijenjati samo kada je status takmičenja prijave otvorene ili prijave zatvorene!");
 				}
-				application.IsAccepted = request.isAccepted;
+				application.IsAccepted = request.Status;
 				//if status is false application is denied - you have to delete every related entity that has been already created - CompetitionTeams and CompetitionTeamsPlayers
 				if(application.IsAccepted == false)
 				{
@@ -174,14 +174,7 @@ namespace ezSCORES.Services
 
 			if (existingPlayersOnCompetition.Any())
 			{
-				if(existingPlayersOnCompetition.Count>1)
-				{
-					throw new UserException($"Sljedeći igrači su već registrirani na takmičenju: {string.Join(",", existingPlayersOnCompetition)}");
-				}
-				else
-				{
-					throw new UserException($"Igrači je već registrovan na takmičenje: {existingPlayersOnCompetition[0]}");
-				}
+				throw new UserException($"Neki od odabranih igrača su već prijavljeni na takmičenje: {string.Join(",", existingPlayersOnCompetition)}");
 			}
 
 			var today = DateTime.Today;

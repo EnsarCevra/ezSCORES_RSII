@@ -8,6 +8,7 @@ import 'package:ezscores_mobile/providers/ApplicationsProvider.dart';
 import 'package:ezscores_mobile/providers/SelectionProvider.dart';
 import 'package:ezscores_mobile/providers/TeamProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/apply_step_two_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,9 @@ class _ApplyStepOneScreenState extends State<ApplyStepOneScreen> {
         var filter = {
           "name": _searchController.text,
           "selectionId" : _selectedSelectionID,
-          //"onlyUsersTeams" : true, //uncomment this when finished
+          "includeTeamsThatAlreadyAppliedForCompetition" : false,
+          "competitionId" : widget.competition.id,
+          "onlyUsersTeams" : true,
           "page": page,
           "pageSize": pageSize,
         };
@@ -111,7 +114,14 @@ class _ApplyStepOneScreenState extends State<ApplyStepOneScreen> {
             "competitionId": widget.competition.id
           };
           await applicationProvider.validateTeam(request);
-          //if validated navigate to the next screen
+          Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => ApplyStepTwoScreen(competition: widget.competition, selectedTeam: selectedTeam!,),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ),
+                );
         } on Exception catch (e) {
           showMobileErrorNotification(context, e.toString());
         }
@@ -125,30 +135,11 @@ class _ApplyStepOneScreenState extends State<ApplyStepOneScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const Icon(Icons.emoji_events),
-            const SizedBox(width: 20,),
-            Text(
-              '${widget.competition.name!} - ${widget.competition.selection?.name}'
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            const Icon(Icons.people),
-            const SizedBox(width: 20,),
-            Text(
-              '${selectedTeam?.name != null ? selectedTeam?.name! : ''}'
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
         TextField(
           controller: _searchController,
           style: textTheme.bodySmall,
           decoration: InputDecoration(
-            labelText: "Naziv tima",
+            labelText: "Pretraga timova",
             labelStyle: textTheme.bodySmall,
             prefixIcon: const Icon(Icons.search, size: 18),
             isDense: true,
@@ -180,6 +171,25 @@ class _ApplyStepOneScreenState extends State<ApplyStepOneScreen> {
               });
             }
           },
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const Icon(Icons.emoji_events),
+            const SizedBox(width: 20,),
+            Text(
+              '${widget.competition.name!} - ${widget.competition.selection?.name}'
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            const Icon(Icons.people),
+            const SizedBox(width: 20,),
+            Text(
+              '${selectedTeam?.name != null ? selectedTeam?.name! : ''}'
+            ),
+          ],
         ),
       ],
     );
