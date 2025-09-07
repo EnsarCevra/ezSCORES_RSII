@@ -7,6 +7,7 @@ import 'package:ezscores_mobile/providers/ApplicationsProvider.dart';
 import 'package:ezscores_mobile/providers/PlayersProvider.dart';
 import 'package:ezscores_mobile/providers/base_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/apply_step_three_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -103,14 +104,14 @@ class _ApplyStepTwoScreenState extends State<ApplyStepTwoScreen> {
             "playerIds": selectedPlayerIds
           };
           await applicationProvider.validatePlayers(request);
-          // Navigator.of(context).push(
-          //         PageRouteBuilder(
-          //           pageBuilder: (context, animation, secondaryAnimation) => ApplyStepTwoScreen(competition: widget.competition, selectedTeam: selectedTeam!,),
-          //           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          //             return FadeTransition(opacity: animation, child: child);
-          //           },
-          //         ),
-          //       );
+          Navigator.of(context).push(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => ApplyStepThreeScreen(competition: widget.competition, selectedTeam: widget.selectedTeam, selectedPlayers: selectedPlayers,),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          );
         } on UserException catch (e) {
           final parts = e.exMessage.split(':');
           String userMessage = parts.first.trim();

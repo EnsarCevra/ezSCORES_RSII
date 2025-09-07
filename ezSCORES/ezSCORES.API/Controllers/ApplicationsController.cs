@@ -42,7 +42,7 @@ namespace ezSCORES.API.Controllers
 		{
 			return base.GetList(searchObject);
 		}
-		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer + "," + Model.Constants.Roles.Manager)]
 		public override Applications Insert(ApplicationInsertRequest request)
 		{
 			return base.Insert(request);

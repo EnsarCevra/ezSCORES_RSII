@@ -418,7 +418,7 @@ class _CompetitionsDetailsScreenState
         _buildInfoRow(
           icon: Icons.monetization_on,
           label: "Kotizacija",
-          value: "${competition!.fee.toString()} KM"
+          value: competition!.fee == null ? 'Besplatno' : "${competition!.fee} KM"
         ),
         _buildInfoRow(
           icon: Icons.group_add,
@@ -450,15 +450,15 @@ class _CompetitionsDetailsScreenState
                 {
                   request['userId'] = AuthProvider.id!;
                   request['competitionId'] = widget.competitionId!;
-                  await reviewsProvider.insert(request);
+                  currentUserReview = await reviewsProvider.insert(request);
                   showMobileNotification(context, 'Ocjena dodana');
                 }
                 else{
                   //if its the same rating there is no need to update
                   if(currentUserReview!.rating!.toInt() != starIndex)
                   {
-                    await reviewsProvider.update(currentUserReview!.id!, request);
-                    currentUserReview!.rating = starIndex.toDouble();//update model without API call
+                    currentUserReview = await reviewsProvider.update(currentUserReview!.id!, request);
+                    //currentUserReview!.rating = starIndex.toDouble();//update model without API call
                     showMobileNotification(context, 'Ocjena ažurirana');
                   }
                 }

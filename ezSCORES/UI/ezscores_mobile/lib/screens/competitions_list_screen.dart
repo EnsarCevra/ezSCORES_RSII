@@ -355,7 +355,10 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
       if (validReviews.isEmpty) return 0;
 
       final total = validReviews.map((r) => r.rating!).reduce((a, b) => a + b);
-      return total / validReviews.length;
+      var averageRating = total / validReviews.length;
+      var averageRatingRounded = averageRating.toStringAsFixed(2);
+      averageRating = double.parse(averageRatingRounded);
+      return averageRating;
     }
     
   Future<void> _loadFavoriteCompetitionsForUser() async{
