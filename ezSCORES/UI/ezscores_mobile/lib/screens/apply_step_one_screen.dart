@@ -1,5 +1,6 @@
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
+import 'package:ezscores_mobile/helpers/progress_bar.dart';
 import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/search_result.dart';
 import 'package:ezscores_mobile/models/selections.dart';
@@ -128,6 +129,7 @@ class _ApplyStepOneScreenState extends State<ApplyStepOneScreen> {
         },
         child: const Icon(Icons.next_plan, size: 28, color: Colors.white,),
       ),
+      bottomNavigationBar: const StepProgressBar(currentStep: 1,),
     );
   }
   _buildSearch(){

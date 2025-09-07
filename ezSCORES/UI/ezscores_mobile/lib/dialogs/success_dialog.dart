@@ -53,45 +53,48 @@ class _SuccessPopupState extends State<SuccessPopup>
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: ScaleTransition(
-          scale: _scaleAnimation,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.green.shade600,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.check_circle_outline,
-                    color: Colors.white,
-                    size: 60,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.message,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Center(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade600,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle_outline,
                       color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      size: 60,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

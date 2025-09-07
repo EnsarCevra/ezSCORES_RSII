@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:ezscores_mobile/dialogs/success_dialog.dart';
+import 'package:ezscores_mobile/helpers/progress_bar.dart';
 import 'package:ezscores_mobile/models/competitions.dart';
 import 'package:ezscores_mobile/models/players.dart';
 import 'package:ezscores_mobile/models/teams.dart';
@@ -62,24 +63,12 @@ class _ApplyStepThreeScreenState extends State<ApplyStepThreeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        child: SizedBox(
-          height: 50,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0),
-              ),
-            ),
-            onPressed: () => _confirmSubmit(context),
-            child: const Text(
-              "Pošalji prijavu",
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.green,
+        onPressed: (){_confirmSubmit(context);},
+        child: const Icon(Icons.send, size: 28, color: Colors.white,),
       ),
+      bottomNavigationBar: const StepProgressBar(currentStep: 3,),
     );
   }
 
@@ -123,7 +112,7 @@ class _ApplyStepThreeScreenState extends State<ApplyStepThreeScreen> {
                 ),
               ),
               Text(
-                widget.competition.name ?? "Nepoznato takmičenje",
+                '${widget.competition.name} - ${widget.competition.selection?.name}',
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -137,6 +126,7 @@ class _ApplyStepThreeScreenState extends State<ApplyStepThreeScreen> {
                   color: Colors.white,
                 ),
               ),
+              const SizedBox(height: 5),
               Row(
                 children: [
                   ClipRRect(
