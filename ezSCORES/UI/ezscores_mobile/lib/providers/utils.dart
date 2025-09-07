@@ -291,23 +291,47 @@ Widget buildCityTypeAheadField({
   );
 }
 
-Future<bool> showConfirmDeleteDialog(BuildContext context, {String? title, String? content, String? confirmMessage}) async {
+Future<bool> showConfirmDeleteDialog(
+  BuildContext context, {
+  String? title,
+  String? content,
+  String? confirmMessage,
+}) async {
   final result = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text(title ?? 'Upozorenje'),
-      content: Text(content ?? 'Jeste li sigurni da želite izbrisati ovaj zapis?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Odustani'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(
+        title ?? 'Upozorenje',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      content: SingleChildScrollView(
+        child: Text(
+          content ?? 'Jeste li sigurni da želite izbrisati ovaj zapis?',
+          style: const TextStyle(fontSize: 14),
         ),
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
+      ),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      actions: [
+        Expanded(
+          child: TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Odustani', style: TextStyle(fontSize: 14)),
           ),
-          child: Text(confirmMessage ?? 'Izbriši'),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(confirmMessage ?? 'Izbriši', style: const TextStyle(fontSize: 14)),
+          ),
         ),
       ],
     ),

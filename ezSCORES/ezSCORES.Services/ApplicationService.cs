@@ -5,6 +5,7 @@ using ezSCORES.Model.Requests.ApplicationRequests;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.Requests.TeamsRequests;
 using ezSCORES.Model.SearchObjects;
+using ezSCORES.Services.Auth;
 using ezSCORES.Services.Database;
 using Mapster;
 using MapsterMapper;
@@ -23,14 +24,24 @@ namespace ezSCORES.Services
 {
     public class ApplicationService : BaseCRUDService<Applications, ApplicationSearchObject, Database.Application,ApplicationInsertRequest, ApplicationUpdateRequest>, IApplicationService
 	{
-		public ApplicationService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
+		private readonly IActiveUserService _activeUserService;
+		public ApplicationService(EzScoresdbRsiiContext context, IMapper mapper, IActiveUserService activeUserService) : base(context, mapper)
 		{
+			_activeUserService = activeUserService;
 		}
 
 		public override IQueryable<Database.Application> AddFilter(ApplicationSearchObject search, IQueryable<Database.Application> query)
 		{
 			query = query.Include(x => x.Team);
 			//filter by status?
+			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
+			{
+				query = query.Where(x => x.Team.UserId == _activeUserService.GetActiveUserId());
+			}
+			if (search.IsAccepted != null)
+			{
+				query = query.Where(x => x.IsAccepted == search.IsAccepted);
+			}
 			if(search.CompetitionId != null)
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x => x.Team).ThenInclude(x => x.User);

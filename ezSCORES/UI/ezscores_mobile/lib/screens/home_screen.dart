@@ -4,6 +4,7 @@ import 'package:ezscores_mobile/models/DTOs/matchesByDateDto.dart';
 import 'package:ezscores_mobile/models/matches.dart';
 import 'package:ezscores_mobile/providers/MatchesProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
+import 'package:ezscores_mobile/screens/applications_list_screen.dart';
 import 'package:ezscores_mobile/screens/favorites_screen.dart';
 import 'package:ezscores_mobile/screens/match_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -92,9 +93,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        if(AuthProvider.roleName == 'Manager')ElevatedButton(
+        if(AuthProvider.roleName == 'Manager' || AuthProvider.roleName == 'Admin')ElevatedButton(
           onPressed: () {
-            // TODO: Navigate to Prijave screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: ((context) => ApplicationsListScreen()
+                )
+              )
+            );
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(

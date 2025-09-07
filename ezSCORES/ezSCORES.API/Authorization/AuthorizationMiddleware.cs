@@ -41,13 +41,6 @@ namespace ezSCORES.API.Authorization
 							await httpContext.Response.WriteAsync("Niste autorizovani da pristupite ovom takmičenju!");
 							return;
 						}
-						//var competition = competitionsService.GetById(int.Parse(resourceId));
-						//if (competition.UserId != currentUserId)
-						//{
-						//	httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-						//	await httpContext.Response.WriteAsync("Niste autorizovani da pristupite ovom takmičenju!");
-						//	return;
-						//}
 					}
 					if (httpContext.Request.Path.StartsWithSegments("/api/Applications"))
 					{
@@ -58,13 +51,6 @@ namespace ezSCORES.API.Authorization
 							await httpContext.Response.WriteAsync("Niste autorizovani da pristupite ovoj prijavi!");
 							return;
 						}
-						//var application = applicationService.GetById(int.Parse(resourceId));
-						//if (competitionsService.GetById(application.CompetitionId).UserId != currentUserId && application.Team.UserId != currentUserId)
-						//{
-						//	httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-						//	await httpContext.Response.WriteAsync("Niste autorizovani da pristupite ovoj prijavi!");
-						//	return;
-						//}
 					}
 					if (httpContext.Request.Path.StartsWithSegments("/api/CompetitionsReferees"))
 					{
@@ -74,13 +60,6 @@ namespace ezSCORES.API.Authorization
 							await httpContext.Response.WriteAsync("Niste autorizovani za ovu akciju!");
 							return;
 						}
-						//var competitionReferee = competitionsRefereesService.GetById(int.Parse(resourceId));
-						//if (competitionsService.GetById(competitionReferee.CompetitionId).UserId != currentUserId)
-						//{
-						//	httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-						//	await httpContext.Response.WriteAsync("Niste autorizovani za ovu akciju!");
-						//	return;
-						//}
 					}
 					if (httpContext.Request.Path.StartsWithSegments("/api/CompetitionsRefereesMatches"))
 					{
@@ -99,13 +78,6 @@ namespace ezSCORES.API.Authorization
 							await httpContext.Response.WriteAsync("Niste autorizovani za ovu akciju!");
 							return;
 						}
-						//var competitionSponsors = competitionsSponsorsService.GetById(int.Parse(resourceId));
-						//if (competitionsService.GetById(competitionSponsors.CompetitionId).UserId != currentUserId)
-						//{
-						//	httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-						//	await httpContext.Response.WriteAsync("Niste autorizovani za ovu akciju!");
-						//	return;
-						//}
 					}
 					if (httpContext.Request.Path.StartsWithSegments("/api/CompetitionsTeams"))
 					{
@@ -205,17 +177,7 @@ namespace ezSCORES.API.Authorization
 									return;
 								}
 							}
-							else if (activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
-							{
-								var teamIdStr = httpContext.Request.Query["teamId"].FirstOrDefault();
-								if (string.IsNullOrEmpty(teamIdStr) || !await authorizationService.CanUserAccessTeamAsync(currentUserId, int.Parse(teamIdStr)))
-								{
-									httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-									await httpContext.Response.WriteAsync("Niste autorizovani da pristupite prijavama!");
-									return;
-								}
-							}
-							else
+							else if (activeUserService.GetActiveUserRole() != Model.Constants.Roles.Manager)
 							{
 								httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
 								await httpContext.Response.WriteAsync("Niste autorizovani da pristupite prijavama!");

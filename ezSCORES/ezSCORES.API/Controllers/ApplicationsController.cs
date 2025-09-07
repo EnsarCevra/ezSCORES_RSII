@@ -37,7 +37,7 @@ namespace ezSCORES.API.Controllers
 		{
 			(_service as IApplicationService).ValidatePlayers(request.PlayerIds, request.CompetitionId);
 		}
-		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer + "," + Model.Constants.Roles.Manager)]
 		public override PagedResult<Applications> GetList([FromQuery] ApplicationSearchObject searchObject)
 		{
 			return base.GetList(searchObject);
