@@ -1,3 +1,4 @@
+import 'package:ezscores_mobile/models/competitionsTeams.dart';
 import 'package:ezscores_mobile/models/selections.dart';
 import 'package:ezscores_mobile/models/users.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -9,6 +10,7 @@ class Teams{
   String? picture;
   Selections? selection;
   Users? user;
+  CompetitionsTeams? competitionTeam;
 
   Teams({this.id, this.name});
 

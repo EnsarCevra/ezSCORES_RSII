@@ -52,7 +52,7 @@ namespace ezSCORES.API.Controllers
 		{
 			return base.Update(id, request);
 		}
-		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Manager)]
 		public override void Delete(int id)
 		{
 			base.Delete(id);

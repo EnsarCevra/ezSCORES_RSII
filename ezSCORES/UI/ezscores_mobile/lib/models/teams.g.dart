@@ -16,7 +16,11 @@ Teams _$TeamsFromJson(Map<String, dynamic> json) => Teams(
           : Selections.fromJson(json['selection'] as Map<String, dynamic>)
       ..user = json['user'] == null
           ? null
-          : Users.fromJson(json['user'] as Map<String, dynamic>);
+          : Users.fromJson(json['user'] as Map<String, dynamic>)
+      ..competitionTeam = json['competitionTeam'] == null
+          ? null
+          : CompetitionsTeams.fromJson(
+              json['competitionTeam'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$TeamsToJson(Teams instance) => <String, dynamic>{
       'id': instance.id,
@@ -24,4 +28,5 @@ Map<String, dynamic> _$TeamsToJson(Teams instance) => <String, dynamic>{
       'picture': instance.picture,
       'selection': instance.selection,
       'user': instance.user,
+      'competitionTeam': instance.competitionTeam,
     };

@@ -20,5 +20,6 @@ namespace ezSCORES.Model
 
 		public bool? IsAccepted { get; set; }
 		public virtual Teams Team { get; set; } = null!;
+		public virtual Competitions Competition { get; set; } = null!;
 	}
 }

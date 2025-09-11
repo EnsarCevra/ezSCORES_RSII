@@ -16,7 +16,10 @@ Applications _$ApplicationsFromJson(Map<String, dynamic> json) => Applications()
   ..isAccepted = json['isAccepted'] as bool?
   ..team = json['team'] == null
       ? null
-      : Teams.fromJson(json['team'] as Map<String, dynamic>);
+      : Teams.fromJson(json['team'] as Map<String, dynamic>)
+  ..competition = json['competition'] == null
+      ? null
+      : Competitions.fromJson(json['competition'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$ApplicationsToJson(Applications instance) =>
     <String, dynamic>{
@@ -28,4 +31,5 @@ Map<String, dynamic> _$ApplicationsToJson(Applications instance) =>
       'paidAmount': instance.paidAmount,
       'isAccepted': instance.isAccepted,
       'team': instance.team,
+      'competition': instance.competition,
     };

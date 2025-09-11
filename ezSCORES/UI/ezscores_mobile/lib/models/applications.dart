@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:ezscores_mobile/models/teams.dart';
+import 'package:ezscores_mobile/models/competitions.dart';
 part 'applications.g.dart';
 
 @JsonSerializable()
@@ -12,6 +13,7 @@ class Applications {
   double? paidAmount;
 	bool? isAccepted;
   Teams? team;
+  Competitions? competition;
 
 	Applications();
 

@@ -36,7 +36,8 @@ namespace ezSCORES.Services
 			//filter by status?
 			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
 			{
-				query = query.Where(x => x.Team.UserId == _activeUserService.GetActiveUserId());
+				query = query.Where(x => x.Team.UserId == _activeUserService.GetActiveUserId())
+					.Include(x=>x.Competition).ThenInclude(x=>x.Selection);
 			}
 			if (search.IsAccepted != null)
 			{
@@ -50,12 +51,28 @@ namespace ezSCORES.Services
 		}
 		protected override Database.Application? ApplyIncludes(int id, DbSet<Database.Application> set)
 		{
-			return set.Where(x=>x.Id == id).Include(x => x.Team)
+			if(_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Organizer ||
+				_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Admin)
+			{ //if organizer or admin show user data as well
+				return set.Where(x => x.Id == id).Include(x => x.Team)
 							.ThenInclude(x => x.User)
 							.Include(x => x.Team)
 							.ThenInclude(x => x.CompetitionsTeams)
 							.ThenInclude(x => x.CompetitionsTeamsPlayers)
-							.ThenInclude(x => x.Player).FirstOrDefault();
+							.ThenInclude(x => x.Player)
+							.FirstOrDefault();
+			}
+			else //if manager then return competition information as well
+			{
+				return set.Where(x => x.Id == id)
+							.Include(x => x.Competition)
+							.Include(x => x.Team)
+							.ThenInclude(x => x.CompetitionsTeams)
+							.ThenInclude(x => x.CompetitionsTeamsPlayers)
+							.ThenInclude(x => x.Player)
+							.FirstOrDefault();
+			}
+				
 		}
 		public override void BeforeInsert(ApplicationInsertRequest request, Database.Application entity)
 		{

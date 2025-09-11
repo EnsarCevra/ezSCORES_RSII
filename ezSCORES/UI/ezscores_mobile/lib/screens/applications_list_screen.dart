@@ -3,11 +3,14 @@ import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
 import 'package:ezscores_mobile/models/applications.dart';
 import 'package:ezscores_mobile/providers/ApplicationsProvider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
+import 'package:ezscores_mobile/screens/application_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
 class ApplicationsListScreen extends StatefulWidget {
+  const ApplicationsListScreen({super.key});
+
   @override
   State<ApplicationsListScreen> createState() => _ApplicationsListScreenState();
 }
@@ -20,6 +23,7 @@ class _ApplicationsListScreenState extends State<ApplicationsListScreen> {
   late PaginationController<Applications> _paginationController;
   final ScrollController _scrollController = ScrollController();
 
+  @override
   void initState() {
     super.initState();
     
@@ -116,9 +120,9 @@ class _ApplicationsListScreenState extends State<ApplicationsListScreen> {
                     ),
                   ),
                   DropdownMenuItem(
-                    value: "Nije prihvaćeno",
+                    value: "Odbijeno",
                     child: Text(
-                      "Nije prihvaćeno",
+                      "Odbijeno",
                       style: textTheme.bodySmall,
                     ),
                   ),
@@ -169,8 +173,18 @@ class _ApplicationsListScreenState extends State<ApplicationsListScreen> {
   final textTheme = Theme.of(context).textTheme;
 
   return InkWell(
-    onTap:() {
-      //navigate to application details
+    onTap:() async{
+      final shouldReload = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: ((context) => ApplicationDetailsScreen(application: application,)
+                )
+              )
+            );
+        if(shouldReload != null && shouldReload == true)
+        {
+          _paginationController.loadPage();
+        }
     } ,
     child: Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -214,7 +228,6 @@ class _ApplicationsListScreenState extends State<ApplicationsListScreen> {
             if(application.isAccepted == null)IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () async {
-                //still not finished, have to check backend
                 await deleteEntity(
                   context: context,
                   deleteFunction: applicationProvider.delete,
