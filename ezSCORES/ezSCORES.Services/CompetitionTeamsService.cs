@@ -26,7 +26,22 @@ namespace ezSCORES.Services
 
 		public override IQueryable<CompetitionsTeam> AddFilter(CompetitionTeamsSearchObject search, IQueryable<CompetitionsTeam> query)
 		{
-			if(search.CompetitionId != null)
+			if(search.IncludeDeletedRecords != null)
+			{
+				var app = Context.Applications
+					.AsNoTracking()
+					.FirstOrDefault(a => a.Id == search.ApplicationId);
+				if(app != null)
+				{
+					query = query.IgnoreQueryFilters();
+					query = query
+						.Where(ct => ct.TeamId == app.TeamId &&
+									 ct.CompetitionId == app.CompetitionId)
+									.OrderBy(ct => Math.Abs(EF.Functions.DateDiffMillisecond(ct.CreatedAt, app.CreatedAt)))
+									.Take(1);
+				}
+			}
+			if (search.CompetitionId != null)
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x=>x.Team);
 			}
@@ -34,9 +49,9 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.TeamId == search.TeamId).Include(x => x.Team);
 			}
-			if (search.isEliminated != null)
+			if (search.IsEliminated != null)
 			{
-				query = query.Where(x => x.IsEliminated == search.isEliminated);
+				query = query.Where(x => x.IsEliminated == search.IsEliminated);
 			}
 			if (search.GroupId != null && search.OnlyNullAndCurrentGroup == null)
 			{
@@ -49,7 +64,7 @@ namespace ezSCORES.Services
 					query = query.Where(x => x.GroupId == null || x.GroupId == search.GroupId);
 				}
 			}
-			if (search.isPlayersIncluded != null)
+			if (search.IsPlayersIncluded != null)
 			{
 				query = query.Include(x => x.CompetitionsTeamsPlayers).ThenInclude(x => x.Player);
 			}

@@ -196,9 +196,9 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
       return const Text("Nema odabranih igrača.");
     }
 
-      final useVerticalGrid = widget.application == null || widget.application?.message != null;
+      final useHorizontalGrid = widget.application == null || widget.application?.message != null;
 
-    if (useVerticalGrid) {
+    if (useHorizontalGrid) {
       return SizedBox(
         height: 120,
         child: ListView.separated(

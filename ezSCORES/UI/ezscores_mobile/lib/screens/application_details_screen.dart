@@ -34,7 +34,9 @@ class _ApplicationDetailsScreenState extends State<ApplicationDetailsScreen> {
     var filter = {
       "teamId" : widget.application.team!.id,
        "competitionId" : widget.application.competitionId,
-       "isPlayersIncluded" : true
+       "isPlayersIncluded" : true,
+       "includeDeletedRecords" : true,
+       "applicationId" : widget.application.id
        };
     var competitionTeamsData = await competitionTeamsProvider.get(filter: filter);
     

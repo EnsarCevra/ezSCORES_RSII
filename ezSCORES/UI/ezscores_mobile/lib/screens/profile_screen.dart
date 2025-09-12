@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:ezscores_mobile/dialogs/success_dialog.dart';
 import 'package:ezscores_mobile/helpers/not_logged_in_widget.dart';
+import 'package:ezscores_mobile/models/roles.dart';
 import 'package:ezscores_mobile/providers/UserProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
@@ -43,6 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       phoneNumber: AuthProvider.phoneNumber,
       organization: AuthProvider.organization,
       picture: AuthProvider.picture,
+      role : Roles(id: AuthProvider.roleID, name: AuthProvider.roleName, description: AuthProvider.roleDecription)
     );
 
     _initialValue = {
@@ -53,6 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       "phoneNumber": widget.user?.phoneNumber,
       "organization": widget.user?.organization,
       "picture": widget.user?.picture,
+      "role" : widget.user?.role?.name,
     };
 
     _base64Image = _initialValue['picture'];
@@ -148,6 +151,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           FormBuilderTextField(
             name: 'email',
             decoration: const InputDecoration(labelText: "Email"),
+            enabled: false,
+          ),
+          FormBuilderTextField(
+            name: 'role',
+            decoration: const InputDecoration(labelText: "Uloga"),
             enabled: false,
           ),
           const SizedBox(height: 10),

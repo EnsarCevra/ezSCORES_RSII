@@ -216,7 +216,7 @@ class _ApplicationsListScreenState extends State<ApplicationsListScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    application.isAccepted == null ? 'Na obradi' : application.isAccepted == true ? "Prihvaćeno" : "Nije prihvaćeno",
+                    application.isAccepted == null ? 'Na obradi' : application.isAccepted == true ? "Prihvaćeno" : "Odbijeno",
                     style: textTheme.bodySmall?.copyWith(
                       color: application.isAccepted == null ? Colors.grey : application.isAccepted == true ? Colors.green : Colors.red,
                       fontWeight: FontWeight.w500,

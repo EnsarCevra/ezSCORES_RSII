@@ -144,9 +144,22 @@ namespace ezSCORES.Services
 				//if status is false application is denied - you have to delete every related entity that has been already created - CompetitionTeams and CompetitionTeamsPlayers
 				if(application.IsAccepted == false)
 				{
-					//Find CompetitionTeam and soft delete it
-					//Find all players and soft delete them
-				}
+					var competitionTeam = Context.CompetitionsTeams
+						.Where(x => x.CompetitionId == application.CompetitionId && x.TeamId == application.TeamId).FirstOrDefault();
+					if(competitionTeam != null)
+					{
+						var players = Context.CompetitionsTeamsPlayers
+						.Where(p => p.CompetitionsTeamsId == competitionTeam.Id)
+						.Select(p => p.Player)
+						.AsQueryable();
+						competitionTeam.IsDeleted = true;
+
+						foreach (var player in players)
+						{
+							player.IsDeleted = true;
+						}
+					}
+                }
 				Context.SaveChanges();
 				return Mapper.Map<Applications>(application);
 			}
