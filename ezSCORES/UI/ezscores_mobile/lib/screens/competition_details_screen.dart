@@ -10,6 +10,7 @@ import 'package:ezscores_mobile/providers/ReviewsProvider.dart';
 import 'package:ezscores_mobile/providers/auth_provider.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:ezscores_mobile/screens/apply_step_one_screen.dart';
+import 'package:ezscores_mobile/screens/login_screen.dart';
 import 'package:ezscores_mobile/screens/scores_screen.dart';
 import 'package:ezscores_mobile/screens/standings_screen.dart';
 import 'package:flutter/material.dart';
@@ -94,9 +95,8 @@ class _CompetitionsDetailsScreenState
              || competition!.status == CompetitionStatus.finished) ...[
               _buildDetailsButtons(),
             ],
-            if( (competition!.status == CompetitionStatus.underway
-             || competition!.status == CompetitionStatus.finished)
-             && AuthProvider.isLoggedIn())_buildReviewController(),
+            if(competition!.status == CompetitionStatus.underway
+             || competition!.status == CompetitionStatus.finished)_buildReviewController(),
             const SizedBox(height: 10),
             _buildGeneralInfo(),
             const SizedBox(height: 24),
@@ -445,26 +445,83 @@ class _CompetitionsDetailsScreenState
             final starIndex = index + 1;
             return IconButton(
               onPressed: () async{
-                var request = {"rating": starIndex};
-                if(currentUserReview == null)
+                if(AuthProvider.isLoggedIn())
                 {
-                  request['userId'] = AuthProvider.id!;
-                  request['competitionId'] = widget.competitionId!;
-                  currentUserReview = await reviewsProvider.insert(request);
-                  showMobileNotification(context, 'Ocjena dodana');
-                }
-                else{
-                  //if its the same rating there is no need to update
-                  if(currentUserReview!.rating!.toInt() != starIndex)
+                  var request = {"rating": starIndex};
+                  if(currentUserReview == null)
                   {
-                    currentUserReview = await reviewsProvider.update(currentUserReview!.id!, request);
-                    //currentUserReview!.rating = starIndex.toDouble();//update model without API call
-                    showMobileNotification(context, 'Ocjena ažurirana');
+                    request['userId'] = AuthProvider.id!;
+                    request['competitionId'] = widget.competitionId!;
+                    currentUserReview = await reviewsProvider.insert(request);
+                    showMobileNotification(context, 'Ocjena dodana');
                   }
+                  else{
+                    //if its the same rating there is no need to update
+                    if(currentUserReview!.rating!.toInt() != starIndex)
+                    {
+                      currentUserReview = await reviewsProvider.update(currentUserReview!.id!, request);
+                      //currentUserReview!.rating = starIndex.toDouble();//update model without API call
+                      showMobileNotification(context, 'Ocjena ažurirana');
+                    }
+                  }
+                  setState(() {
+                    _selectedRating = starIndex;
+                  });
                 }
-                setState(() {
-                  _selectedRating = starIndex;
-                });
+                else
+                {
+                  return showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Center(
+                        child: Text(
+                          "Morate se prijaviti da biste ostavili recenziju!",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      actions: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text("Odustani", overflow: TextOverflow.ellipsis),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(builder: (context) => const LoginPage())
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text("Prijavi se", overflow: TextOverflow.ellipsis),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
               icon: Icon(
                 _selectedRating >= starIndex ? Icons.star : Icons.star_border,
