@@ -1,3 +1,4 @@
+import 'package:ezscores_mobile/dialogs/add_new_player_dialog.dart';
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
 import 'package:ezscores_mobile/helpers/progress_bar.dart';
@@ -188,7 +189,7 @@ class _ApplyStepTwoScreenState extends State<ApplyStepTwoScreen> {
         ),
         
         const SizedBox(height: 10,),
-        const Text('Trenutni sastav (klikni da uklonis)'),
+        const Text('Trenutni sastav'),
         _buildSelectedPlayersView()
       ],
     );
@@ -283,83 +284,111 @@ Widget _buildPlayerCard(BuildContext context, Players player) {
 }
 
   Widget _buildSelectedPlayersView() {
-  if (selectedPlayers.isEmpty) {
-    return const Center(child: Text('Nema igrača u sastavu', style: TextStyle(fontSize: 12),));
+    final playersList = selectedPlayers.toList().reversed.toList();
+
+    return SizedBox(
+      height: 95,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: playersList.length + 1, // +1 for the "add" card
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, index) {
+          if (index == playersList.length) {
+            return InkWell(
+              onTap: () async{
+                final newPlayer = await showDialog<Players>(
+                  context: context,
+                  builder: (context) => const AddPlayerDialog(),
+                );
+
+                if(newPlayer != null)
+                {
+                  setState(() {
+                    selectedPlayers.add(newPlayer);
+                  });
+                }
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 1,
+                child: SizedBox(
+                  width: 65,
+                  child: Center(
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.grey.shade200,
+                      child: const Icon(Icons.add, size: 22, color: Colors.black54),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          final player = playersList.elementAt(index);
+          return _buildMiniPlayerCard(player);
+        },
+      ),
+    );
   }
-  final playersList = selectedPlayers.toList().reversed.toList();
 
-  return SizedBox(
-    height: 120,
-    child: ListView.separated(
-      scrollDirection: Axis.horizontal,
-      itemCount: playersList.length,
-      separatorBuilder: (_, __) => const SizedBox(width: 8),
-      itemBuilder: (context, index) {
-        final player = playersList.elementAt(index);
-        return _buildMiniPlayerCard(player);
-      },
-    ),
-  );
-}
-
-Widget _buildMiniPlayerCard(Players player) {
-  final bool isConflict = conflictPlayerIds.contains(player.id);
+  Widget _buildMiniPlayerCard(Players player) {
+    final bool isConflict = conflictPlayerIds.contains(player.id);
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
       transitionBuilder: (child, animation) => FadeTransition(
         opacity: animation,
-        child: ScaleTransition(
-          scale: animation,
-          child: child,
-        ),
+        child: ScaleTransition(scale: animation, child: child),
       ),
       child: InkWell(
-        onTap: () async{
+        onTap: () async {
           selectedPlayers.remove(player);
           _loadPlayers();
-          setState(() {
-          });
+          setState(() {});
         },
         child: Card(
           key: ValueKey(player.id),
           color: isConflict ? Colors.red.shade200 : Colors.green.shade200,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          elevation: 1,
           child: SizedBox(
-            width: 80,
+            width: 65,
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ClipOval(
                     child: Container(
-                      width: 50,
-                      height: 50,
+                      width: 36,
+                      height: 36,
                       color: Colors.grey[300],
                       child: player.picture == null || player.picture!.isEmpty
-                          ? const Icon(Icons.person, size: 30, color: Colors.grey)
+                          ? const Icon(Icons.person, size: 22, color: Colors.grey)
                           : imageFromString(player.picture!),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     "${player.firstName ?? ''} ${player.lastName ?? ''}",
                     style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     player.birthDate != null
                         ? formatDateOnly(player.birthDate!)
-                        : "Nepoznat datum",
-                    style: const TextStyle(fontSize: 10),
+                        : "Nepoznat",
+                    style: const TextStyle(fontSize: 8),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -370,6 +399,7 @@ Widget _buildMiniPlayerCard(Players player) {
       ),
     );
   }
+
   
   void _loadPlayers() async{
     await _paginationController.loadPage();

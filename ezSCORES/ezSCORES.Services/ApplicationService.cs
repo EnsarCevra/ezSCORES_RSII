@@ -43,7 +43,11 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.IsAccepted == search.IsAccepted);
 			}
-			if(search.CompetitionId != null)
+			if(search.TeamId != null)
+			{
+				query = query.Where(x => x.TeamId == search.TeamId).Include(x=>x.Team);
+			}
+			if (search.CompetitionId != null)
 			{
 				query = query.Where(x => x.CompetitionId == search.CompetitionId).Include(x => x.Team).ThenInclude(x => x.User);
 			}
@@ -148,15 +152,14 @@ namespace ezSCORES.Services
 						.Where(x => x.CompetitionId == application.CompetitionId && x.TeamId == application.TeamId).FirstOrDefault();
 					if(competitionTeam != null)
 					{
-						var players = Context.CompetitionsTeamsPlayers
+						var competitionTeamPlayers = Context.CompetitionsTeamsPlayers
 						.Where(p => p.CompetitionsTeamsId == competitionTeam.Id)
-						.Select(p => p.Player)
 						.AsQueryable();
 						competitionTeam.IsDeleted = true;
 
-						foreach (var player in players)
+						foreach (var competitionsTeamsPlayer in competitionTeamPlayers)
 						{
-							player.IsDeleted = true;
+							competitionsTeamsPlayer.IsDeleted = true;
 						}
 					}
                 }
@@ -298,6 +301,29 @@ namespace ezSCORES.Services
 			{
 				throw new UserException("Selekcija na odabranom takmičenju ne postoji ili nije unesena!");
 			}
+		}
+		public override Database.Application? BeforeDelete(int id, DbSet<Database.Application> set)
+		{
+			var application = set.Find(id);
+			if (application != null)
+			{
+				var competitionTeamToDelete = Context.CompetitionsTeams
+						.Where(x => x.CompetitionId == application.CompetitionId && x.TeamId == application.TeamId).FirstOrDefault();
+				if (competitionTeamToDelete != null)
+				{
+					var competitionTeamPlayers = Context.CompetitionsTeamsPlayers
+						.Where(p => p.CompetitionsTeamsId == competitionTeamToDelete.Id)
+						.AsQueryable();
+					competitionTeamToDelete.IsDeleted = true;
+
+					foreach (var competitionsTeamsPlayer in competitionTeamPlayers)
+					{
+						competitionsTeamsPlayer.IsDeleted = true;
+					}
+				}
+				Context.SaveChanges();
+			}
+			return application;
 		}
 	}
 }

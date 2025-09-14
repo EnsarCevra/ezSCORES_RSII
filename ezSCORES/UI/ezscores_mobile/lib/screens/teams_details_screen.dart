@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:ezscores_mobile/dialogs/success_dialog.dart';
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
+import 'package:ezscores_mobile/providers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -173,7 +174,7 @@ class _TeamsDetailsScreenState extends State<TeamsDetailsScreen> {
                     const SizedBox(height: 20),
                     FormBuilderTextField(
                       name: "name",
-                      decoration: _inputDecoration("Naziv"),
+                      decoration: mobileTextInputDecoration("Naziv"),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(
@@ -185,7 +186,7 @@ class _TeamsDetailsScreenState extends State<TeamsDetailsScreen> {
                     const SizedBox(height: 20),
                     FormBuilderDropdown<int>(
                       name: "selectionId",
-                      decoration: _inputDecoration("Selekcija"),
+                      decoration: mobileTextInputDecoration("Selekcija"),
                       validator: FormBuilderValidators.required(
                           errorText: 'Selekcija je obavezna'),
                       items: selectionResult?.result
@@ -214,32 +215,6 @@ class _TeamsDetailsScreenState extends State<TeamsDetailsScreen> {
                 ),
               ),
             ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(
-        fontWeight: FontWeight.w500,
-        color: Colors.grey,
-      ),
-      filled: true,
-      fillColor: Colors.grey.shade100,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.blue.shade400, width: 1.6),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red),
-      ),
-      errorMaxLines: 3,
     );
   }
 }

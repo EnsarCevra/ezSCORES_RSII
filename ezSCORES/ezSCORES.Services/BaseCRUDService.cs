@@ -71,8 +71,6 @@ namespace ezSCORES.Services
 		{
 			var set = Context.Set<TDbEntity>();
 
-			//var entity = set.Find(id);
-
 			var entity = BeforeDelete(id, set);
 
 			if(entity == null)
@@ -80,16 +78,6 @@ namespace ezSCORES.Services
 				throw new Exception("Selected entity doesn't exist");
 			}
 
-			//if(entity is ISoftDelete softDeleteEntity)
-			//{
-			//	softDeleteEntity.IsDeleted = true;
-			//	softDeleteEntity.RemovedAt = DateTime.Now;
-			//	Context.Update(entity);
-			//}
-			//else
-			//{
-			//	Context.Remove(entity);
-			//}
 
 			CascadeSoftDelete(entity);
 
