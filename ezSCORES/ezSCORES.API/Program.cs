@@ -84,31 +84,41 @@ builder.Services.AddDbContext<EzScoresdbRsiiContext>(options => options.UseSqlSe
 builder.Services.AddHttpContextAccessor();
 
 
+//builder.Services.AddCors(options =>
+
+//{
+
+//	options.AddDefaultPolicy(builder =>
+
+//	{
+
+//		builder.WithOrigins("http://localhost:4200")
+
+//			.AllowAnyMethod()
+
+//			.AllowAnyHeader()
+
+//			.AllowCredentials();
+
+//	});
+
+//});
 builder.Services.AddCors(options =>
-
 {
-
-	options.AddDefaultPolicy(builder =>
-
+	options.AddPolicy("AllowFlutterApp", builder =>
 	{
-
-		builder.WithOrigins("http://localhost:4200")
-
+		builder
+			.SetIsOriginAllowed(_ => true) // allow all origins for testing
 			.AllowAnyMethod()
-
-			.AllowAnyHeader()
-
-			.AllowCredentials();
-
+			.AllowAnyHeader();
 	});
-
 });
 
 var app = builder.Build();
 
-app.UseCors();
+app.UseCors("AllowFlutterApp");
 
-app.UseMiddleware<AuthorizationMiddleware>();
+//app.UseMiddleware<AuthorizationMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -117,7 +127,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

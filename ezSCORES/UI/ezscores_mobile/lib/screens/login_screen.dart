@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage>
               const SizedBox(height: 40),
               Center(
                 child: Image.asset(
-                  "assets/images/ezlogo5.png",
+                  "assets/images/ezLogo5.png",
                   height: 120,
                   width: 120,
                 ),
