@@ -33,19 +33,23 @@ namespace ezSCORES.Services
 		public override IQueryable<Database.Application> AddFilter(ApplicationSearchObject search, IQueryable<Database.Application> query)
 		{
 			query = query.Include(x => x.Team);
-			//filter by status?
+			//filter by status ?
 			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
 			{
 				query = query.Where(x => x.Team.UserId == _activeUserService.GetActiveUserId())
-					.Include(x=>x.Competition).ThenInclude(x=>x.Selection);
+					.Include(x => x.Competition);
+			}
+			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
+			{
+				query = query.Where(x => x.Team.UserId == _activeUserService.GetActiveUserId());
 			}
 			if (search.IsAccepted != null)
 			{
 				query = query.Where(x => x.IsAccepted == search.IsAccepted);
 			}
-			if(search.TeamId != null)
+			if (search.TeamId != null)
 			{
-				query = query.Where(x => x.TeamId == search.TeamId).Include(x=>x.Team);
+				query = query.Where(x => x.TeamId == search.TeamId).Include(x => x.Team);
 			}
 			if (search.CompetitionId != null)
 			{
@@ -324,6 +328,20 @@ namespace ezSCORES.Services
 				Context.SaveChanges();
 			}
 			return application;
+		}
+
+		public Applications MakePayment(int id, ApplicationMakePaymentRequest request)
+		{
+			var application = Context.Applications.Find(id);
+
+			if(application == null)
+			{
+				throw new UserException("Prijava ne postoji, uplata nije sačuvana!");
+			}
+			application.IsPaId = true;
+			application.PaIdAmount = request.PaidAmount;
+			Context.SaveChanges();
+			return Mapper.Map<Applications>(application);
 		}
 	}
 }

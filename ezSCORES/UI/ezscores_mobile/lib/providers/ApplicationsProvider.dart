@@ -71,4 +71,25 @@ class ApplicationProvider extends BaseProvider<Applications>
       throw UserException("Unknown error while validating players.");
     }
   }
+  Future<Applications> makePayment(int id, dynamic request) async {
+    var url = "${BaseProvider.baseUrl}Applications/$id/make-payment";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    final body = jsonEncode(request);
+
+    http.Response response;
+    try {
+      response = await http.patch(uri, headers: headers, body: body);
+    } on UserException {
+      rethrow;
+    }
+
+    if (isValidResponse(response)) {
+      var data = jsonDecode(response.body);
+      return fromJson(data);
+    } else {
+      throw UserException("Unknown error.");
+    }
+  }
 }

@@ -3,14 +3,16 @@ import 'package:ezscores_mobile/models/applications.dart';
 import 'package:ezscores_mobile/models/competitionsTeams.dart';
 import 'package:ezscores_mobile/models/players.dart';
 import 'package:ezscores_mobile/providers/CompetitionTeamsProvider.dart';
+import 'package:ezscores_mobile/screens/pay_pal_screen.dart';
 import 'package:ezscores_mobile/views/application_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class ApplicationDetailsScreen extends StatefulWidget {
-  final Applications application;
+  Applications application;
 
-  const ApplicationDetailsScreen({
+  ApplicationDetailsScreen({
     super.key,
     required this.application,
   });
@@ -62,7 +64,40 @@ class _ApplicationDetailsScreenState extends State<ApplicationDetailsScreen> {
         competition: widget.application.competition!,
         team: widget.application.team!,
         players: playersSet!
-      )
+      ),
+      bottomNavigationBar: widget.application.isAccepted == true && widget.application.isPaId != true?
+      SizedBox(
+      width: double.infinity,
+      height: 44,
+      child: ElevatedButton(
+        onPressed: () async {
+          var isPaid = await Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => CompetitionPaymentScreen(applicationId: widget.application.id!, competitionFee: 200, competitionName: 'Dummy Competition',),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ),
+                );
+          if(isPaid == true)
+          {
+            setState(() {
+              widget.application.isPaId = true;
+            });
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+          backgroundColor: Colors.green,
+          padding: EdgeInsets.zero,
+        ),
+        child: const Text(
+          "Uplati kotizaciju",
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ),) : null
     );
   }
 }

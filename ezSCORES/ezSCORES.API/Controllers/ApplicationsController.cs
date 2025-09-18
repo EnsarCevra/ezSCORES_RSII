@@ -57,5 +57,13 @@ namespace ezSCORES.API.Controllers
 		{
 			base.Delete(id);
 		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Manager)]
+		[HttpPatch("{id}/make-payment")]
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Manager)]
+		public Applications MakePayment(int id, ApplicationMakePaymentRequest request)
+		{
+			return (_service as IApplicationService).MakePayment(id, request);
+		}
+
 	}
 }

@@ -17,5 +17,6 @@ namespace ezSCORES.Services
 		Applications? ToogleStatus(int id, ToogleStatusRequest status);
 		void ValidateTeam(int teamId, int competitionId);
 		void ValidatePlayers(List<int> playerIds, int competitionId);
+		Applications MakePayment(int id, ApplicationMakePaymentRequest request);
 	}
 }
