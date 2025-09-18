@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/models/enums/gameStage.dart';
 import 'package:ezscores_mobile/providers/utils.dart';
@@ -57,7 +59,6 @@ Widget build(BuildContext context) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Blue fixture header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -77,11 +78,8 @@ Widget build(BuildContext context) {
               ),
             ),
             const SizedBox(height: 6),
-
-            /// Matches in this fixture
             _buildMatches(fixture),
-
-            const SizedBox(height: 16), // spacing before next fixture
+            const SizedBox(height: 16),
           ],
         );
       },
@@ -125,7 +123,6 @@ Widget build(BuildContext context) {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    /// Match time
                     SizedBox(
                       width: 55,
                       child: Text(
@@ -141,7 +138,6 @@ Widget build(BuildContext context) {
               
                     const SizedBox(width: 12),
               
-                    /// Teams with logos
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,11 +145,25 @@ Widget build(BuildContext context) {
                           Row(
                             children: [
                               Container(
-                                width: 24,
-                                height: 24,
-                                color: Colors.grey.shade300,
-                                margin: const EdgeInsets.only(right: 6),
-                              ),
+                                  width: 24,
+                                  height: 24,
+                                  margin: const EdgeInsets.only(right: 6),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.grey.shade300,
+                                    image: match.homeTeam?.picture != null && match.homeTeam!.picture!.isNotEmpty
+                                        ? DecorationImage(
+                                            image: MemoryImage(
+                                              base64Decode(match.homeTeam!.picture!),
+                                            ),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: (match.homeTeam?.picture == null || match.homeTeam!.picture!.isEmpty)
+                                      ? const Icon(Icons.shield, size: 16, color: Colors.white)
+                                      : null,
+                                ),
                               Expanded(
                                 child: Text(
                                   match.homeTeam?.name ?? "?",
@@ -167,10 +177,24 @@ Widget build(BuildContext context) {
                           Row(
                             children: [
                               Container(
-                                width: 24,
-                                height: 24,
-                                color: Colors.grey.shade300,
-                                margin: const EdgeInsets.only(right: 6),
+                                  width: 24,
+                                  height: 24,
+                                  margin: const EdgeInsets.only(right: 6),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.grey.shade300,
+                                    image: match.awayTeam?.picture != null && match.awayTeam!.picture!.isNotEmpty
+                                        ? DecorationImage(
+                                            image: MemoryImage(
+                                              base64Decode(match.awayTeam!.picture!),
+                                            ),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: (match.awayTeam?.picture == null || match.awayTeam!.picture!.isEmpty)
+                                      ? const Icon(Icons.shield, size: 16, color: Colors.white)
+                                      : null,
                               ),
                               Expanded(
                                 child: Text(

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ezscores_mobile/helpers/app_loading_widget.dart';
 import 'package:ezscores_mobile/helpers/pagination/pagination_controller.dart';
 import 'package:ezscores_mobile/models/DTOs/matchesByDateDto.dart';
@@ -322,8 +324,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   width: 24,
                                   height: 24,
-                                  color: Colors.grey.shade300,
                                   margin: const EdgeInsets.only(right: 6),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.grey.shade300,
+                                    image: match.homeTeam?.picture != null && match.homeTeam!.picture!.isNotEmpty
+                                        ? DecorationImage(
+                                            image: MemoryImage(
+                                              base64Decode(match.homeTeam!.picture!),
+                                            ),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: (match.homeTeam?.picture == null || match.homeTeam!.picture!.isEmpty)
+                                      ? const Icon(Icons.shield, size: 16, color: Colors.white)
+                                      : null,
                                 ),
                                 Expanded(
                                   child: Text(
@@ -340,8 +356,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   width: 24,
                                   height: 24,
-                                  color: Colors.grey.shade300,
                                   margin: const EdgeInsets.only(right: 6),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.grey.shade300,
+                                    image: match.awayTeam?.picture != null && match.awayTeam!.picture!.isNotEmpty
+                                        ? DecorationImage(
+                                            image: MemoryImage(
+                                              base64Decode(match.awayTeam!.picture!),
+                                            ),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: (match.awayTeam?.picture == null || match.awayTeam!.picture!.isEmpty)
+                                      ? const Icon(Icons.shield, size: 16, color: Colors.white)
+                                      : null,
                                 ),
                                 Expanded(
                                   child: Text(

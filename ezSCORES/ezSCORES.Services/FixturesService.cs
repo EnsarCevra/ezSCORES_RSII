@@ -110,7 +110,6 @@ namespace ezSCORES.Services
 							{
 								Id = f.Id,
 								GameStage = f.GameStage,
-
 								SequenceNumber = f.SequenceNumber,
 								IsCurrentlyActive = f.IsCurrentlyActive,
 								IsCompleted = f.IsCompleted,
@@ -132,12 +131,14 @@ namespace ezSCORES.Services
 										HomeTeam = new TeamDTO
 										{
 											Id = m.HomeTeam.Team.Id,
-											Name = m.HomeTeam.Team.Name
+											Name = m.HomeTeam.Team.Name,
+											Picture = m.HomeTeam.Team.Picture
 										},
 										AwayTeam = new TeamDTO
 										{
 											Id = m.AwayTeam.Team.Id,
-											Name = m.AwayTeam.Team.Name
+											Name = m.AwayTeam.Team.Name,
+											Picture = m.AwayTeam.Team.Picture
 										},
 										Stadium = m.Stadium != null ? new Stadiums {Id = m.Stadium.Id, Name = m.Stadium.Name, Picture = m.Stadium.Picture } : null,
 										HomeTeamScore = m.IsCompleted ? Context.Goals.Count(g => g.MatchId == m.Id && g.IsHomeGoal) : null,

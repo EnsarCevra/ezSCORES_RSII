@@ -33,7 +33,6 @@ namespace ezSCORES.Services
 		public override IQueryable<Database.Application> AddFilter(ApplicationSearchObject search, IQueryable<Database.Application> query)
 		{
 			query = query.Include(x => x.Team);
-			//filter by status ?
 			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
 			{
 				query = query.Where(x => x.Team.UserId == _activeUserService.GetActiveUserId())

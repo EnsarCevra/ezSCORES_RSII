@@ -215,7 +215,6 @@ namespace ezSCORES.Services
 
 		public PagedResult<MatchesByDateDTO> GetMatchesByDate(MatchesByDateSearchObject search)
 		{
-			// 1) Base query
 			var query = Context.Matches
 				.Include(m => m.HomeTeam.Team)
 				.Include(m => m.AwayTeam.Team)
@@ -223,14 +222,12 @@ namespace ezSCORES.Services
 				.Include(m => m.Goals)
 				.AsQueryable();
 
-			// 2) Filter by date
 			if (search?.DateTime != null)
 			{
 				var date = search.DateTime.Date;
 				query = query.Where(m => m.DateAndTime.Date == date);
 			}
 
-			// 3) Group by competition
 			var grouped = query
 				.GroupBy(m => m.Fixture.Competition)
 				.Select(g => new MatchesByDateDTO
@@ -287,7 +284,6 @@ namespace ezSCORES.Services
 				});
 
 
-			// 5) Apply pagination
 			if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
 			{
 				grouped = grouped
@@ -295,10 +291,8 @@ namespace ezSCORES.Services
 					.Take(search.PageSize.Value);
 			}
 			int count = query.Count();
-			// 6) Execute
 			var resultList = grouped.ToList();
 
-			// 7) Wrap in PagedResult
 			return new PagedResult<MatchesByDateDTO>
 			{
 				Count = count,
