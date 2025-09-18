@@ -441,6 +441,7 @@ class _CompetitionsDetailsScreenState
         _buildSectionTitle("Ocjeni takmičenje"),
         const SizedBox(height: 8),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(5, (index) {
             final starIndex = index + 1;
             return IconButton(

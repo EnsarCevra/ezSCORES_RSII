@@ -37,7 +37,7 @@ namespace ezSCORES.Services
 			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
 			{
 				query = query.Where(x => x.Team.UserId == _activeUserService.GetActiveUserId())
-					.Include(x => x.Competition);
+					.Include(x => x.Competition).ThenInclude(x=>x.Selection);
 			}
 			if (_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
 			{

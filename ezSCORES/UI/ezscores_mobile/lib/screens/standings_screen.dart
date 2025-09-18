@@ -154,9 +154,8 @@ class _StandingsScreenState extends State<StandingsScreen> {
 
   return Center(
     child: DataTable(
-      columnSpacing: 8,
+      columnSpacing: 17,
       headingRowHeight: 28,
-      dataRowHeight: 26,
       horizontalMargin: 8, // reduces left/right padding: VisualDensity.compact, // makes table denser
       columns: const [
         DataColumn(label: Text("Tim", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))),

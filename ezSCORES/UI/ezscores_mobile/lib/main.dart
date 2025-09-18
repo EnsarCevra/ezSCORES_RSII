@@ -34,8 +34,8 @@ void main() async{
   await dotenv.load(fileName: ".env");
   if (Platform.isWindows) {
     setWindowTitle('Mobile Simulation');
-    setWindowMinSize(const Size(450, 844));
-    setWindowMaxSize(const Size(450, 844));
+    setWindowMinSize(const Size(600, 900));
+    setWindowMaxSize(const Size(600, 900));
   }
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => CompetitionProvider()),

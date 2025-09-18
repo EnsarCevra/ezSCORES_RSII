@@ -54,13 +54,14 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
         children: [
           _buildGeneralDetails(context),
           const SizedBox(height: 20),
+          _buildPaymentStatusView(),
+          const SizedBox(height: 20),
           const Text(
             "Odabrani igrači",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           const SizedBox(height: 2),
           _buildTeamPlayersView(),
-          const SizedBox(height: 10),
           if(widget.application == null || widget.application?.message != null)_buildMessageInput(),
         ],
       ),
@@ -196,42 +197,31 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
       return const Text("Nema odabranih igrača.");
     }
 
-      final useHorizontalGrid = widget.application == null || widget.application?.message != null;
+    return Expanded(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const cardMinWidth = 100.0;
+          final crossAxisCount = (constraints.maxWidth ~/ cardMinWidth).clamp(1, 3);
 
-    if (useHorizontalGrid) {
-      return SizedBox(
-        height: 120,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: widget.players.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 8),
-          itemBuilder: (context, index) {
-            final player = widget.players.elementAt(index);
-            return _buildMiniPlayerCard(context, player);
-          },
-        ),
-      );
-    } else {
-      return Expanded(
-        child: GridView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          padding: EdgeInsets.zero,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1,
-          ),
-          itemCount: widget.players.length,
-          itemBuilder: (context, index) {
-            final player = widget.players.elementAt(index);
-            return _buildMiniPlayerCard(context, player);
-          },
-        ),
-      );
-    }
+          return GridView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 0.8,
+            ),
+            itemCount: widget.players.length,
+            itemBuilder: (context, index) {
+              final player = widget.players.elementAt(index);
+              return _buildMiniPlayerCard(context, player);
+            },
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildMiniPlayerCard(BuildContext context, Players player) {
@@ -240,45 +230,46 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
-      child: SizedBox(
-        width: 100,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: [
-              ClipOval(
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  color: Colors.grey[300],
-                  child: player.picture == null || player.picture!.isEmpty
-                      ? const Icon(Icons.person, size: 30, color: Colors.grey)
-                      : imageFromString(player.picture!),
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ClipOval(
+              child: Container(
+                width: 50,
+                height: 50,
+                color: Colors.grey[300],
+                child: player.picture == null || player.picture!.isEmpty
+                    ? const Icon(Icons.person, size: 30, color: Colors.grey)
+                    : imageFromString(player.picture!),
               ),
-              const SizedBox(height: 6),
-              Text(
-                "${player.firstName ?? ''} ${player.lastName ?? ''}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: textTheme.bodySmall
-                    ?.copyWith(fontWeight: FontWeight.w600, fontSize: 12),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "${player.firstName ?? ''} ${player.lastName ?? ''}",
+              maxLines: 2, // allow wrapping into 2 rows
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
               ),
-              const SizedBox(height: 4),
-              Text(
-                player.birthDate != null
-                    ? formatDateOnly(player.birthDate!)
-                    : "Nepoznat datum",
-                style: textTheme.labelSmall?.copyWith(color: Colors.grey[700]),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              player.birthDate != null
+                  ? formatDateOnly(player.birthDate!)
+                  : "Nepoznat datum",
+              style: textTheme.labelSmall?.copyWith(color: Colors.grey[700]),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
   }
+
 
   Widget _buildMessageInput() {
     return TextField(
@@ -314,5 +305,50 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
       ),
       onChanged: widget.onMessageChanged,
     );
+  }
+  
+  _buildPaymentStatusView() {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+            "Status uplate",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+        Flexible(
+          flex: 0,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: _paymentStatusColor(widget.application!.isAccepted),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+                widget.application!.isPaId == true
+                        ? 'Uplaćeno'
+                        : 'Nije uplaćeno',
+                style: textTheme.bodySmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+  
+  _paymentStatusColor(bool? isPaid) {
+    return isPaid == true
+        ? Colors.green
+        : Colors.red;
   }
 }
