@@ -93,22 +93,43 @@ class _LoginPageState extends State<LoginPage>
                         AuthProvider.username,
                         AuthProvider.password,
                       );
-                      AuthProvider.id = user.id;
-                      AuthProvider.firstName = user.firstName;
-                      AuthProvider.lastName = user.lastName;
-                      AuthProvider.userName = user.userName;
-                      AuthProvider.picture = user.picture;
-                      AuthProvider.email = user.email;
-                      AuthProvider.phoneNumber = user.phoneNumber;
-                      AuthProvider.organization = user.organization;
-                      AuthProvider.roleID = user.role?.id;
-                      AuthProvider.roleName = user.role?.name;
-                      AuthProvider.roleDecription = user.role?.description;
+                      if(user.role!.id != 2 && user.role!.id != 4)//if not manager or spec (if not allowed user for mobile)
+                      {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Obavijest"),
+                              content: const Text("Ovaj tip korisnika nije podržan na mobilnoj aplikaciji"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(), 
+                                  child: const Text("Uredu"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      else
+                      {
+                        AuthProvider.id = user.id;
+                        AuthProvider.firstName = user.firstName;
+                        AuthProvider.lastName = user.lastName;
+                        AuthProvider.userName = user.userName;
+                        AuthProvider.picture = user.picture;
+                        AuthProvider.email = user.email;
+                        AuthProvider.phoneNumber = user.phoneNumber;
+                        AuthProvider.organization = user.organization;
+                        AuthProvider.roleID = user.role?.id;
+                        AuthProvider.roleName = user.role?.name;
+                        AuthProvider.roleDecription = user.role?.description;
 
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                            builder: (context) => MainNavigationScreen()),
-                      );
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (context) => MainNavigationScreen()),
+                        );
+                      }
                     } on UserException catch (exception) {
                       showDialog(
                         context: context,

@@ -25,10 +25,12 @@ import 'package:ezscores_desktop/screens/admin_dashboard_screen.dart';
 import 'package:ezscores_desktop/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => CompetitionProvider()),
     ChangeNotifierProvider(create: (_) => TeamProvider()),
@@ -89,7 +91,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white
           )),
-        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 38, 208, 47)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 38, 208, 47)),
         useMaterial3: true,
       ),
       home: LoginPage(),
@@ -114,15 +116,15 @@ class _LoginPageState extends State<LoginPage>
       body: Center(
         child: Center(
           child: Container(
-            constraints: BoxConstraints(maxHeight: 400, maxWidth: 300),
+            constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300),
             child: Card(
-              child: Padding(padding: EdgeInsets.all(10),
+              child: Padding(padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
                   Image.asset("assets/images/ezlogo5.png", height: 100, width: 100,),
-                  SizedBox(height: 50,),
-                  Container(
+                  const SizedBox(height: 50,),
+                  SizedBox(
                     height: 200,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -139,7 +141,7 @@ class _LoginPageState extends State<LoginPage>
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             labelText: "Lozinka",
-                            prefixIcon: Icon(Icons.password),
+                            prefixIcon: const Icon(Icons.password),
                             suffixIcon: IconButton(
                               onPressed: () {
                                 setState(() {
@@ -170,23 +172,44 @@ class _LoginPageState extends State<LoginPage>
                           style: const ButtonStyle(
                           ),
                         onPressed: () async {
-                          AuthProvider.username = _usernameController.text;
-                          AuthProvider.password = _passwordController.text;
-                          try{
-                            var userProvider = UserProvider();
-                            var user = await userProvider.login(AuthProvider.username, AuthProvider.password);
-                            AuthProvider.id = user.id;
-                            AuthProvider.firstName = user.firstName;
-                            AuthProvider.lastName = user.lastName;
-                            AuthProvider.userName = user.userName;
-                            AuthProvider.picture = user.picture;
-                            AuthProvider.email = user.email;
-                            AuthProvider.phoneNumber = user.phoneNumber;
-                            AuthProvider.organization = user.organization;
-                            AuthProvider.roleID = user.role?.id;
-                            AuthProvider.roleName = user.role?.name;
-                            AuthProvider.roleDecription = user.role?.description;
-                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => AdminDashboardScreen(selectedIndex: 0,)));
+                            AuthProvider.username = _usernameController.text;
+                            AuthProvider.password = _passwordController.text;
+                            try{
+                              var userProvider = UserProvider();
+                              var user = await userProvider.login(AuthProvider.username, AuthProvider.password);
+                              if(user.role!.id != 1 && user.role!.id != 3)//if not organizer or admin (if not allowed user for desktop)
+                              {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text("Obavijest"),
+                                      content: const Text("Ovaj tip korisnika nije podržan na desktop aplikaciji"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(), 
+                                          child: const Text("Uredu"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                              else
+                              {
+                                AuthProvider.id = user.id;
+                                AuthProvider.firstName = user.firstName;
+                                AuthProvider.lastName = user.lastName;
+                                AuthProvider.userName = user.userName;
+                                AuthProvider.picture = user.picture;
+                                AuthProvider.email = user.email;
+                                AuthProvider.phoneNumber = user.phoneNumber;
+                                AuthProvider.organization = user.organization;
+                                AuthProvider.roleID = user.role?.id;
+                                AuthProvider.roleName = user.role?.name;
+                                AuthProvider.roleDecription = user.role?.description;
+                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const AdminDashboardScreen(selectedIndex: 0,)));
+                              }
                           }on UserException catch(exception)
                           {
                             showDialog(
@@ -197,7 +220,7 @@ class _LoginPageState extends State<LoginPage>
                                 content: Text(exception.exMessage),));
                           }
                         },
-                         child: Text("Prijavi se"))
+                         child: const Text("Prijavi se"))
                       ],
                     )
                   )

@@ -4,6 +4,7 @@ import 'package:ezscores_desktop/models/search_result.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
@@ -13,8 +14,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
-    baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "http://localhost:5230/api/");
+    baseUrl = dotenv.env['baseUrl'] ?? "http://localhost:5000/api/";
   }
 
   Future<SearchResult<T>> get({dynamic filter}) async {
