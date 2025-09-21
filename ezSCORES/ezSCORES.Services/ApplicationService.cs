@@ -1,5 +1,7 @@
 ﻿using Azure.Core;
+using EasyNetQ;
 using ezSCORES.Model;
+using ezSCORES.Model.Messages;
 using ezSCORES.Model.Requests;
 using ezSCORES.Model.Requests.ApplicationRequests;
 using ezSCORES.Model.Requests.CompetitionRequests;
@@ -166,7 +168,23 @@ namespace ezSCORES.Services
 						}
 					}
                 }
+				
 				Context.SaveChanges();
+				var teamInfo = Context.Teams
+							.Where(t => t.Id == application.TeamId).Include(t => t.User).FirstOrDefault();
+				var bus = RabbitHutch.CreateBus("host=localhost");
+				var message = new ApplicationStatusChanged
+				{
+					ApplicationId = application.Id,
+					CompetitionName = competition.Name,
+					TeamName = teamInfo.Name,
+					UserEmail = teamInfo.User.Email,
+					UserFirstName = teamInfo.User.FirstName,
+					ApplicationStatus = request.Status,
+					IsFeeRequired = competition.Fee != null ? true : false,
+				};
+				bus.PubSub.PublishAsync(message);
+				Console.WriteLine("Published ApplicationAccepted message");
 				return Mapper.Map<Applications>(application);
 			}
 			else

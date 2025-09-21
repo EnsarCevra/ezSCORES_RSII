@@ -54,7 +54,7 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
         children: [
           _buildGeneralDetails(context),
           const SizedBox(height: 20),
-          _buildPaymentStatusView(),
+          if(widget.application!=null)_buildPaymentStatusView(),
           const SizedBox(height: 20),
           const Text(
             "Odabrani igrači",
