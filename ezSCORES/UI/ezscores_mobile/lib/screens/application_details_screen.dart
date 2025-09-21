@@ -65,7 +65,7 @@ class _ApplicationDetailsScreenState extends State<ApplicationDetailsScreen> {
         team: widget.application.team!,
         players: playersSet!
       ),
-      bottomNavigationBar: widget.application.isAccepted == true && widget.application.isPaId != true?
+      bottomNavigationBar: widget.application.isAccepted == true && widget.application.competition!.fee != null && widget.application.isPaId != true?
       SizedBox(
       width: double.infinity,
       height: 44,
@@ -73,7 +73,7 @@ class _ApplicationDetailsScreenState extends State<ApplicationDetailsScreen> {
         onPressed: () async {
           var isPaid = await Navigator.of(context).push(
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => CompetitionPaymentScreen(applicationId: widget.application.id!, competitionFee: 200, competitionName: 'Dummy Competition',),
+                    pageBuilder: (context, animation, secondaryAnimation) => CompetitionPaymentScreen(applicationId: widget.application.id!, competitionFee: widget.application.competition!.fee!, competitionName: widget.application.competition!.name!,),
                     transitionsBuilder: (context, animation, secondaryAnimation, child) {
                       return FadeTransition(opacity: animation, child: child);
                     },

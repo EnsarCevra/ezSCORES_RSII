@@ -303,7 +303,7 @@ namespace ezSCORES.Services
 			}
 			else // Senior or veteran futsal
 			{
-				if (competitionSelection!.Id == 10) // If it is veterans, only veteran teams are allowed
+				if (competitionSelection!.Id == 10 && competitionSelection.Id != teamSelection.Id) // If it is veterans and team is not veteran block, if its senior everyone can participate
 				{
 					throw new UserException("Ovo takmičenje je namijenjeno samo za veteranske ekipe");
 				}

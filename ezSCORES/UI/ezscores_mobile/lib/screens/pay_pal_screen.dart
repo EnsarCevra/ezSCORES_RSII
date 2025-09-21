@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 class CompetitionPaymentScreen extends StatefulWidget {
   final int applicationId;
   final String competitionName;
-  final double competitionFee;
+  final int competitionFee;
   String? secret;
   String? public;
   String? sandBoxMode;
@@ -33,11 +33,13 @@ class CompetitionPaymentScreen extends StatefulWidget {
 
 class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
   late ApplicationProvider applicationProvider;
+  double competitionFeeDouble = 0;
 
   @override
   void initState() {
     super.initState();
     applicationProvider = context.read<ApplicationProvider>();
+    competitionFeeDouble = widget.competitionFee.toDouble();
   }
   void _showPaymentStatusDialog(String title, String message, Color color) {
     showDialog(
@@ -95,7 +97,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      "Kotizacija: \$${widget.competitionFee.toStringAsFixed(2)}",
+                      "Kotizacija: ${competitionFeeDouble.toStringAsFixed(2)} BAM",
                       style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -146,11 +148,11 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                               {
                                 "amount": {
                                   "total":
-                                      widget.competitionFee.toStringAsFixed(2),
+                                      competitionFeeDouble.toStringAsFixed(2),
                                   "currency": "USD",
                                   "details": {
                                     "subtotal":
-                                        widget.competitionFee.toStringAsFixed(2),
+                                        competitionFeeDouble.toStringAsFixed(2),
                                     "shipping": '0',
                                     "shipping_discount": 0
                                   }
@@ -164,7 +166,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                                           "Entry - ${widget.competitionName}",
                                       "quantity": 1,
                                       "price":
-                                          widget.competitionFee.toStringAsFixed(2),
+                                          competitionFeeDouble.toStringAsFixed(2),
                                       "currency": "USD"
                                     }
                                   ],
@@ -175,7 +177,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                             onSuccess: (Map params) async{
                               //Navigator.pop(context);
                               try {
-                                var request = {'paidAmount':widget.competitionFee};
+                                var request = {'paidAmount':competitionFeeDouble};
                                 await applicationProvider.makePayment(widget.applicationId, request);
                                 if(context.mounted)
                                 {

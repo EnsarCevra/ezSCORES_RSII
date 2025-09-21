@@ -323,7 +323,7 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
             padding: const EdgeInsets.symmetric(
                 horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: _paymentStatusColor(widget.application!.isAccepted),
+              color: _paymentStatusColor(widget.application!.isPaId),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Padding(
