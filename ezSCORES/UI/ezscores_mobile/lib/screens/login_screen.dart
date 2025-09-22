@@ -16,103 +16,107 @@ class _LoginPageState extends State<LoginPage>
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController  = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
    @override
   Widget build(BuildContext context){
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              Center(
-                child: Image.asset(
-                  "assets/images/ezLogo5.png",
-                  height: 120,
-                  width: 120,
-                ),
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  labelText: "Korisničko ime",
-                  prefixIcon: const Icon(Icons.supervised_user_circle),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+    return Stack(
+      children: [Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                Center(
+                  child: Image.asset(
+                    "assets/images/ezLogo5.png",
+                    height: 120,
+                    width: 120,
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
                 ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: "Lozinka",
-                  prefixIcon: const Icon(Icons.password),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                    ),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
+                const SizedBox(height: 30),
+                TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(
+                    labelText: "Korisničko ime",
+                    prefixIcon: const Icon(Icons.supervised_user_circle),
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
-                  onPressed: () async {
-                    AuthProvider.username = _usernameController.text;
-                    AuthProvider.password = _passwordController.text;
-                    try {
-                      var userProvider = UserProvider();
-                      var user = await userProvider.login(
-                        AuthProvider.username,
-                        AuthProvider.password,
-                      );
-                      if(user.role!.id != 2 && user.role!.id != 4)//if not manager or spec (if not allowed user for mobile)
-                      {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  decoration: InputDecoration(
+                    labelText: "Lozinka",
+                    prefixIcon: const Icon(Icons.password),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                  ),
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () async {
+                      setState(() => _isLoading = true);
+      
+                      AuthProvider.username = _usernameController.text;
+                      AuthProvider.password = _passwordController.text;
+                    
+                      try {
+                        var userProvider = UserProvider();
+                        var user = await userProvider.login(
+                          AuthProvider.username,
+                          AuthProvider.password,
+                        );
+                        
+                        if (user.role!.id != 2 && user.role!.id != 4) {
+                          setState(() => _isLoading = false);
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
                               title: const Text("Obavijest"),
                               content: const Text("Ovaj tip korisnika nije podržan na mobilnoj aplikaciji"),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(), 
+                                  onPressed: () => Navigator.pop(context),
                                   child: const Text("Uredu"),
                                 ),
                               ],
-                            );
-                          },
-                        );
-                      }
-                      else
-                      {
+                            ),
+                          );
+                          return;
+                        }
+                        
                         AuthProvider.id = user.id;
                         AuthProvider.firstName = user.firstName;
                         AuthProvider.lastName = user.lastName;
@@ -124,70 +128,81 @@ class _LoginPageState extends State<LoginPage>
                         AuthProvider.roleID = user.role?.id;
                         AuthProvider.roleName = user.role?.name;
                         AuthProvider.roleDecription = user.role?.description;
-
+                        
+                        setState(() => _isLoading = false);
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                              builder: (context) => MainNavigationScreen()),
+                            builder: (context) => MainNavigationScreen(),
+                          ),
+                        );
+                          } on UserException catch (exception) {
+                        setState(() => _isLoading = false);
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Greška prilikom prijave"),
+                            content: Text(exception.exMessage),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("OK"),
+                              ),
+                            ],
+                          ),
                         );
                       }
-                    } on UserException catch (exception) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Greška prilikom prijave"),
-                          content: Text(exception.exMessage),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("OK"),
-                            )
-                          ],
-                        ),
-                      );
-                    }
+                    },
+                    child: const Text(
+                      "Prijavi se",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                    );
                   },
                   child: const Text(
-                    "Prijavi se",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    "Nemate račun? Kreirajte ga ovdje!",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => RegisterScreen()),
-                  );
-                },
-                child: const Text(
-                  "Nemate račun? Kreirajte ga ovdje!",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
-                    fontSize: 14,
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => MainNavigationScreen()),
+                    );
+                  },
+                  child: const Text(
+                    "Nastavi kao gost",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => MainNavigationScreen()),
-                  );
-                },
-                child: const Text(
-                  "Nastavi kao gost",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+      if (_isLoading)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+      ]
     );
 
   }
