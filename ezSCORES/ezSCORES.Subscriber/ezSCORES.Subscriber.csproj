@@ -23,12 +23,4 @@
 	  </None>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <EditorConfigFiles Remove="C:\Users\38762\Desktop\ezSCORES_RSII\ezSCORES\ezSCORESSubscriber\.editorconfig" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="C:\Users\38762\Desktop\ezSCORES_RSII\ezSCORES\ezSCORESSubscriber\.editorconfig" />
-	</ItemGroup>
-
 </Project>

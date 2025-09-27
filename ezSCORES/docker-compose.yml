@@ -1,0 +1,95 @@
+version: '3'
+services:
+#mssql docker   
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    container_name: rabbitmq
+    hostname: "rabbitmq"
+    labels:
+        NAME: "rabbitmq"
+    restart: unless-stopped
+    environment:
+        - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+        - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    ports:
+        - "15672:15672"
+        - "5672:5672"
+    expose:
+        - 5672
+        - 15672
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 10
+    networks:
+        - ezscoresnet
+   
+  ezscores-sql:
+    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+    restart: unless-stopped
+    user: root
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=${SA_PASS}
+        - MSSQL_PID=Developer
+    ports:
+        - "1401:1433"
+    expose:
+      - 1433
+    networks:
+        - ezscoresnet
+    
+  
+  ezscores-api:
+      restart: unless-stopped
+      build:
+        context: .
+      environment:
+        - ConnectionStrings:ezSCORES_Connection=Server=${DB_SOURCE},1433;Database=${DB_CATALOG};User=sa;Password=${SA_PASS};ConnectRetryCount=0;TrustServerCertificate=True
+        - ASPNETCORE_ENVIRONMENT=Development
+        - _enableSSL="true"
+        - _displayName=${API_DISPLAY_NAME}
+        - _timeout=${TIMEOUT}
+        - _port=${API_PORT}
+        - _rabbitMqHost=${RABBIT_MQ_HOST}
+        - _rabbitMqUser=${RABBITMQ_DEFAULT_USER}
+        - _rabbitMqPassword=${RABBITMQ_DEFAULT_PASS}
+        - _rabbitMqPort=${RABBIT_MQ_PORT}
+        - _saPassword=${SA_PASS}
+      ports:
+        - "5212:5212"
+      networks:
+        - ezscoresnet
+      links:
+        - ezscores-sql
+      depends_on:
+        - ezscores-sql
+        - rabbitmq
+
+  ezscores-subscriber:
+    restart: on-failure
+    build:
+      context: ./
+      dockerfile: ./ezSCORES.Subscriber/Dockerfile
+    depends_on:
+      - rabbitmq      
+    environment:
+        - _fromAddress=${SMTP_FROM}
+        - _password=${SMTP_EZ_PASS}
+        - _host=${SMTP_HOST}
+        - _enableSSL=true
+        - _displayName=${DISPLAY_NAME}
+        - _timeout=${TIMEOUT}
+        - _port=${SMTP_PORT}
+        - _rabbitMqHost=${RABBIT_MQ_HOST}
+        - _rabbitMqUser=${RABBITMQ_DEFAULT_USER}
+        - _rabbitMqPassword=${RABBITMQ_DEFAULT_PASS}
+        - _rabbitMqPort=${RABBIT_MQ_PORT}
+    networks:
+      - ezscoresnet
+
+
+networks:
+  ezscoresnet:
+    driver: bridge      

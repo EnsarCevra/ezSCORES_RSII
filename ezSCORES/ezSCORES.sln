@@ -9,7 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ezSCORES.Model", "ezSCORES.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ezSCORES.Services", "ezSCORES.Services\ezSCORES.Services.csproj", "{4B97BA3F-86E9-4D92-B0EE-B4C54F05880A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezSCORESSubscriber", "ezSCORESSubscriber\ezSCORESSubscriber.csproj", "{CB8D0139-C988-4384-AD63-1B41C79703CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ezSCORES.Subscriber", "ezSCORES.Subscriber\ezSCORES.Subscriber.csproj", "{CB8D0139-C988-4384-AD63-1B41C79703CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{528B33AD-95BE-498F-B5D2-71AE93BB8DA1}"
+	ProjectSection(SolutionItems) = preProject
+		ezSCORESSubscriber\.env = ezSCORESSubscriber\.env
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
