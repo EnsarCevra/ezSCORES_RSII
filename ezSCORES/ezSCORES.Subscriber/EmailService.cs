@@ -1,4 +1,4 @@
-﻿using ezSCORES.Model.Messages;
+﻿using ezSCORES.Subscriber;
 using System.Net;
 using System.Net.Mail;
 
@@ -23,8 +23,8 @@ namespace ezSCORESSubscriber
 				};
 				//create body based on application status and wethere application fee should be paid or not
 				var body = $"Poštovani/poštovana {msg.UserFirstName},\n\nVaša prijava na {msg.CompetitionName} " +
-					$"takmičenje sa ekipom {msg.TeamName} je {(msg.ApplicationStatus ? "prihvaćena": "odbijena")}.\n\n" +
-					$"{(msg.IsFeeRequired == true ? "Molimo izvršite uplatu putem mobilne aplikacije.":"")}" +
+					$"takmičenje sa ekipom {msg.TeamName} je {(msg.ApplicationStatus ? "prihvaćena" : "odbijena")}.\n\n" +
+					$"{(msg.IsFeeRequired == true ? "Molimo izvršite uplatu putem mobilne aplikacije." : "")}" +
 					$"\n\n Lijep pozdrav, \nEZ Tim";
 
 				var email = new MailMessage(from, msg.UserEmail)

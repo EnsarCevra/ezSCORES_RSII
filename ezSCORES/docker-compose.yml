@@ -58,7 +58,7 @@ services:
         - _rabbitMqPort=${RABBIT_MQ_PORT}
         - _saPassword=${SA_PASS}
       ports:
-        - "5212:5212"
+        - "5000:5000"
       networks:
         - ezscoresnet
       links:
@@ -70,8 +70,8 @@ services:
   ezscores-subscriber:
     restart: on-failure
     build:
-      context: ./
-      dockerfile: ./ezSCORES.Subscriber/Dockerfile
+      context: ./ezSCORES.Subscriber
+      dockerfile: Dockerfile
     depends_on:
       - rabbitmq      
     environment:

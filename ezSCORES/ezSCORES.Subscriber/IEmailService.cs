@@ -1,4 +1,4 @@
-﻿using ezSCORES.Model.Messages;
+﻿using ezSCORES.Subscriber;
 using System;
 using System.Collections.Generic;
 using System.Linq;
