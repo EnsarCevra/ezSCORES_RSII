@@ -2,11 +2,13 @@
 using ezSCORES.Model.Constants;
 using ezSCORES.Model.DTOs;
 using ezSCORES.Model.ENUMs;
+using ezSCORES.Model.Recommender;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Auth;
 using ezSCORES.Services.CompetitionStatusStateMachine;
 using ezSCORES.Services.Database;
+using ezSCORES.Services.Recommender;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,11 +24,13 @@ namespace ezSCORES.Services
     public class CompetitionsService : BaseCRUDService<Competitions, CompetitionsSearchObject, Competition, CompetitionsInsertRequest, CompetitionsUpdateRequest>, ICompetitionsService
 	{
 		private readonly IActiveUserService _activeUserService;
+		private readonly IRecommenderService _recommenderService;
 		public BaseCompetitionState BaseCompetitionState { get; set; }
-		public CompetitionsService(EzScoresdbRsiiContext context, IMapper mapper, BaseCompetitionState baseCompetitionState, IActiveUserService activeUserService) : base(context, mapper)
+		public CompetitionsService(EzScoresdbRsiiContext context, IMapper mapper, BaseCompetitionState baseCompetitionState, IActiveUserService activeUserService, IRecommenderService recommenderService) : base(context, mapper)
 		{
 			BaseCompetitionState = baseCompetitionState;
 			_activeUserService = activeUserService;
+			_recommenderService = recommenderService;
 		}
 		public override Competitions Insert(CompetitionsInsertRequest request)
 		{
@@ -244,6 +248,11 @@ namespace ezSCORES.Services
 			var fullYearData = Enumerable.Range(1, 12)
 				.ToDictionary(month => month, month => rawData.ContainsKey(month) ? rawData[month] : 0);
 			return fullYearData;
+		}
+
+		public RecommendedCompetitionSetup RecommendCompetitionSetup(int userId)
+		{
+			return _recommenderService.RecommendCompetitionSetup(userId);
 		}
 	}
 }

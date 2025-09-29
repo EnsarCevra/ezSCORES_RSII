@@ -5,6 +5,7 @@ using ezSCORES.Services;
 using ezSCORES.Services.Auth;
 using ezSCORES.Services.CompetitionStatusStateMachine;
 using ezSCORES.Services.Database;
+using ezSCORES.Services.Recommender;
 using Mapster;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,7 @@ builder.Services.AddTransient<IFixturesService, FixturesService>();
 builder.Services.AddTransient<ICompetitionTeamsService, CompetitionTeamsService>();
 builder.Services.AddTransient<ICompetitionsRefereesMatchService, CompetitionsRefereesMatchService>();
 builder.Services.AddTransient<ICompetitionsTeamsPlayersService, CompetitionsTeamsPlayersService>();
+builder.Services.AddTransient<IRecommenderService, RecommenderService>();
 
 //StateMachine DependencyInjection
 builder.Services.AddTransient<BaseCompetitionState>();

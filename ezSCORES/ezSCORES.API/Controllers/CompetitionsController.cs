@@ -1,5 +1,6 @@
 ﻿using ezSCORES.Model;
 using ezSCORES.Model.DTOs;
+using ezSCORES.Model.Recommender;
 using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services;
@@ -83,6 +84,12 @@ namespace ezSCORES.API.Controllers
 		public AdminDashboardDTO GetAdminDashboardInfo([FromQuery] AdminDashboardSearchObject searchObject)
 		{
 			return (_service as ICompetitionsService).GetAdminDashboardInfo(searchObject);
+		}
+		[Authorize(Roles = Model.Constants.Roles.Admin + "," + Model.Constants.Roles.Organizer)]
+		[HttpGet("{userId}/recommend-competition-setup")]
+		public RecommendedCompetitionSetup GetRecomendedCompetitionSetup(int userId)
+		{
+			return (_service as ICompetitionsService).RecommendCompetitionSetup(userId);
 		}
 	}
 }

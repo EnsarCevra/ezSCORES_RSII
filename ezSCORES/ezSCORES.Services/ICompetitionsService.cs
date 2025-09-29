@@ -8,6 +8,7 @@ using ezSCORES.Model.Requests.CompetitionRequests;
 using ezSCORES.Model.SearchObjects;
 using ezSCORES.Model.ENUMs;
 using ezSCORES.Model.DTOs;
+using ezSCORES.Model.Recommender;
 
 namespace ezSCORES.Services
 {
@@ -20,5 +21,6 @@ namespace ezSCORES.Services
 		Competitions StartCompetition(int id);
 		Competitions FinishCompetition(int id);
 		AdminDashboardDTO GetAdminDashboardInfo(AdminDashboardSearchObject searchObject);
+		RecommendedCompetitionSetup RecommendCompetitionSetup(int userId);
 	}
 }
