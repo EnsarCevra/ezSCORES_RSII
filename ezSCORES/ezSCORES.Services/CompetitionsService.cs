@@ -11,13 +11,6 @@ using ezSCORES.Services.Database;
 using ezSCORES.Services.Recommender;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ezSCORES.Services
 {

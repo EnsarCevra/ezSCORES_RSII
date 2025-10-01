@@ -18,9 +18,13 @@ namespace ezSCORES.Services.Recommender
 
 		private readonly string _modelDir = Path.Combine(AppContext.BaseDirectory, "RecommenderModels");
 
-		private readonly object _competitionTypeLock = new();
-		private readonly object _maxTeamCountLock = new();
-		private readonly object _maxPlayersLock = new();
+		public readonly object competitionTypeLock = new();
+		public readonly object maxTeamCountLock = new();
+		public readonly object maxPlayersLock = new();
+
+		private const string competitionTypeModelFilePath = "competitionTypeModel.zip";
+		private const string maxTeamCountModelFilePath = "maxTeamCountModel.zip";
+		private const string maxPlayersModelFilePath = "maxPlayersModel.zip";
 
 		public RecommenderService(EzScoresdbRsiiContext dbContext)
 		{
@@ -55,36 +59,35 @@ namespace ezSCORES.Services.Recommender
 			}
 
 			_competitionTypeModel ??= LoadOrTrainModel(
-			Path.Combine(_modelDir, "competitionTypeModel.zip"),
+			Path.Combine(_modelDir, competitionTypeModelFilePath),
 			competitions.Select(c => new CompetitionPreference
 			{
 				UserId = (uint)c.UserId,
 				ItemId = (uint)c.CompetitionType,
 				Label = 1f
 			}).ToList(),
-			_competitionTypeLock);
+			competitionTypeLock);
 
 			_maxTeamCountModel ??= LoadOrTrainModel(
-				Path.Combine(_modelDir, "maxTeamCountModel.zip"),
+				Path.Combine(_modelDir, maxTeamCountModelFilePath),
 				competitions.Select(c => new CompetitionPreference
 				{
 					UserId = (uint)c.UserId,
 					ItemId = (uint)c.MaxTeamCount,
 					Label = 1f
 				}).ToList(),
-				_maxTeamCountLock);
+				maxTeamCountLock);
 
 			_maxPlayersModel ??= LoadOrTrainModel(
-				Path.Combine(_modelDir, "maxPlayersModel.zip"),
+				Path.Combine(_modelDir, maxPlayersModelFilePath),
 				competitions.Select(c => new CompetitionPreference
 				{
 					UserId = (uint)c.UserId,
 					ItemId = (uint)c.MaxPlayersPerTeam,
 					Label = 1f
 				}).ToList(),
-				_maxPlayersLock);
+				maxPlayersLock);
 
-			// Train
 			var bestType = Predict(userId, _competitionTypeModel, Enum.GetValues(typeof(CompetitionType)).Cast<int>());
 			var bestTeamCount = Predict(userId, _maxTeamCountModel, competitions.Select(c => c.MaxTeamCount).Distinct());
 			var bestPlayers = Predict(userId, _maxPlayersModel, competitions.Select(c => c.MaxPlayersPerTeam).Distinct());
@@ -94,7 +97,7 @@ namespace ezSCORES.Services.Recommender
 			response.MaxPlayersPerTeam = bestPlayers;
 			return response;
 		}
-		private ITransformer LoadOrTrainModel(string filePath, List<CompetitionPreference> trainingData, object lockObj, bool forceTrain = false)
+		public ITransformer LoadOrTrainModel(string filePath, List<CompetitionPreference> trainingData, object lockObj, bool forceTrain = false)
 		{
 			lock (lockObj)
 			{
