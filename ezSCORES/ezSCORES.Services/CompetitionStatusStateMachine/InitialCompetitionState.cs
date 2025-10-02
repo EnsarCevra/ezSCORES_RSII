@@ -16,11 +16,9 @@ namespace ezSCORES.Services.CompetitionStatusStateMachine
 	public class InitialCompetitionState : BaseCompetitionState
 	{
 		private readonly IActiveUserService _activeUserService;
-		private readonly IRecommenderRetrainingService _recommenderRetrainingService;
-		public InitialCompetitionState(EzScoresdbRsiiContext context, IMapper mapper, IServiceProvider serviceProvider, IActiveUserService activeUserService, IRecommenderRetrainingService recommenderRetrainingService) : base(context, mapper, serviceProvider)
+		public InitialCompetitionState(EzScoresdbRsiiContext context, IMapper mapper, IServiceProvider serviceProvider, IActiveUserService activeUserService) : base(context, mapper, serviceProvider)
 		{
 			_activeUserService = activeUserService;
-			_recommenderRetrainingService = recommenderRetrainingService;
 		}
 
 		public override Competitions Insert(CompetitionsInsertRequest request)
@@ -35,7 +33,6 @@ namespace ezSCORES.Services.CompetitionStatusStateMachine
 			entity.Status = Model.ENUMs.CompetitionStatus.Preparation;
 			set.Add(entity);
 			Context.SaveChanges();
-			_ = _recommenderRetrainingService.RetrainModelsAsync();
 			return Mapper.Map<Competitions>(entity);
 		}
 		public override Competitions Preparation(int id)

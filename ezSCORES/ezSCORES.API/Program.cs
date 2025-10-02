@@ -37,8 +37,8 @@ builder.Services.AddTransient<IFixturesService, FixturesService>();
 builder.Services.AddTransient<ICompetitionTeamsService, CompetitionTeamsService>();
 builder.Services.AddTransient<ICompetitionsRefereesMatchService, CompetitionsRefereesMatchService>();
 builder.Services.AddTransient<ICompetitionsTeamsPlayersService, CompetitionsTeamsPlayersService>();
-builder.Services.AddTransient<IRecommenderService, RecommenderService>();
 
+builder.Services.AddSingleton<IRecommenderService, RecommenderService>();
 //StateMachine DependencyInjection
 builder.Services.AddTransient<BaseCompetitionState>();
 builder.Services.AddTransient<InitialCompetitionState>();

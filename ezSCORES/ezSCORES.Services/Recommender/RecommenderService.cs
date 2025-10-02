@@ -1,42 +1,30 @@
 ﻿using ezSCORES.Model.ENUMs;
 using ezSCORES.Model.Recommender;
 using ezSCORES.Services.Database;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ezSCORES.Services.Recommender
 {
 	public class RecommenderService : IRecommenderService
 	{
 		private readonly MLContext _mlContext;
-		private readonly EzScoresdbRsiiContext	_dbContext;
+		private readonly IServiceScopeFactory _scopeFactory;
 
-		private ITransformer _competitionTypeModel;
-		private ITransformer _maxTeamCountModel;
-		private ITransformer _maxPlayersModel;
-
-		private readonly string _modelDir = Path.Combine(AppContext.BaseDirectory, "RecommenderModels");
-
-		public readonly object competitionTypeLock = new();
-		public readonly object maxTeamCountLock = new();
-		public readonly object maxPlayersLock = new();
-
-		private const string competitionTypeModelFilePath = "competitionTypeModel.zip";
-		private const string maxTeamCountModelFilePath = "maxTeamCountModel.zip";
-		private const string maxPlayersModelFilePath = "maxPlayersModel.zip";
-
-		public RecommenderService(EzScoresdbRsiiContext dbContext)
+		public RecommenderService(IServiceScopeFactory scopeFactory)
 		{
 			_mlContext = new MLContext();
-			_dbContext = dbContext;
-			if (!Directory.Exists(_modelDir))
-				Directory.CreateDirectory(_modelDir);
+			_scopeFactory = scopeFactory;
 		}
 
 		public RecommendedCompetitionSetup RecommendCompetitionSetup(int userId)
 		{
-			var competitions = _dbContext.Competitions
+			using var scope = _scopeFactory.CreateScope();
+			var dbContext = scope.ServiceProvider.GetRequiredService<EzScoresdbRsiiContext>();
+			var competitions = dbContext.Competitions
 				.Where(c => !c.IsDeleted)
 				.Select(c => new CompetitionData
 				{
@@ -51,69 +39,45 @@ namespace ezSCORES.Services.Recommender
 
 			if (!competitions.Any())
 			{
-				response.CompetitionType = CompetitionType.League;
-				response.MaxTeamCount = 8;
-				response.MaxPlayersPerTeam = 10;
+				response.CompetitionType = CompetitionType.Tournament;
+				response.MaxTeamCount = 16;
+				response.MaxPlayersPerTeam = 12;
 
-				return response; // fallback defaults
+				return response;
 			}
 
-			_competitionTypeModel ??= LoadOrTrainModel(
-			Path.Combine(_modelDir, competitionTypeModelFilePath),
+			var competitionTypeModel = TrainMatrixModel(
 			competitions.Select(c => new CompetitionPreference
 			{
 				UserId = (uint)c.UserId,
 				ItemId = (uint)c.CompetitionType,
 				Label = 1f
-			}).ToList(),
-			competitionTypeLock);
+			}).ToList());
 
-			_maxTeamCountModel ??= LoadOrTrainModel(
-				Path.Combine(_modelDir, maxTeamCountModelFilePath),
+			var maxTeamCountModel = TrainMatrixModel(
 				competitions.Select(c => new CompetitionPreference
 				{
 					UserId = (uint)c.UserId,
 					ItemId = (uint)c.MaxTeamCount,
 					Label = 1f
-				}).ToList(),
-				maxTeamCountLock);
+				}).ToList());
 
-			_maxPlayersModel ??= LoadOrTrainModel(
-				Path.Combine(_modelDir, maxPlayersModelFilePath),
+			var maxPlayersModel = TrainMatrixModel(
 				competitions.Select(c => new CompetitionPreference
 				{
 					UserId = (uint)c.UserId,
 					ItemId = (uint)c.MaxPlayersPerTeam,
 					Label = 1f
-				}).ToList(),
-				maxPlayersLock);
+				}).ToList());
 
-			var bestType = Predict(userId, _competitionTypeModel, Enum.GetValues(typeof(CompetitionType)).Cast<int>());
-			var bestTeamCount = Predict(userId, _maxTeamCountModel, competitions.Select(c => c.MaxTeamCount).Distinct());
-			var bestPlayers = Predict(userId, _maxPlayersModel, competitions.Select(c => c.MaxPlayersPerTeam).Distinct());
+			var bestType = Predict(userId, competitionTypeModel, Enum.GetValues(typeof(CompetitionType)).Cast<int>());
+			var bestTeamCount = Predict(userId, maxTeamCountModel, competitions.Select(c => c.MaxTeamCount).Distinct());
+			var bestPlayers = Predict(userId, maxPlayersModel, competitions.Select(c => c.MaxPlayersPerTeam).Distinct());
 
 			response.CompetitionType = (CompetitionType)bestType;
 			response.MaxTeamCount = bestTeamCount;
 			response.MaxPlayersPerTeam = bestPlayers;
 			return response;
-		}
-		public ITransformer LoadOrTrainModel(string filePath, List<CompetitionPreference> trainingData, object lockObj, bool forceTrain = false)
-		{
-			lock (lockObj)
-			{
-				if (!forceTrain && File.Exists(filePath))
-				{
-					using var stream = File.OpenRead(filePath);
-					return _mlContext.Model.Load(stream, out _);
-				}
-
-				var model = TrainMatrixModel(trainingData);
-
-				using var fs = File.Create(filePath);
-				_mlContext.Model.Save(model, _mlContext.Data.LoadFromEnumerable(trainingData).Schema, fs);
-
-				return model;
-			}
 		}
 		private int Predict(int userId, ITransformer model, IEnumerable<int> candidates)
 		{
@@ -148,8 +112,8 @@ namespace ezSCORES.Services.Recommender
 				MatrixColumnIndexColumnName = nameof(CompetitionPreference.UserId),
 				MatrixRowIndexColumnName = nameof(CompetitionPreference.ItemId),
 				LabelColumnName = nameof(CompetitionPreference.Label),
-				NumberOfIterations = 20,
-				ApproximationRank = 50,
+				NumberOfIterations = 5,
+				ApproximationRank = 20,
 				Alpha = 0.01,
 				Lambda = 0.025,
 				LossFunction = MatrixFactorizationTrainer.LossFunctionType.SquareLossOneClass
@@ -171,7 +135,7 @@ namespace ezSCORES.Services.Recommender
 
 	public class CompetitionPreference
 	{
-		[KeyType(count: 100000)] // adjust capacity
+		[KeyType(count: 100000)]
 		public uint UserId { get; set; }
 
 		[KeyType(count: 100000)]
