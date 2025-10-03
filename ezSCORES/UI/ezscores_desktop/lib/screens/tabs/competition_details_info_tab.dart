@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:ezscores_desktop/dialogs/competition_recommendation_dialog.dart';
 import 'package:ezscores_desktop/helpers/state_machine/competition_state_transitions.dart';
 import 'package:ezscores_desktop/models/cities.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
@@ -10,6 +11,7 @@ import 'package:ezscores_desktop/models/selections.dart';
 import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
+import 'package:ezscores_desktop/providers/auth_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/tabs/competitions_aditidional_settings_tab.dart';
 import 'package:file_picker/file_picker.dart';
@@ -65,7 +67,23 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
     };
     initForm();
   }
-
+  
+Future<void> _showRecommendationDialog() async {
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => CompetitionRecommendationDialog(
+        getRecommendation: () => competitionProvider.recommendCompetitionSetup(AuthProvider.id!),
+        onAccept: (recommendation) {
+          _selectedCompetitionType = recommendation.competitionType!.index;
+          _formKey.currentState?.fields['competitionType']?.didChange(recommendation.competitionType!.index);
+          _formKey.currentState?.fields['maxTeamCount']?.didChange(recommendation.maxTeamCount.toString());
+          _formKey.currentState?.fields['maxPlayersPerTeam']?.didChange(recommendation.maxPlayersPerTeam.toString());
+          setState(() {});
+        },
+      ),
+    ); 
+}
   Future initForm() async {
     var selectionData = await selectionProvider.get();
     setState(() {
@@ -79,6 +97,10 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
         _cityController.text = _selectedCity!.name ?? '';
       } 
     });
+    if(widget.competition == null)
+    {
+      _showRecommendationDialog();
+    }
   }
 
   @override

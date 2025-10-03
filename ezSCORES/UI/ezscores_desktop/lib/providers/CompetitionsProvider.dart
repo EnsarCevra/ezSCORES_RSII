@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ezscores_desktop/models/DTOs/adminCardsDto.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
+import 'package:ezscores_desktop/models/recommender/recommendCompetitionSetup.dart';
 import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -41,7 +42,7 @@ class CompetitionProvider extends BaseProvider<Competitions>
     http.Response response;
     try {
       response = await http.patch(uri, headers: headers);
-    } on UserException catch (e) {
+    } on UserException {
       rethrow;
     }
 
@@ -57,7 +58,7 @@ class CompetitionProvider extends BaseProvider<Competitions>
     http.Response response;
     try {
       response = await http.get(uri, headers: headers);
-    } on UserException catch (e) {
+    } on UserException {
       rethrow;
     }
 
@@ -68,5 +69,23 @@ class CompetitionProvider extends BaseProvider<Competitions>
     final data = jsonDecode(response.body);
     return AdminDashboardCardsDTO.fromJson(data);
   }
+  Future<RecommendedCompetitionSetup> recommendCompetitionSetup(int userId) async {
+    final url = "${BaseProvider.baseUrl}Competitions/$userId/recommend-competition-setup";
+    final uri = Uri.parse(url);
+    final headers = createHeaders();
 
+    http.Response response;
+    try {
+      response = await http.get(uri, headers: headers);
+    } on Exception catch (e) {
+      throw UserException("Failed to fetch recommendation: $e");
+    }
+
+    if (isValidResponse(response)) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return RecommendedCompetitionSetup.fromJson(data);
+    } else {
+      throw UserException("Unknown error while fetching recommendation.");
+    }
+  }
 }

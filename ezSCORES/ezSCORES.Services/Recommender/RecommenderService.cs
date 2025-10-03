@@ -25,7 +25,6 @@ namespace ezSCORES.Services.Recommender
 			using var scope = _scopeFactory.CreateScope();
 			var dbContext = scope.ServiceProvider.GetRequiredService<EzScoresdbRsiiContext>();
 			var competitions = dbContext.Competitions
-				.Where(c => !c.IsDeleted)
 				.Select(c => new CompetitionData
 				{
 					UserId = c.UserId,
