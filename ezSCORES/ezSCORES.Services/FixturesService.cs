@@ -68,7 +68,10 @@ namespace ezSCORES.Services
 				.Select(x => x.SequenceNumber)
 				.FirstOrDefault();
 				//this will work if no deletion of fixtures is quarantied and if its all same game stage
-				entity.SequenceNumber = previousMaxSequenceNumber + 1;
+				//if its initial fixture it should have sequence nubmer 0
+				entity.SequenceNumber = previousMaxSequenceNumber == 0 && !Context.Fixtures.Any(x => x.CompetitionId == entity.CompetitionId)
+				? 0
+				: previousMaxSequenceNumber + 1;
 			}
 			
 		}
@@ -80,10 +83,10 @@ namespace ezSCORES.Services
 			{
 				throw new UserException("Odabrano kolo ne postoji ili je izbrisano!");
 			}
-			var unfinishedMatchesIds = Context.Matches.Where(x => x.FixtureId == fixture.Id && !x.IsCompleted).Select(x=>x.Id);
-			if(unfinishedMatchesIds.Any())
+			var unfinishedMatchesExist = Context.Matches.Where(x => x.FixtureId == fixture.Id && !x.IsCompleted).Any();
+			if(unfinishedMatchesExist)
 			{
-				throw new UserException($"Nezavršeni susreti: {string.Join(",", unfinishedMatchesIds)}");
+				throw new UserException($"Da biste završili kolo morate završiti sve utakmice u okviru tog kola!");
 			}
 			fixture.IsCurrentlyActive = false;
 			fixture.IsCompleted = true;

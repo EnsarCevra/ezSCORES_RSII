@@ -174,34 +174,30 @@ Widget _buildTournamentGroups(List<GroupStandingsDTO> groups) {
   Widget _buildStandingsTable(String? title, List<TeamStandingsDTO> standings) {
   return Container(
     width: double.infinity,
-    padding: const EdgeInsets.symmetric(horizontal: 8),
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: 24, // More space between columns
-        headingRowHeight: 40,
-        dataRowHeight: 36,
-        columns: const [
-          DataColumn(label: Text("Tim")),
-          DataColumn(label: Text("U")),
-          DataColumn(label: Text("P")),
-          DataColumn(label: Text("N")),
-          DataColumn(label: Text("I")),
-          DataColumn(label: Text("+/-")),
-          DataColumn(label: Text("B")),
-        ],
-        rows: standings.map((team) {
-          return DataRow(cells: [
-            DataCell(Text(team.teamName ?? "-")),
-            DataCell(Text("${team.played ?? 0}")),
-            DataCell(Text("${team.wins ?? 0}")),
-            DataCell(Text("${team.draws ?? 0}")),
-            DataCell(Text("${team.losses ?? 0}")),
-            DataCell(Text(team.goalDifference != null ? "${team.goalsScored}" ":" "${team.goalsConceded}": "")),
-            DataCell(Text("${team.points ?? 0}")),
-          ]);
-          }).toList(),
-        ),
+    padding: const EdgeInsets.all(8),
+    child: DataTable(
+      columnSpacing: 24,
+      headingRowHeight: 40,
+      columns: const [
+        DataColumn(label: Text("Tim")),
+        DataColumn(label: Text("U")),
+        DataColumn(label: Text("P")),
+        DataColumn(label: Text("N")),
+        DataColumn(label: Text("I")),
+        DataColumn(label: Text("+/-")),
+        DataColumn(label: Text("B")),
+      ],
+      rows: standings.map((team) {
+        return DataRow(cells: [
+          DataCell(Text(team.teamName ?? "-")),
+          DataCell(Text("${team.played ?? 0}")),
+          DataCell(Text("${team.wins ?? 0}")),
+          DataCell(Text("${team.draws ?? 0}")),
+          DataCell(Text("${team.losses ?? 0}")),
+          DataCell(Text(team.goalDifference != null ? "${team.goalsScored}" ":" "${team.goalsConceded}": "")),
+          DataCell(Text("${team.points ?? 0}")),
+        ]);
+        }).toList(),
       ),
     );
   }

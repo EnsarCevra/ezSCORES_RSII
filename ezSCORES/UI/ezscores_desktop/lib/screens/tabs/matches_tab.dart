@@ -99,7 +99,7 @@ class _MatchesTabState extends State<MatchesTab> {
                         Row(
                           children: [
                             Text(
-                              '${fixture.gameStage!.displayName} • ${fixture.sequenceNumber! + 1}. kolo ${fixture.isCompleted == true ? '•  Kompletirano' : ''}',
+                              '${fixture.gameStage!.displayName} ${fixture.gameStage == GameStage.groupPhase || fixture.gameStage == GameStage.league ? '• ${fixture.sequenceNumber! + 1}. kolo' : ''} ${fixture.isCompleted == true ? '•  Kompletirano' : ''}',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const Spacer(),  

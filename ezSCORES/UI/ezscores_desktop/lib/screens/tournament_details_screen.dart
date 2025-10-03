@@ -85,7 +85,7 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-      widget.competition != null ? "Detalji takmičenja" : "Novo takmičenje",
+      widget.competition != null ? "Detalji takmičenja • ${widget.competition!.name}" : "Novo takmičenje",
       selectedIndex: widget.selectedIndex,
       Column(
         children: [
