@@ -1437,7 +1437,7 @@ public static class ModelBuilderExtensions
             new Role { Id = 1, Name = "Organizer", Description = "Creating tournaments and managing", IsActive = true, IsDeleted = false, CreatedAt = DateTime.Parse("2025-10-04 14:30:00")},
             new Role { Id = 2, Name = "Manager", Description = "Managing teams and participating on competitions", IsActive = true, IsDeleted = false, CreatedAt = DateTime.Parse("2025-10-04 14:30:00")},
             new Role { Id = 3, Name = "Admin", Description = "System administrator, has all privileges in the system", IsActive = true, IsDeleted = false, CreatedAt = DateTime.Parse("2025-10-04 14:30:00")},
-			new Role { Id = 4, Name = "Manager", Description = "Spectates competitions, rates and reviews them", IsActive = true, IsDeleted = false, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
+			new Role { Id = 4, Name = "Spectator", Description = "Spectates competitions, rates and reviews them", IsActive = true, IsDeleted = false, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
 		);
 		modelBuilder.Entity<Selection>().HasData(
 	        new Selection { Id = 10, Name = "Veterani", AgeMax = null, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = new DateTime(2025, 3, 7, 1, 13, 40), ModifiedAt = null },

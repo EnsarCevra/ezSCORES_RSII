@@ -1,3 +1,4 @@
+import 'package:ezscores_desktop/models/enums/competitionType.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
 import 'package:ezscores_desktop/providers/FixturesProvider.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,9 @@ import 'package:provider/provider.dart';
 
 class FixtureDialog extends StatefulWidget {
   final int competitionId;
+  final CompetitionType competitionType;
   final int? fixtureId;
-  const FixtureDialog({super.key, required this.competitionId, this.fixtureId});
+  const FixtureDialog({super.key, required this.competitionId, this.fixtureId, required this.competitionType});
 
   @override
   State<FixtureDialog> createState() => _FixtureDialogState();
@@ -44,10 +46,10 @@ class _FixtureDialogState extends State<FixtureDialog> {
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: widget.fixtureId != null && fixture == null
-              ? Column(
-                  key: const ValueKey('loading'),
+              ? const Column(
+                  key: ValueKey('loading'),
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     SizedBox(
                       width: 24,
                       height: 24,
@@ -66,7 +68,7 @@ class _FixtureDialogState extends State<FixtureDialog> {
                     key: const ValueKey('form'),
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      FormBuilderDropdown<GameStage>(
+                      if(widget.competitionType != CompetitionType.league)FormBuilderDropdown<GameStage>(
                         name: "gameStage",
                         initialValue: fixture?.gameStage,
                         decoration: const InputDecoration(labelText: "Faza igre"),
@@ -120,7 +122,7 @@ class _FixtureDialogState extends State<FixtureDialog> {
 
       final request = {
         "competitionId" : widget.competitionId,
-        "gameStage": (formData['gameStage'] as GameStage).value,
+        "gameStage": widget.competitionType != CompetitionType.league ? (formData['gameStage'] as GameStage).value : GameStage.league.value,
         "matchLength": int.parse(formData['matchLength']),
       };
 

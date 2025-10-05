@@ -1,5 +1,6 @@
 import 'package:ezscores_desktop/dialogs/fixture_upsert_dialog.dart';
 import 'package:ezscores_desktop/models/DTOs/fixtureDto.dart';
+import 'package:ezscores_desktop/models/enums/competitionType.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
 import 'package:ezscores_desktop/providers/FixturesProvider.dart';
 import 'package:ezscores_desktop/providers/MatchesProvider.dart';
@@ -12,7 +13,8 @@ import 'package:intl/intl.dart';
 class MatchesTab extends StatefulWidget {
   final int selectedIndex;
   final int competitionId;
-  const MatchesTab({super.key, required this.competitionId, required this.selectedIndex});
+  final CompetitionType competitionType;
+  const MatchesTab({super.key, required this.competitionId, required this.competitionType, required this.selectedIndex});
 
   @override
   State<MatchesTab> createState() => _MatchesTabState();
@@ -69,7 +71,7 @@ class _MatchesTabState extends State<MatchesTab> {
                 onPressed: () async{
                   final actionResult = await showDialog<bool>(
                   context: context,
-                  builder: (context) => FixtureDialog(competitionId: widget.competitionId,),
+                  builder: (context) => FixtureDialog(competitionId: widget.competitionId, competitionType: widget.competitionType,),
                   );
                   if (actionResult == true) {
                     initForm();
@@ -122,7 +124,7 @@ class _MatchesTabState extends State<MatchesTab> {
                               onPressed: () async{
                                 final actionResult = await showDialog<bool>(
                                 context: context,
-                                builder: (context) => FixtureDialog(competitionId: widget.competitionId, fixtureId: fixture.id,),
+                                builder: (context) => FixtureDialog(competitionId: widget.competitionId, fixtureId: fixture.id, competitionType: widget.competitionType),
                                 );
                                 if (actionResult == true) {
                                   initForm();
@@ -192,7 +194,7 @@ class _MatchesTabState extends State<MatchesTab> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: SizedBox(
-                                      height: 80, // fixed height ensures vertical centering is meaningful
+                                      height: 80,
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [

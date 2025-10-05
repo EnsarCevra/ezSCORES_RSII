@@ -45,15 +45,14 @@ class _SponsorDialogState extends State<SponsorDialog> {
                 initialValue: widget.sponsor?.name ?? "",
                 decoration: const InputDecoration(labelText: "Naziv"),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator:  FormBuilderValidators.compose(
-                  [
-                    FormBuilderValidators.match(
-                      r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
-                      errorText: 'Naziv mora početi velikim slovom i sadržavati samo slova'
-                    ),
-                    FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
-                    FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 3 slova'),
-                  ]),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.match(
+                    r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ\s]*$',
+                    errorText: 'Naziv mora početi velikim slovom i sadržavati samo slova i razmake',
+                  ),
+                  FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
+                  FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 3 slova'),
+                ]),
                 ),
               const SizedBox(height: 16),
               Row(
