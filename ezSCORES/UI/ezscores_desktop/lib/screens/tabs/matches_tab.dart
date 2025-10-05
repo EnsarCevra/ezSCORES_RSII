@@ -192,74 +192,70 @@ class _MatchesTabState extends State<MatchesTab> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: SizedBox(
-  height: 80, // fixed height ensures vertical centering is meaningful
-  child: Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      /// LEFT SIDE
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (match.gameStage == GameStage.groupPhase)
-              Text(
-                match.group!.name!,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey),
-              ),
-            const SizedBox(height: 8),
-            Text(
-              '${match.homeTeam?.name ?? "?"} vs ${match.awayTeam?.name ?? "?"}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${DateFormat('dd.MM.yyyy HH:mm').format(match.dateAndTime!)} • ${match.stadium?.name ?? ""}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-      ),
+                                      height: 80, // fixed height ensures vertical centering is meaningful
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          /// LEFT SIDE
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                if (match.gameStage == GameStage.groupPhase)
+                                                  Text(
+                                                    match.group!.name!,
+                                                    style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey),
+                                                  ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  '${match.homeTeam?.name ?? "?"} vs ${match.awayTeam?.name ?? "?"}',
+                                                  style: Theme.of(context).textTheme.titleMedium,
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '${DateFormat('dd.MM.yyyy HH:mm').format(match.dateAndTime!)} • ${match.stadium?.name ?? ""}',
+                                                  style: Theme.of(context).textTheme.bodySmall,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
 
-      /// RIGHT SIDE
-      Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              match.isCompleted == true
-                  ? '${match.homeTeamScore} : ${match.awayTeamScore}'
-                  : '-',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(width: 12),
-            Container(
-              width: 1,
-              height: 40,
-              color: Colors.grey.shade300,
-            ),
-            const SizedBox(width: 12),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              tooltip: "Izbriši susret",
-              onPressed: () {
-                deleteEntity(
-                  context: context,
-                  deleteFunction: matchProvider.delete,
-                  entityId: match.matchId!,
-                  onDeleted: initForm
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    ],
-  ),
-)
-
-
-
-
+                                          /// RIGHT SIDE
+                                          Center(
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  match.isCompleted == true
+                                                      ? '${match.homeTeamScore} : ${match.awayTeamScore}'
+                                                      : '-',
+                                                  style: Theme.of(context).textTheme.titleLarge,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Container(
+                                                  width: 1,
+                                                  height: 40,
+                                                  color: Colors.grey.shade300,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                IconButton(
+                                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                                  tooltip: "Izbriši susret",
+                                                  onPressed: () {
+                                                    deleteEntity(
+                                                      context: context,
+                                                      deleteFunction: matchProvider.delete,
+                                                      entityId: match.matchId!,
+                                                      onDeleted: initForm
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
                                     ),
                                   );
                                 }).toList(),

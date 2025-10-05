@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ezSCORES.Services.Database;
 
@@ -11,9 +12,11 @@ using ezSCORES.Services.Database;
 namespace ezSCORES.Services.Migrations
 {
     [DbContext(typeof(EzScoresdbRsiiContext))]
-    partial class EzScoresdbRsiiContextModelSnapshot : ModelSnapshot
+    [Migration("20251004205024_DataSeed")]
+    partial class DataSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -354,6 +357,7 @@ namespace ezSCORES.Services.Migrations
                             Id = 22,
                             CompetitionId = 3,
                             CreatedAt = new DateTime(2025, 10, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsAccepted = false,
                             IsActive = true,
                             IsDeleted = false,
                             IsPaId = false,
@@ -365,6 +369,7 @@ namespace ezSCORES.Services.Migrations
                             Id = 23,
                             CompetitionId = 3,
                             CreatedAt = new DateTime(2025, 10, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsAccepted = false,
                             IsActive = true,
                             IsDeleted = false,
                             IsPaId = false,
@@ -376,6 +381,7 @@ namespace ezSCORES.Services.Migrations
                             Id = 24,
                             CompetitionId = 3,
                             CreatedAt = new DateTime(2025, 10, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsAccepted = false,
                             IsActive = true,
                             IsDeleted = false,
                             IsPaId = false,
@@ -387,6 +393,7 @@ namespace ezSCORES.Services.Migrations
                             Id = 25,
                             CompetitionId = 3,
                             CreatedAt = new DateTime(2025, 10, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
+                            IsAccepted = false,
                             IsActive = true,
                             IsDeleted = false,
                             IsPaId = false,
@@ -3867,7 +3874,7 @@ namespace ezSCORES.Services.Migrations
                             IsCurrentlyActive = false,
                             IsDeleted = false,
                             MatchLength = 15,
-                            SequenceNumber = 0
+                            SequenceNumber = 1
                         },
                         new
                         {
@@ -4143,11 +4150,11 @@ namespace ezSCORES.Services.Migrations
                         new
                         {
                             Id = 16,
-                            CompetitionTeamPlayerId = 115,
+                            CompetitionTeamPlayerId = 126,
                             CreatedAt = new DateTime(2025, 10, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             IsDeleted = false,
-                            IsHomeGoal = true,
+                            IsHomeGoal = false,
                             MatchId = 7,
                             ScoredAtMinute = 10,
                             SequenceNumber = 2
@@ -4167,11 +4174,11 @@ namespace ezSCORES.Services.Migrations
                         new
                         {
                             Id = 18,
-                            CompetitionTeamPlayerId = 139,
+                            CompetitionTeamPlayerId = 150,
                             CreatedAt = new DateTime(2025, 10, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             IsDeleted = false,
-                            IsHomeGoal = true,
+                            IsHomeGoal = false,
                             MatchId = 8,
                             ScoredAtMinute = 12,
                             SequenceNumber = 2
@@ -4191,11 +4198,11 @@ namespace ezSCORES.Services.Migrations
                         new
                         {
                             Id = 20,
-                            CompetitionTeamPlayerId = 115,
+                            CompetitionTeamPlayerId = 139,
                             CreatedAt = new DateTime(2025, 10, 4, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             IsDeleted = false,
-                            IsHomeGoal = true,
+                            IsHomeGoal = false,
                             MatchId = 9,
                             ScoredAtMinute = 15,
                             SequenceNumber = 2
@@ -7051,8 +7058,8 @@ namespace ezSCORES.Services.Migrations
                             IsActive = true,
                             IsDeleted = false,
                             LastName = "Čevra",
-                            PasswordHash = "ODpOqZ0oalk6+z/9ed/n+FAFGeE=",
-                            PasswordSalt = "WCS1p9TJ0W0jWUR1KP0JaA==",
+                            PasswordHash = "M7zEJ+DYWDwhK9xe5h3QpSFXK9w=",
+                            PasswordSalt = "q83k3u3B9nZrV2l4Qwh0+Q==",
                             PhoneNumber = "+38761000111",
                             RoleId = 3,
                             UserName = "cevraensar"
@@ -7066,8 +7073,8 @@ namespace ezSCORES.Services.Migrations
                             IsActive = true,
                             IsDeleted = false,
                             LastName = "Kovačević",
-                            PasswordHash = "ODpOqZ0oalk6+z/9ed/n+FAFGeE=",
-                            PasswordSalt = "WCS1p9TJ0W0jWUR1KP0JaA==",
+                            PasswordHash = "M7zEJ+DYWDwhK9xe5h3QpSFXK9w=",
+                            PasswordSalt = "q83k3u3B9nZrV2l4Qwh0+Q==",
                             PhoneNumber = "+38761000222",
                             RoleId = 1,
                             UserName = "mirzakovacevic"
@@ -7081,8 +7088,8 @@ namespace ezSCORES.Services.Migrations
                             IsActive = true,
                             IsDeleted = false,
                             LastName = "Čevra",
-                            PasswordHash = "ODpOqZ0oalk6+z/9ed/n+FAFGeE=",
-                            PasswordSalt = "WCS1p9TJ0W0jWUR1KP0JaA==",
+                            PasswordHash = "M7zEJ+DYWDwhK9xe5h3QpSFXK9w=",
+                            PasswordSalt = "q83k3u3B9nZrV2l4Qwh0+Q==",
                             PhoneNumber = "+38761000222",
                             RoleId = 1,
                             UserName = "ensarcevra"
@@ -7096,8 +7103,8 @@ namespace ezSCORES.Services.Migrations
                             IsActive = true,
                             IsDeleted = false,
                             LastName = "Hadžiosmanović",
-                            PasswordHash = "ODpOqZ0oalk6+z/9ed/n+FAFGeE=",
-                            PasswordSalt = "WCS1p9TJ0W0jWUR1KP0JaA==",
+                            PasswordHash = "M7zEJ+DYWDwhK9xe5h3QpSFXK9w=",
+                            PasswordSalt = "q83k3u3B9nZrV2l4Qwh0+Q==",
                             PhoneNumber = "+38761000333",
                             RoleId = 2,
                             UserName = "elminhadziosmanovic"
@@ -7111,8 +7118,8 @@ namespace ezSCORES.Services.Migrations
                             IsActive = true,
                             IsDeleted = false,
                             LastName = "Karić",
-                            PasswordHash = "ODpOqZ0oalk6+z/9ed/n+FAFGeE=",
-                            PasswordSalt = "WCS1p9TJ0W0jWUR1KP0JaA==",
+                            PasswordHash = "M7zEJ+DYWDwhK9xe5h3QpSFXK9w=",
+                            PasswordSalt = "q83k3u3B9nZrV2l4Qwh0+Q==",
                             PhoneNumber = "+38761000444",
                             RoleId = 2,
                             UserName = "nerminkaric"
@@ -7126,8 +7133,8 @@ namespace ezSCORES.Services.Migrations
                             IsActive = true,
                             IsDeleted = false,
                             LastName = "Muratović",
-                            PasswordHash = "ODpOqZ0oalk6+z/9ed/n+FAFGeE=",
-                            PasswordSalt = "WCS1p9TJ0W0jWUR1KP0JaA==",
+                            PasswordHash = "M7zEJ+DYWDwhK9xe5h3QpSFXK9w=",
+                            PasswordSalt = "q83k3u3B9nZrV2l4Qwh0+Q==",
                             PhoneNumber = "+38761000555",
                             RoleId = 4,
                             UserName = "selmamuratovic"

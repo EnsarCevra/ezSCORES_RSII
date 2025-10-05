@@ -172,7 +172,7 @@ namespace ezSCORES.Services
 				Context.SaveChanges();
 				var teamInfo = Context.Teams
 							.Where(t => t.Id == application.TeamId).Include(t => t.User).FirstOrDefault();
-				var bus = RabbitHutch.CreateBus("host=localhost");
+				var bus = RabbitHutch.CreateBus("host=rabbitmq");
 				var message = new ApplicationStatusChanged
 				{
 					ApplicationId = application.Id,

@@ -37,4 +37,4 @@ var bus = RabbitHutch.CreateBus(connectionString); await bus.PubSub.SubscribeAsy
 Console.WriteLine("Listening for messages, press <return> key to close");
 
 Console.ReadLine();
-
+Thread.Sleep(Timeout.Infinite);

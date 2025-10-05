@@ -124,6 +124,7 @@ namespace ezSCORES.Services
 										DateAndTime = m.DateAndTime,
 										IsCompleted = m.IsCompleted,
 										IsUnderway = m.IsUnderway,
+										GameStage = f.GameStage,
 										Group = m.HomeTeam.Group == null
 										? null
 										: new GroupDTO

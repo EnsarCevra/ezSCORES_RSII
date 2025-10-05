@@ -153,7 +153,9 @@ namespace ezSCORES.Services
 							MatchId = x.Id,
 							DateAndTime = x.DateAndTime,
 							FixtureId = x.FixtureId,
-							Group = new GroupDTO
+							Group = x.HomeTeam.Group == null
+							? null
+							: new GroupDTO
 							{
 								Id = x.HomeTeam.Group.Id,
 								Name = x.HomeTeam.Group.Name
