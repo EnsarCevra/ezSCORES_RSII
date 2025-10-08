@@ -17,7 +17,8 @@ import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   int? selectedIndex;
-  RegisterScreen({super.key, this.selectedIndex});
+  final bool enableRoles;
+  RegisterScreen({super.key, this.selectedIndex, required this.enableRoles});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -311,7 +312,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 children: [
                   _buildImagePicker(),
-                  Row(
+                  if(widget.enableRoles)Row(
                     children: [
                       Expanded(
                         child: FormBuilderDropdown(

@@ -43,6 +43,7 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
   int? _selectedCompetitionType;
   int? _selectedStatus;
   bool hasFee = false;
+  bool _isFormEditable = false;
 
   @override
   void initState() {
@@ -87,6 +88,8 @@ Future<void> _showRecommendationDialog() async {
   Future initForm() async {
     var selectionData = await selectionProvider.get();
     setState(() {
+      _isFormEditable = widget.competition == null || widget.competition?.status == CompetitionStatus.preparation;
+      hasFee = widget.competition?.fee != null;
       selectionResult = selectionData;
       _base64Image = widget.competition?.picture;
       _selectedCity = widget.competition?.city;
@@ -129,299 +132,334 @@ Future<void> _showRecommendationDialog() async {
   }
   final TextEditingController _cityController = TextEditingController();
   Widget _buildForm() {
-    return FormBuilder(
-        key: _formKey,
-        initialValue: _initialValue,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Row(
+    return Column(
+      children: [
+        Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Text(
+        _isFormEditable
+            ? "Osnovni podaci"
+            : "Uređivanje je moguće samo u stanju pripreme!",
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: _isFormEditable ? Colors.black : Colors.redAccent,
+        ),
+      ),
+    ),
+        FormBuilder(
+            key: _formKey,
+            enabled: _isFormEditable,
+            initialValue: _initialValue,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: FormBuilderField<String>(
-                      name: "imageId",
-                      builder: (field) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InputDecorator(
-                              decoration: InputDecoration(
-                                labelText: "Odaberite sliku",
-                                errorText: field.errorText,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderField<String>(
+                          enabled: _isFormEditable,
+                          name: "imageId",
+                          builder: (field) {
+                            return AbsorbPointer(
+                              absorbing: !_isFormEditable,
+                              child: Opacity(
+                                opacity: _isFormEditable ? 1.0 : 0.8,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    InputDecorator(
+                                      decoration: InputDecoration(
+                                        labelText: "Odaberite sliku",
+                                        errorText: field.errorText,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: 8.0),
+                                            child: _base64Image != null
+                                                ? Image.memory(
+                                                    base64Decode(_base64Image!),
+                                                    height: 150,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : const Icon(
+                                                    Icons.sports_soccer,
+                                                    size: 150,
+                                                  ),
+                                          ),
+                                          ListTile(
+                                            leading: const Icon(Icons.image),
+                                            title: Text(
+                                              _base64Image == null
+                                                  ? "Odaberi sliku"
+                                                  : "Promijeni sliku",
+                                            ),
+                                            trailing: const Icon(Icons.file_upload),
+                                            onTap: _isFormEditable
+                                                ? () async {
+                                                    final result = await getImage();
+                                                    if (result != null) {
+                                                      field.didChange(result);
+                                                      setState(() {
+                                                        _base64Image = result;
+                                                      });
+                                                    }
+                                                  }
+                                                : null,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: _base64Image != null
-                                        ? Image.memory(
-                                            base64Decode(_base64Image!),
-                                            height: 150,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : const Icon(
-                                          size: 150,
-                                          Icons.sports_soccer
-                                        )
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.image),
-                                    title: Text(_base64Image == null ? "Odaberi sliku" : "Promijeni sliku"),
-                                    trailing: const Icon(Icons.file_upload),
-                                    onTap: () async {
-                                      final result = await getImage(); 
-                                      if (result != null) {
-                                        field.didChange(result); 
-                                        setState(() {
-                                          _base64Image = result;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 30),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                      name: 'name',
-                      decoration: const InputDecoration(labelText: "Naziv takmičenja"),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
-                        FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 3 slova'),
-                      ]),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 30),
-              Row(
-                children: [
-                  Expanded(
-                    child: buildCityTypeAheadField(
-                    context: context,
-                    name: "city",
-                    controller: _cityController,
-                    selectedCity: _selectedCity,
-                    direction: AxisDirection.up,
-                    isRequired: true,
-                    onChanged: (city) {
-                      setState(() {
-                        _selectedCity = city;
-                      });
-                    },
-                  ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: FormBuilderDropdown(
-                      name: "selectionId",
-                      decoration: const InputDecoration(
-                        labelText: "Selekcija",
-                      ),
-                      validator: FormBuilderValidators.compose(
-                        [
-                          FormBuilderValidators.required(errorText: 'Selekcija je obavezna'),
-                        ]
-                      ),
-                      focusColor: Colors.transparent,
-                      items: (selectionResult != null)
-                        ? selectionResult!.result.map((item) =>
-                            DropdownMenuItem(
-                              value: item.id,
-                              child: Text(item.name ?? ""),
-                            ),
-                          ).toList()
-                        : [],
-                      )),
-                ],
-              ),
-              const SizedBox(width: 30),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderDateTimePicker(
-                      name: 'startDate',
-                      format: DateFormat('dd.MM.yyyy'),
-                      inputType: InputType.date,
-                      decoration: const InputDecoration(
-                        labelText: 'Početak takmičenja',
-                        suffixIcon: Icon(Icons.calendar_today),
-                      ),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(DateTime.now().year + 100),
-                      validator: FormBuilderValidators.required(errorText: 'Datum je obavezan'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: FormBuilderDateTimePicker(
-                      name: 'applicationEndDate',
-                      format: DateFormat('dd.MM.yyyy'),
-                      inputType: InputType.date,
-                      decoration: const InputDecoration(
-                        labelText: 'Kraj prijava',
-                        suffixIcon: Icon(Icons.calendar_today),
-                      ),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(DateTime.now().year + 100),
-                      validator: FormBuilderValidators.required(errorText: 'Datum je obavezan'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 30),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderDropdown<int>(
-                      name: 'competitionType',
-                      decoration: const InputDecoration(
-                        labelText: 'Tip/Vrsta',
-                      ),
-                      focusColor: Colors.transparent,
-                      items: CompetitionType.values
-                          .map((type) => DropdownMenuItem<int>(
-                                value: type.value,
-                                child: Text(type.displayName),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCompetitionType = value;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: FormBuilderTextField(
-                      name: 'season',
-                      decoration: const InputDecoration(
-                        labelText: "Sezona (npr. 2024/2025)",
-                      ),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: 'Sezona je obavezna'),
-                        FormBuilderValidators.match(
-                          r'^(\d{4}|\d{2}\/\d{2}|\d{4}\/\d{2}|\d{4}\/\d{4})$',
-                          errorText: 'Format mora biti npr. 2025, 24/25, 2024/25 ili 2024/2025',
+                            );
+                          },
                         ),
-                      ]),
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                Expanded(
-                     child: FormBuilderTextField(
-                       name: 'maxTeamCount',
-                       decoration: const InputDecoration(labelText: 'Maksimalan broj timova'),
-                       keyboardType: TextInputType.number,
-                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                       validator: FormBuilderValidators.compose([
-                         FormBuilderValidators.required(errorText: 'Obavezno'),
-                         FormBuilderValidators.integer(errorText: 'Mora biti cijeli broj'),
-                         FormBuilderValidators.min(1, errorText: 'Minimalno 1'),
-                       ]),
-                     ),
-                   ),
-                   const SizedBox(width: 16),
-                   Expanded(
-                     child: FormBuilderTextField(
-                       name: 'maxPlayersPerTeam',
-                       decoration: const InputDecoration(labelText: 'Maksimalno igrača po timu'),
-                       keyboardType: TextInputType.number,
-                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                       validator: FormBuilderValidators.compose([
-                         FormBuilderValidators.required(errorText: 'Obavezno'),
-                         FormBuilderValidators.integer(errorText: 'Mora biti cijeli broj'),
-                         FormBuilderValidators.min(1, errorText: 'Minimalno 1'),
-                       ]),
-                     ),
-                   ),
-                ],
-              ),
-              const SizedBox(width: 30),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FormBuilderField<bool>(
-                      name: 'hasFee',
-                      initialValue: hasFee,
-                      builder: (field) {
-                        return Row(
-                          children: [
-                            const Text('Kotizacija?'),
-                            Switch(
-                              value: field.value ?? false,
-                              onChanged: (value) {
-                                field.didChange(value);
-                                setState(() {
-                                  hasFee = value;
-                                });
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    if (hasFee)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
+                  const SizedBox(width: 30),
+                  Row(
+                    children: [
+                      Expanded(
                         child: FormBuilderTextField(
-                          name: 'fee',
-                          decoration: const InputDecoration(
-                            labelText: 'Kotizacija (KM)',
-                          ),
-                          keyboardType: TextInputType.number,
+                          name: 'name',
+                          decoration: const InputDecoration(labelText: "Naziv takmičenja"),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: FormBuilderValidators.compose([
-                            FormBuilderValidators.required(errorText: 'Unesite iznos kotizacije'),
-                            FormBuilderValidators.numeric(errorText: 'Iznos mora biti broj'),
-                            FormBuilderValidators.min(0, errorText: 'Iznos mora biti pozitivan'),
+                            FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
+                            FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 3 slova'),
                           ]),
                         ),
                       ),
-                  ],
-                ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                      name: 'description',
-                      decoration: const InputDecoration(
-                        labelText: "Opis takmičenja",
-                        alignLabelWithHint: true,
+                    ],
+                  ),
+                  const SizedBox(width: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: buildCityTypeAheadField(
+                          context: context,
+                          name: "city",
+                          controller: _cityController,
+                          selectedCity: _selectedCity,
+                          direction: AxisDirection.up,
+                          isRequired: true,
+                          isEnabled: _isFormEditable,
+                          onChanged: (city) {
+                            setState(() {
+                              _selectedCity = city;
+                            });
+                          },
+                        ),
                       ),
-                      maxLines: 5,
-                      minLines: 3,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: 'Opis je obavezan'),
-                        FormBuilderValidators.minLength(10, errorText: 'Opis mora imati barem 10 karaktera'),
-                      ]),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: FormBuilderDropdown(
+                          name: "selectionId",
+                          decoration: const InputDecoration(
+                            labelText: "Selekcija",
+                          ),
+                          validator: FormBuilderValidators.compose(
+                            [
+                              FormBuilderValidators.required(errorText: 'Selekcija je obavezna'),
+                            ]
+                          ),
+                          focusColor: Colors.transparent,
+                          items: (selectionResult != null)
+                            ? selectionResult!.result.map((item) =>
+                                DropdownMenuItem(
+                                  value: item.id,
+                                  child: Text(item.name ?? ""),
+                                ),
+                              ).toList()
+                            : [],
+                          )),
+                    ],
+                  ),
+                  const SizedBox(width: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderDateTimePicker(
+                          name: 'startDate',
+                          format: DateFormat('dd.MM.yyyy'),
+                          inputType: InputType.date,
+                          decoration: const InputDecoration(
+                            labelText: 'Početak takmičenja',
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(DateTime.now().year + 100),
+                          validator: FormBuilderValidators.required(errorText: 'Datum je obavezan'),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: FormBuilderDateTimePicker(
+                          name: 'applicationEndDate',
+                          format: DateFormat('dd.MM.yyyy'),
+                          inputType: InputType.date,
+                          decoration: const InputDecoration(
+                            labelText: 'Kraj prijava',
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(DateTime.now().year + 100),
+                          validator: FormBuilderValidators.required(errorText: 'Datum je obavezan'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderDropdown<int>(
+                          name: 'competitionType',
+                          decoration: const InputDecoration(
+                            labelText: 'Tip/Vrsta',
+                          ),
+                          focusColor: Colors.transparent,
+                          items: CompetitionType.values
+                              .map((type) => DropdownMenuItem<int>(
+                                    value: type.value,
+                                    child: Text(type.displayName),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCompetitionType = value;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: FormBuilderTextField(
+                          name: 'season',
+                          decoration: const InputDecoration(
+                            labelText: "Sezona (npr. 2024/2025)",
+                          ),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: FormBuilderValidators.compose([
+                            FormBuilderValidators.required(errorText: 'Sezona je obavezna'),
+                            FormBuilderValidators.match(
+                              r'^(\d{4}|\d{2}\/\d{2}|\d{4}\/\d{2}|\d{4}\/\d{4})$',
+                              errorText: 'Format mora biti npr. 2025, 24/25, 2024/25 ili 2024/2025',
+                            ),
+                          ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                    Expanded(
+                         child: FormBuilderTextField(
+                           name: 'maxTeamCount',
+                           decoration: const InputDecoration(labelText: 'Maksimalan broj timova'),
+                           keyboardType: TextInputType.number,
+                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                           validator: FormBuilderValidators.compose([
+                             FormBuilderValidators.required(errorText: 'Obavezno'),
+                             FormBuilderValidators.integer(errorText: 'Mora biti cijeli broj'),
+                             FormBuilderValidators.min(1, errorText: 'Minimalno 1'),
+                           ]),
+                         ),
+                       ),
+                       const SizedBox(width: 16),
+                       Expanded(
+                         child: FormBuilderTextField(
+                           name: 'maxPlayersPerTeam',
+                           decoration: const InputDecoration(labelText: 'Maksimalno igrača po timu'),
+                           keyboardType: TextInputType.number,
+                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                           validator: FormBuilderValidators.compose([
+                             FormBuilderValidators.required(errorText: 'Obavezno'),
+                             FormBuilderValidators.integer(errorText: 'Mora biti cijeli broj'),
+                             FormBuilderValidators.min(1, errorText: 'Minimalno 1'),
+                           ]),
+                         ),
+                       ),
+                    ],
+                  ),
+                  const SizedBox(width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: AbsorbPointer(
+                      absorbing: !_isFormEditable,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FormBuilderField<bool>(
+                            name: 'hasFee',
+                            initialValue: hasFee,
+                            builder: (field) {
+                              return Row(
+                                children: [
+                                  const Text('Kotizacija?'),
+                                  Switch(
+                                    value: field.value ?? false,
+                                    onChanged: (value) {
+                                      field.didChange(value);
+                                      setState(() {
+                                        hasFee = value;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          if (hasFee)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: FormBuilderTextField(
+                                name: 'fee',
+                                decoration: const InputDecoration(
+                                  labelText: 'Kotizacija (KM)',
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(errorText: 'Unesite iznos kotizacije'),
+                                  FormBuilderValidators.numeric(errorText: 'Iznos mora biti broj'),
+                                  FormBuilderValidators.min(0, errorText: 'Iznos mora biti pozitivan'),
+                                ]),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FormBuilderTextField(
+                          name: 'description',
+                          decoration: const InputDecoration(
+                            labelText: "Opis takmičenja",
+                            alignLabelWithHint: true,
+                          ),
+                          maxLines: 5,
+                          minLines: 3,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: FormBuilderValidators.compose([
+                            FormBuilderValidators.required(errorText: 'Opis je obavezan'),
+                            FormBuilderValidators.minLength(10, errorText: 'Opis mora imati barem 10 karaktera'),
+                          ]),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
           ),
-      ),
+        ),
+      ],
     );
   }
 
@@ -445,7 +483,7 @@ Future<void> _showRecommendationDialog() async {
             },
             child: const Text("Dodatne postavke")),
           const SizedBox(width: 10,),
-          ElevatedButton(
+          if(_isFormEditable)ElevatedButton(
             onPressed: () async {
               final isValid = _formKey.currentState?.saveAndValidate();
               if (isValid == true) {

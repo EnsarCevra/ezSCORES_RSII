@@ -136,7 +136,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
           const SizedBox(width: 8),
           ElevatedButton(onPressed: () async{
             final actionResult = await Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => RegisterScreen(selectedIndex: widget.selectedIndex,),
+              pageBuilder: (context, animation, secondaryAnimation) => RegisterScreen(selectedIndex: widget.selectedIndex, enableRoles: true,),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
                   opacity: animation,

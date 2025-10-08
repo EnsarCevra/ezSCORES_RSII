@@ -129,11 +129,13 @@ Widget buildCityTypeAheadField({
   required ValueChanged<Cities?> onChanged,
   AxisDirection direction = AxisDirection.down,
   bool isRequired = false,
+  bool isEnabled = true,
 }) {
   final cityProvider = Provider.of<CityProvider>(context, listen: false);
 
   return FormBuilderField<Cities>(
     name: name,
+    enabled: isEnabled,
     initialValue: selectedCity,
     validator: (value) {
       if (isRequired && value == null) {
@@ -142,16 +144,16 @@ Widget buildCityTypeAheadField({
       return null;
     },
     builder: (FormFieldState<Cities?> field) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TypeAheadFormField<Cities>(
+      return AbsorbPointer( // 👈 disables all interaction if isEnabled = false
+        absorbing: !isEnabled,
+        child: Opacity(
+          opacity: isEnabled ? 1.0 : 0.8, // optional: make it look disabled
+          child: TypeAheadFormField<Cities>(
             suggestionsBoxDecoration: const SuggestionsBoxDecoration(
               constraints: BoxConstraints(maxHeight: 200),
             ),
             validator: (value) {
-              if(value != null && value.isNotEmpty && selectedCity == null)
-              {
+              if (value != null && value.isNotEmpty && selectedCity == null) {
                 return 'Odaberite grad iz ponuđene liste';
               }
               return null;
@@ -159,13 +161,14 @@ Widget buildCityTypeAheadField({
             suggestionsBoxVerticalOffset: -0.5,
             direction: direction,
             textFieldConfiguration: TextFieldConfiguration(
+              enabled: isEnabled, // 👈 disable text input
               controller: controller,
               decoration: InputDecoration(
                 labelText: 'Grad',
                 errorText: field.errorText,
-                suffixIcon: selectedCity != null
+                suffixIcon: (selectedCity != null && isEnabled)
                     ? IconButton(
-                        icon: Icon(Icons.clear),
+                        icon: const Icon(Icons.clear),
                         onPressed: () {
                           controller.clear();
                           onChanged(null);
@@ -178,6 +181,7 @@ Widget buildCityTypeAheadField({
             autovalidateMode: AutovalidateMode.onUserInteraction,
             minCharsForSuggestions: 2,
             suggestionsCallback: (pattern) async {
+              if (!isEnabled) return [];
               final data = await cityProvider.get(filter: {"name": pattern});
               return data.result;
             },
@@ -186,14 +190,15 @@ Widget buildCityTypeAheadField({
             onSuggestionSelected: (city) {
               controller.text = city.name ?? '';
               onChanged(city);
-              field.didChange(city); // Notify FormBuilder
+              field.didChange(city);
             },
           ),
-        ],
+        ),
       );
     },
   );
 }
+
 
 Future<bool> showConfirmDeleteDialog(BuildContext context, {String? title, String? content, String? confirmMessage}) async {
   final result = await showDialog<bool>(
