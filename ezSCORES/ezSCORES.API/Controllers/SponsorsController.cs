@@ -10,7 +10,7 @@ namespace ezSCORES.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class SponsorsController : BaseCRUDController<Sponsors, BaseSearchObject, SponsorUpsertRequest, SponsorUpsertRequest>
+	public class SponsorsController : BaseCRUDController<Sponsors, BaseCompetitionSearchObject, SponsorUpsertRequest, SponsorUpsertRequest>
 	{
 		public SponsorsController(ISponsorsService service) : base (service)
 		{

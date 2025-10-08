@@ -18,13 +18,23 @@ class PaginationController<T> extends ChangeNotifier {
     notifyListeners();
 
     currentPage = page;
-    final result = await fetchPage(page, pageSize);
-    items = result.result;
+    var result = await fetchPage(currentPage, pageSize);
     totalCount = result.count;
 
+    final totalPages = (totalCount / pageSize).ceil();
+
+    // If current page is now out of range, move to last valid page
+    if (totalPages > 0 && currentPage >= totalPages) {
+      currentPage = totalPages - 1;
+      result = await fetchPage(currentPage, pageSize); // reload
+      totalCount = result.count;
+    }
+
+    items = result.result;
     isLoading = false;
     notifyListeners();
   }
+
 
   int get totalPages {
     if (totalCount == 0) return 0;

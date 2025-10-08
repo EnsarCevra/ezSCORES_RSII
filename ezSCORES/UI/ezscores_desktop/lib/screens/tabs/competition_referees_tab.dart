@@ -26,7 +26,6 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
   late RefereeProvider refereeProvider;
   late CompetitionsRefereesProvider competitionRefereeProvider;
   SearchResult<CompetitionsReferees>? competitionRefereeResult; 
-  Set<int?>? excludedReferees;
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
@@ -48,8 +47,8 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
   } 
 
   Future initForm() async{
-    await _paginationController.loadPage();
     await _loadCompetitionReferees();
+    await _paginationController.loadPage();
    }
 
 
@@ -121,7 +120,7 @@ class _CompetitionRefereesTabState extends State<CompetitionRefereesTab>
             ElevatedButton(onPressed: () async{
               await _paginationController.loadPage(0);
               setState(() {
-                _excludeAssignedReferees();
+                //_excludeAssignedReferees();
               });
             }, child: const Icon(Icons.search)),
           ],
@@ -352,10 +351,10 @@ _buildAssignedRefereesView() {
           content: Text(e.toString()),));
       }                  // Refresh
   }
-  void _excludeAssignedReferees() {
-    excludedReferees = competitionRefereeResult!.result.map((e) => e.refereeId).toSet();
-    _paginationController.items = _paginationController.items.where((ref)=> !excludedReferees!.contains(ref.id)).toList();
-  }
+  // void _excludeAssignedReferees() {
+  //   excludedReferees = competitionRefereeResult!.result.map((e) => e.refereeId).toSet();
+  //   _paginationController.items = _paginationController.items.where((ref)=> !excludedReferees!.contains(ref.id)).toList();
+  // }
   
   _loadCompetitionReferees() async {
     var filter = {
@@ -364,7 +363,6 @@ _buildAssignedRefereesView() {
     var competitionsRefereesData = await competitionRefereeProvider.get(filter: filter);
     setState(() {
       competitionRefereeResult = competitionsRefereesData;
-      _excludeAssignedReferees();
     });
   }
 }

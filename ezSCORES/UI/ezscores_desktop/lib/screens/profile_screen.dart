@@ -305,7 +305,7 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -365,34 +365,34 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                     await userProvider.update(userId, request);
                   }
                   
-                if(context.mounted)
-                {
+                  if(context.mounted && userId == AuthProvider.id)
+                  {
+                    AuthProvider.firstName = request['firstName'];
+                    AuthProvider.lastName = request['lastName'];
+                    AuthProvider.userName = request['userName'];
+                    AuthProvider.picture = request['picture'];
+                    AuthProvider.email = request['email'];
+                    AuthProvider.phoneNumber = request['phoneNumber'];
+                    AuthProvider.organization = request['organization'];
+                  }
                   showBottomRightNotification(context, 'Profil uspješno ažuriran.');
-                  AuthProvider.firstName = request['firstName'];
-                  AuthProvider.lastName = request['lastName'];
-                  AuthProvider.userName = request['userName'];
-                  AuthProvider.picture = request['picture'];
-                  AuthProvider.email = request['email'];
-                  AuthProvider.phoneNumber = request['phoneNumber'];
-                  AuthProvider.organization = request['organization'];
-                }
                 } catch (exception) {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text("Greška"),
+                      title: const Text("Greška"),
                       content: Text(exception.toString()),
                       actions: [
                         TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text("Ok")),
+                            child: const Text("Ok")),
                       ],
                     ),
                   );
                 }
               }
             },
-            child: Text("Sačuvaj"),
+            child: const Text("Sačuvaj"),
           ),
         ],
       ),

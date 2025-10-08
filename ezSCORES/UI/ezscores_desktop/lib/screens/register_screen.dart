@@ -157,24 +157,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       else
       {
         await showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Registracija uspješna"),
-          content: const Text("Uspješno ste se registrovali."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Idi na prijavu"),
-            ),
-          ],
-        ),
-      ).then((_) {
-        if (mounted){
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MyApp()));
-        }
-      });
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Registracija uspješna"),
+            content: const Text("Uspješno ste se registrovali."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.of(context, rootNavigator: true).pushReplacement(
+                      MaterialPageRoute(builder: (_) => const MyApp()),
+                    );
+                  });
+                },
+                child: const Text("Idi na prijavu"),
+              ),
+            ],
+          ),
+        );
+        // Navigator.of(parentContext).pushReplacement(
+        //       MaterialPageRoute(builder: (context) => const MyApp()),
+        //     );
       }
     } catch (e) {
       if (!mounted) return;

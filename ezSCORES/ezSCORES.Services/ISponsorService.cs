@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ezSCORES.Services
 {
-    public interface ISponsorsService : ICRUDService<Sponsors, BaseSearchObject, SponsorUpsertRequest, SponsorUpsertRequest>
+    public interface ISponsorsService : ICRUDService<Sponsors, BaseCompetitionSearchObject, SponsorUpsertRequest, SponsorUpsertRequest>
 	{
 	}
 }

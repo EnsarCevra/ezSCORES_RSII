@@ -120,7 +120,6 @@ class _CompetitionsSponsorsTabState extends State<CompetitionsSponsorsTab>
             ElevatedButton(onPressed: () async{
               await _paginationController.loadPage(0);
               setState(() {
-                _excludeAssignedSponsors();
               });
             }, child: const Icon(Icons.search)),
           ],
@@ -351,11 +350,6 @@ _buildAssignedSponsorsView() {
       }
   }
   
-  void _excludeAssignedSponsors() {
-    excludedSponsors = competitionSponsorResult!.result.map((e) => e.sponsorId).toSet();
-    _paginationController.items = _paginationController.items.where((ref)=> !excludedSponsors!.contains(ref.id)).toList();
-  }
-  
   _loadCompetitionSponsors() async {
     var filter = {
       "competitionId" : widget.competitionId
@@ -363,7 +357,6 @@ _buildAssignedSponsorsView() {
     var competitionsSponsorsData = await compeititonsSponsorsProvider.get(filter: filter);
     setState(() {
       competitionSponsorResult = competitionsSponsorsData;
-      _excludeAssignedSponsors();
     });
   }
 }

@@ -35,7 +35,7 @@ namespace ezSCORES.Services
 		{
 			if (request.RankingPosition != null)
 			{
-				if (Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition).Any())
+				if (Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition && x.CompetitionId == entity.CompetitionId).Any())
 				{
 					throw new UserException("Nagrada za ovo mjesto već postoji!");
 				}

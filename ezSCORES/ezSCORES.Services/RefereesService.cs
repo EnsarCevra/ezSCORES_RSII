@@ -27,6 +27,11 @@ namespace ezSCORES.Services
 				query = query.Where(x => (x.FirstName + " " + x.LastName).StartsWith(search.FirstNameLastNameGTE)
 					|| (x.LastName + " " + x.FirstName).StartsWith(search.FirstNameLastNameGTE));
 			}
+			if(search.CompetitionId != null)
+			{
+				var existingReferees = Context.CompetitionsReferees.Where(x => x.CompetitionId == search.CompetitionId).Select(x=>x.RefereeId).ToList();
+				query = query.Where(x => !existingReferees.Contains(x.Id));
+			}
 			return base.AddFilter(search, query);
 		}
 

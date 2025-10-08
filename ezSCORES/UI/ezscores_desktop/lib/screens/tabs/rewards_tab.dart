@@ -127,24 +127,27 @@ Widget build(BuildContext context) {
                           ),
                           // Center content
                           Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.emoji_events,
-                                size: reward.rankingPosition == 1 ? 100 : (reward.rankingPosition == 2 ? 60 : 48), color: Colors.orange),
-                                const SizedBox(height: 12),
-                                Text(
-                                  reward.name ?? "-",
-                                  style: Theme.of(context).textTheme.titleMedium,
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "${reward.amount?.toStringAsFixed(2) ?? '-'} KM",
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey[700]),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.emoji_events,
+                                  size: reward.rankingPosition == 1 ? 100 : (reward.rankingPosition == 2 ? 60 : 48), color: Colors.orange),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    reward.name ?? "-",
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "${reward.amount?.toStringAsFixed(2) ?? '-'} KM",
+                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey[700]),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
