@@ -420,6 +420,7 @@ Future<void> _showRecommendationDialog() async {
                               padding: const EdgeInsets.only(top: 8.0),
                               child: FormBuilderTextField(
                                 name: 'fee',
+                                initialValue: widget.competition?.fee != null ? widget.competition!.fee.toString() : '',
                                 decoration: const InputDecoration(
                                   labelText: 'Kotizacija (KM)',
                                 ),
@@ -496,6 +497,7 @@ Future<void> _showRecommendationDialog() async {
                 var request = Map.from(formData);
                 request["picture"] = _base64Image;
                 request["cityId"] = _selectedCity!.id!;
+                request["fee"] = hasFee ? formData["fee"] : null;
                 try {
                   final bool isNewCompetition = widget.competition == null;
                   if (widget.competition == null) {

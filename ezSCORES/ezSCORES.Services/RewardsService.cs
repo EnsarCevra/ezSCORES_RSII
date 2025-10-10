@@ -22,24 +22,20 @@ namespace ezSCORES.Services
 
 		public override void BeforeInsert(RewardInsertRequest request, Reward entity)
 		{
-			if(request.RankingPosition != null)
+			if (Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition && x.CompetitionId == request.CompetitionId).Any())
 			{
-				if(Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition && x.CompetitionId == request.CompetitionId).Any())
-				{
-					throw new UserException("Nagrada za ovo mjesto već postoji!");
-				}
+				throw new UserException("Nagrada za ovo mjesto već postoji!");
 			}
+			entity.Name = GetRewardNameByPosition(request.RankingPosition);
 		}
 
 		public override void BeforeUpdate(RewardUpdateRequest request, Reward entity)
 		{
-			if (request.RankingPosition != null)
+			if (Context.Rewards.Where(x => x.Id != entity.Id && x.RankingPosition == request.RankingPosition && x.CompetitionId == entity.CompetitionId).Any())
 			{
-				if (Context.Rewards.Where(x => x.RankingPosition == request.RankingPosition && x.CompetitionId == entity.CompetitionId).Any())
-				{
-					throw new UserException("Nagrada za ovo mjesto već postoji!");
-				}
+				throw new UserException("Nagrada za ovo mjesto već postoji!");
 			}
+			entity.Name = GetRewardNameByPosition(request.RankingPosition);
 		}
 		public override IQueryable<Reward> AddFilter(BaseCompetitionSearchObject search, IQueryable<Reward> query)
 		{
@@ -48,6 +44,17 @@ namespace ezSCORES.Services
 				query = query.Where(x=>x.CompetitionId ==  search.CompetitionId);
 			}
 			return base.AddFilter(search, query);
+		}
+		private static string GetRewardNameByPosition(int position)
+		{
+			return position switch
+			{
+				1 => "Prvo mjesto",
+				2 => "Drugo mjesto",
+				3 => "Treće mjesto",
+				4 => "Četvrto mjesto",
+				_ => $"{position}. mjesto"
+			};
 		}
 	}
 }

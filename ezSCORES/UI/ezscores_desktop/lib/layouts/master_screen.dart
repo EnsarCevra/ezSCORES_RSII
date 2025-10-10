@@ -41,7 +41,7 @@ class _MasterScreenState extends State<MasterScreen> {
       return;
   }
 
-  final result = await Navigator.of(context).push<int>(
+  final result = await Navigator.of(context).push<bool>(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => screenToPush!,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -50,9 +50,9 @@ class _MasterScreenState extends State<MasterScreen> {
       ),
     );
 
-    if (result != null) {
+    if (result == true) {
       setState(() {
-        _currentIndex = result;
+        _currentIndex = index;
       });
     }
 }
@@ -155,7 +155,7 @@ Widget build(BuildContext context) {
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     if (Navigator.of(context).canPop()) {
-                      Navigator.of(context).pop(_currentIndex);
+                      Navigator.of(context).pop(true);
                     }
                   },
                 ),

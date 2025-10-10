@@ -8,9 +8,7 @@ namespace ezSCORES.Model.Requests.RewardRequest
 	{
 		public int CompetitionId { get; set; }
 
-		public string Name { get; set; } = null!;
-
-		public int? RankingPosition { get; set; }
+		public int RankingPosition { get; set; }
 
 		public int Amount { get; set; }
 

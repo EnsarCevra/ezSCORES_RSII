@@ -38,28 +38,56 @@ class _RewardsDialogState extends State<RewardsDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              FormBuilderTextField(
-                name: 'name',
-                initialValue: widget.reward?.name ?? '',
-                decoration: const InputDecoration(labelText: 'Naziv'),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
-                  FormBuilderValidators.minLength(2, errorText: 'Naziv mora imati barem 2 znaka'),
-                ]),
-              ),
-              const SizedBox(height: 12),
-              FormBuilderTextField(
+              // FormBuilderTextField(
+              //   name: 'name',
+              //   initialValue: widget.reward?.name ?? '',
+              //   decoration: const InputDecoration(labelText: 'Naziv'),
+              //   autovalidateMode: AutovalidateMode.onUserInteraction,
+              //   validator: FormBuilderValidators.compose([
+              //     FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
+              //     FormBuilderValidators.minLength(2, errorText: 'Naziv mora imati barem 2 znaka'),
+              //   ]),
+              // ),
+              //const SizedBox(height: 12),
+              FormBuilderField<int>(
                 name: 'rankingPosition',
-                initialValue: widget.reward?.rankingPosition?.toString() ?? '',
-                decoration: const InputDecoration(labelText: 'Pozicija na ljestvici'),
-                keyboardType: TextInputType.number,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(errorText: 'Pozicija je obavezna'),
-                  FormBuilderValidators.integer(errorText: 'Unesite cijeli broj'),
-                  FormBuilderValidators.min(1, errorText: 'Pozicija mora biti veća od 0'),
-                ]),
+                initialValue: widget.reward?.rankingPosition,
+                validator: FormBuilderValidators.required(errorText: 'Pozicija je obavezna'),
+                builder: (FormFieldState<int?> field) {
+                  final selected = field.value;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Pozicija na ljestvici',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          _buildPodiumBox(context, 2, selected, field.didChange, height: 80),
+                          const SizedBox(width: 8),
+                          _buildPodiumBox(context, 1, selected, field.didChange, height: 100),
+                          const SizedBox(width: 8),
+                          _buildPodiumBox(context, 3, selected, field.didChange, height: 70),
+                          const SizedBox(width: 8),
+                          _buildPodiumBox(context, 4, selected, field.didChange, height: 60),
+                        ],
+                      ),
+                      if (field.hasError)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            field.errorText ?? '',
+                            style: const TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 12),
               FormBuilderTextField(
@@ -78,7 +106,7 @@ class _RewardsDialogState extends State<RewardsDialog> {
               FormBuilderTextField(
                 name: 'description',
                 initialValue: widget.reward?.description ?? '',
-                decoration: const InputDecoration(labelText: 'Opis'),
+                decoration: const InputDecoration(labelText: 'Opis (nije obavezno)'),
                 maxLines: 3,
               ),
             ],
@@ -130,6 +158,51 @@ class _RewardsDialogState extends State<RewardsDialog> {
           child: const Text("Spremi"),
         ),
       ],
+    );
+  }
+  Widget _buildPodiumBox(
+    BuildContext context,
+    int value,
+    int? selected,
+    ValueChanged<int> onSelected, {
+    required double height,
+  }) {
+    final bool isSelected = selected == value;
+    final Color baseColor = Colors.blue.shade400;
+
+    return GestureDetector(
+      onTap: () => onSelected(value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 70,
+        height: height,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected ? baseColor : baseColor.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? Colors.blue.shade900 : Colors.transparent,
+            width: 2,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    offset: const Offset(2, 3),
+                    blurRadius: 6,
+                  )
+                ]
+              : [],
+        ),
+        child: Text(
+          value.toString(),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Colors.white : Colors.blue.shade900,
+          ),
+        ),
+      ),
     );
   }
 }
