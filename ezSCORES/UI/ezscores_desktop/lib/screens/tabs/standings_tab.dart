@@ -72,7 +72,7 @@ Widget _buildTournamentGroups(List<GroupStandingsDTO> groups) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-      Align(
+        Align(
           alignment: Alignment.centerRight,
           child: ElevatedButton.icon(
             onPressed: () {
@@ -87,87 +87,86 @@ Widget _buildTournamentGroups(List<GroupStandingsDTO> groups) {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: double.infinity),
             child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: groups.map((group) {
-              return SizedBox(
-                width: 400, // control card width manually
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              group.groupName ?? "Grupa ${group.groupId}",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.add, color: Colors.grey),
-                                  onPressed: () async {
-                                    final shouldReload = await showDialog<bool>(
-                                      context: context,
-                                      builder: (context) => AddTeamsToGroupDialog(competitionId: widget.competitionId, groupId: group.groupId!,),
-                                    );
-
-                                    if (shouldReload == true) {
-                                      _loadGroups();
-                                    }
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.blue),
-                                  onPressed: () {
-                                     _showAddGroupDialog(context, null, group);
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_forever_outlined, color: Colors.red),
-                                  onPressed: () {
-                                    deleteEntity(
-                                      context: context,
-                                      deleteFunction: groupProvider.delete,
-                                      entityId: group.groupId!,
-                                      onDeleted: _loadGroups);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 220,
-                          child: SingleChildScrollView(
-                            child: _buildStandingsTable(null, group.standings ?? []),
-                          ),
-                        ),
-                      ],
+              spacing: 16,
+              runSpacing: 16,
+              children: groups.map((group) {
+                return SizedBox(
+                  width: 400, // still control card width manually
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                group.groupName ?? "Grupa ${group.groupId}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.add, color: Colors.grey),
+                                    onPressed: () async {
+                                      final shouldReload = await showDialog<bool>(
+                                        context: context,
+                                        builder: (context) => AddTeamsToGroupDialog(
+                                          competitionId: widget.competitionId,
+                                          groupId: group.groupId!,
+                                        ),
+                                      );
 
+                                      if (shouldReload == true) {
+                                        _loadGroups();
+                                      }
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () {
+                                      _showAddGroupDialog(context, null, group);
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_forever_outlined, color: Colors.red),
+                                    onPressed: () {
+                                      deleteEntity(
+                                        context: context,
+                                        deleteFunction: groupProvider.delete,
+                                        entityId: group.groupId!,
+                                        onDeleted: _loadGroups,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          _buildStandingsTable(null, group.standings ?? []), // <-- removed fixed height & scroll
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              );
-            }).toList(),
-          ),
+                );
+              }).toList(),
+            ),
           ),
         ),
       ],
     ),
   );
 }
+
 
 
 

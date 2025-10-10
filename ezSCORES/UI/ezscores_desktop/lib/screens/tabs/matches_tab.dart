@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ezscores_desktop/dialogs/fixture_upsert_dialog.dart';
 import 'package:ezscores_desktop/models/DTOs/fixtureDto.dart';
 import 'package:ezscores_desktop/models/competitions.dart';
@@ -213,11 +215,42 @@ class _MatchesTabState extends State<MatchesTab> {
                                                     style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey),
                                                   ),
                                                 const SizedBox(height: 8),
-                                                Text(
-                                                  '${match.homeTeam?.name ?? "?"} vs ${match.awayTeam?.name ?? "?"}',
-                                                  style: Theme.of(context).textTheme.titleMedium,
-                                                ),
-                                                const SizedBox(height: 4),
+                                                Row(
+                                                  children: [
+                                                      Container(
+                                                        width: 32,
+                                                        height: 32,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(6), // rounded edges
+                                                          image: match.homeTeam!.picture != null ? DecorationImage(
+                                                            image: MemoryImage(base64Decode(match.homeTeam!.picture!)),
+                                                            fit: BoxFit.cover,
+                                                          ) :
+                                                          null,
+                                                        ),
+                                                        child: match.homeTeam?.picture == null ? const Icon(Icons.image_not_supported, size: 20, color: Colors.grey,) : null,
+                                                      ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      '${match.homeTeam?.name ?? "?"} vs ${match.awayTeam?.name ?? "?"}',
+                                                      style: Theme.of(context).textTheme.titleMedium,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                      Container(
+                                                        width: 32,
+                                                        height: 32,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(6),
+                                                          image: match.awayTeam!.picture != null ? DecorationImage(
+                                                            image: MemoryImage(base64Decode(match.awayTeam!.picture!)),
+                                                            fit: BoxFit.cover,
+                                                          ) :
+                                                          null,
+                                                        ),
+                                                        child: match.homeTeam?.picture == null ? const Icon(Icons.image_not_supported, size: 20, color: Colors.grey,) : null,
+                                                      ),
+                                                ],),
+                                                const SizedBox(height: 8),
                                                 Text(
                                                   '${DateFormat('dd.MM.yyyy HH:mm').format(match.dateAndTime!)} • ${match.stadium?.name ?? ""}',
                                                   style: Theme.of(context).textTheme.bodySmall,
