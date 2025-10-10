@@ -575,12 +575,6 @@ public static class ModelBuilderExtensions
 			new Application() { Id = 20, CompetitionId = 2, TeamId = 15, Message = "Prijava tima", IsAccepted = true, IsPaId = true, PaIdAmount = 80, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new Application() { Id = 21, CompetitionId = 2, TeamId = 16, Message = "Prijava tima", IsAccepted = true, IsPaId = true, PaIdAmount = 80, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
-			// Competition 3 — 4 applications, last 4 teams, not accepted, not paid
-			new Application() { Id = 22, CompetitionId = 3, TeamId = 17, Message = "Prijava tima", IsAccepted = null, IsPaId = false, PaIdAmount = null, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Application() { Id = 23, CompetitionId = 3, TeamId = 18, Message = "Prijava tima", IsAccepted = null, IsPaId = false, PaIdAmount = null, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Application() { Id = 24, CompetitionId = 3, TeamId = 19, Message = "Prijava tima", IsAccepted = null, IsPaId = false, PaIdAmount = null, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Application() { Id = 25, CompetitionId = 3, TeamId = 20, Message = "Prijava tima", IsAccepted = null, IsPaId = false, PaIdAmount = null, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-
 			// Competition 5 — 8 applications, first 8 teams, accepted & paid
 			new Application() { Id = 26, CompetitionId = 5, TeamId = 1, Message = "Prijava tima", IsAccepted = true, IsPaId = true, PaIdAmount = 200, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new Application() { Id = 27, CompetitionId = 5, TeamId = 2, Message = "Prijava tima", IsAccepted = true, IsPaId = true, PaIdAmount = 200, IsDeleted = false, RemovedAt = null, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
@@ -964,14 +958,14 @@ public static class ModelBuilderExtensions
 			new CompetitionsTeamsPlayer { Id = 90, CompetitionsTeamsId = 16, PlayerId = 90, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 91, CompetitionsTeamsId = 16, PlayerId = 91, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
-			// Competition 3 — Team 17 (5 players)
+			// Competition 2 — Team 17 (5 players)
 			new CompetitionsTeamsPlayer { Id = 92, CompetitionsTeamsId = 17, PlayerId = 92, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 93, CompetitionsTeamsId = 17, PlayerId = 93, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 94, CompetitionsTeamsId = 17, PlayerId = 94, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 95, CompetitionsTeamsId = 17, PlayerId = 95, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 96, CompetitionsTeamsId = 17, PlayerId = 96, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
-			// Competition 3 — Team 18 (6 players)
+			// Competition 2 — Team 18 (6 players)
 			new CompetitionsTeamsPlayer { Id = 97, CompetitionsTeamsId = 18, PlayerId = 97, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 98, CompetitionsTeamsId = 18, PlayerId = 98, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 99, CompetitionsTeamsId = 18, PlayerId = 99, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
@@ -979,14 +973,14 @@ public static class ModelBuilderExtensions
 			new CompetitionsTeamsPlayer { Id = 101, CompetitionsTeamsId = 18, PlayerId = 1, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 102, CompetitionsTeamsId = 18, PlayerId = 2, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
-			// Competition 3 — Team 19 (5 players)
+			// Competition 2 — Team 19 (5 players)
 			new CompetitionsTeamsPlayer { Id = 103, CompetitionsTeamsId = 19, PlayerId = 3, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 104, CompetitionsTeamsId = 19, PlayerId = 4, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 105, CompetitionsTeamsId = 19, PlayerId = 5, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 106, CompetitionsTeamsId = 19, PlayerId = 6, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 107, CompetitionsTeamsId = 19, PlayerId = 7, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
-			// Competition 3 — Team 20 (7 players)
+			// Competition 2 — Team 20 (7 players)
 			new CompetitionsTeamsPlayer { Id = 108, CompetitionsTeamsId = 20, PlayerId = 8, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 109, CompetitionsTeamsId = 20, PlayerId = 9, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 110, CompetitionsTeamsId = 20, PlayerId = 10, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
@@ -995,68 +989,78 @@ public static class ModelBuilderExtensions
 			new CompetitionsTeamsPlayer { Id = 113, CompetitionsTeamsId = 20, PlayerId = 13, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new CompetitionsTeamsPlayer { Id = 114, CompetitionsTeamsId = 20, PlayerId = 14, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
+			// Competition 2 — Team 21 (7 players)
+			new CompetitionsTeamsPlayer { Id = 115, CompetitionsTeamsId = 21, PlayerId = 15, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 116, CompetitionsTeamsId = 21, PlayerId = 16, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 117, CompetitionsTeamsId = 21, PlayerId = 17, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 118, CompetitionsTeamsId = 21, PlayerId = 18, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 119, CompetitionsTeamsId = 21, PlayerId = 19, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 120, CompetitionsTeamsId = 21, PlayerId = 20, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 121, CompetitionsTeamsId = 21, PlayerId = 14, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+
 			// Competition 5 — Team 26 (6 players)
-			new CompetitionsTeamsPlayer { Id = 115, CompetitionsTeamsId = 26, PlayerId = 15, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 116, CompetitionsTeamsId = 26, PlayerId = 16, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 117, CompetitionsTeamsId = 26, PlayerId = 17, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 118, CompetitionsTeamsId = 26, PlayerId = 18, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 119, CompetitionsTeamsId = 26, PlayerId = 19, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 120, CompetitionsTeamsId = 26, PlayerId = 20, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 122, CompetitionsTeamsId = 26, PlayerId = 15, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 123, CompetitionsTeamsId = 26, PlayerId = 16, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 124, CompetitionsTeamsId = 26, PlayerId = 17, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 125, CompetitionsTeamsId = 26, PlayerId = 18, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 126, CompetitionsTeamsId = 26, PlayerId = 19, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 127, CompetitionsTeamsId = 26, PlayerId = 20, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 			// Competition 5 — Team 27 (5 players)
-			new CompetitionsTeamsPlayer { Id = 121, CompetitionsTeamsId = 27, PlayerId = 21, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 122, CompetitionsTeamsId = 27, PlayerId = 22, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 123, CompetitionsTeamsId = 27, PlayerId = 23, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 124, CompetitionsTeamsId = 27, PlayerId = 24, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 125, CompetitionsTeamsId = 27, PlayerId = 25, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 128, CompetitionsTeamsId = 27, PlayerId = 21, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 129, CompetitionsTeamsId = 27, PlayerId = 22, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 130, CompetitionsTeamsId = 27, PlayerId = 23, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 131, CompetitionsTeamsId = 27, PlayerId = 24, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 132, CompetitionsTeamsId = 27, PlayerId = 25, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 			// Competition 5 — Team 28 (7 players)
-			new CompetitionsTeamsPlayer { Id = 126, CompetitionsTeamsId = 28, PlayerId = 26, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 127, CompetitionsTeamsId = 28, PlayerId = 27, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 128, CompetitionsTeamsId = 28, PlayerId = 28, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 129, CompetitionsTeamsId = 28, PlayerId = 29, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 130, CompetitionsTeamsId = 28, PlayerId = 30, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 131, CompetitionsTeamsId = 28, PlayerId = 31, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 132, CompetitionsTeamsId = 28, PlayerId = 32, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 133, CompetitionsTeamsId = 28, PlayerId = 26, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 134, CompetitionsTeamsId = 28, PlayerId = 27, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 135, CompetitionsTeamsId = 28, PlayerId = 28, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 136, CompetitionsTeamsId = 28, PlayerId = 29, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 137, CompetitionsTeamsId = 28, PlayerId = 30, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 138, CompetitionsTeamsId = 28, PlayerId = 31, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 139, CompetitionsTeamsId = 28, PlayerId = 32, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 			// Competition 5 — Team 29 (6 players)
-			new CompetitionsTeamsPlayer { Id = 133, CompetitionsTeamsId = 29, PlayerId = 33, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 134, CompetitionsTeamsId = 29, PlayerId = 34, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 135, CompetitionsTeamsId = 29, PlayerId = 35, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 136, CompetitionsTeamsId = 29, PlayerId = 36, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 137, CompetitionsTeamsId = 29, PlayerId = 37, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 138, CompetitionsTeamsId = 29, PlayerId = 38, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 140, CompetitionsTeamsId = 29, PlayerId = 33, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 141, CompetitionsTeamsId = 29, PlayerId = 34, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 142, CompetitionsTeamsId = 29, PlayerId = 35, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 143, CompetitionsTeamsId = 29, PlayerId = 36, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 144, CompetitionsTeamsId = 29, PlayerId = 37, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 145, CompetitionsTeamsId = 29, PlayerId = 38, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 			// Competition 5 — Team 30 (5 players)
-			new CompetitionsTeamsPlayer { Id = 139, CompetitionsTeamsId = 30, PlayerId = 39, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 140, CompetitionsTeamsId = 30, PlayerId = 40, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 141, CompetitionsTeamsId = 30, PlayerId = 41, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 142, CompetitionsTeamsId = 30, PlayerId = 42, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 143, CompetitionsTeamsId = 30, PlayerId = 43, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 146, CompetitionsTeamsId = 30, PlayerId = 39, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 147, CompetitionsTeamsId = 30, PlayerId = 40, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 148, CompetitionsTeamsId = 30, PlayerId = 41, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 149, CompetitionsTeamsId = 30, PlayerId = 42, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 150, CompetitionsTeamsId = 30, PlayerId = 43, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 			// Competition 5 — Team 31 (6 players)
-			new CompetitionsTeamsPlayer { Id = 144, CompetitionsTeamsId = 31, PlayerId = 44, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 145, CompetitionsTeamsId = 31, PlayerId = 45, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 146, CompetitionsTeamsId = 31, PlayerId = 46, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 147, CompetitionsTeamsId = 31, PlayerId = 47, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 148, CompetitionsTeamsId = 31, PlayerId = 48, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 149, CompetitionsTeamsId = 31, PlayerId = 49, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 151, CompetitionsTeamsId = 31, PlayerId = 44, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 152, CompetitionsTeamsId = 31, PlayerId = 45, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 153, CompetitionsTeamsId = 31, PlayerId = 46, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 154, CompetitionsTeamsId = 31, PlayerId = 47, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 155, CompetitionsTeamsId = 31, PlayerId = 48, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 156, CompetitionsTeamsId = 31, PlayerId = 49, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 			// Competition 5 — Team 32 (5 players)
-			new CompetitionsTeamsPlayer { Id = 150, CompetitionsTeamsId = 32, PlayerId = 50, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 151, CompetitionsTeamsId = 32, PlayerId = 51, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 152, CompetitionsTeamsId = 32, PlayerId = 52, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 153, CompetitionsTeamsId = 32, PlayerId = 53, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 154, CompetitionsTeamsId = 32, PlayerId = 54, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 157, CompetitionsTeamsId = 32, PlayerId = 50, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 158, CompetitionsTeamsId = 32, PlayerId = 51, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 159, CompetitionsTeamsId = 32, PlayerId = 52, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 160, CompetitionsTeamsId = 32, PlayerId = 53, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 161, CompetitionsTeamsId = 32, PlayerId = 54, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 			// Competition 5 — Team 33 (7 players)
-			new CompetitionsTeamsPlayer { Id = 155, CompetitionsTeamsId = 33, PlayerId = 55, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 156, CompetitionsTeamsId = 33, PlayerId = 56, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 157, CompetitionsTeamsId = 33, PlayerId = 57, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 158, CompetitionsTeamsId = 33, PlayerId = 58, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 159, CompetitionsTeamsId = 33, PlayerId = 59, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 160, CompetitionsTeamsId = 33, PlayerId = 60, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new CompetitionsTeamsPlayer { Id = 161, CompetitionsTeamsId = 33, PlayerId = 61, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
+			new CompetitionsTeamsPlayer { Id = 162, CompetitionsTeamsId = 33, PlayerId = 55, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 163, CompetitionsTeamsId = 33, PlayerId = 56, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 164, CompetitionsTeamsId = 33, PlayerId = 57, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 165, CompetitionsTeamsId = 33, PlayerId = 58, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 166, CompetitionsTeamsId = 33, PlayerId = 59, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 167, CompetitionsTeamsId = 33, PlayerId = 60, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new CompetitionsTeamsPlayer { Id = 168, CompetitionsTeamsId = 33, PlayerId = 61, GoalsTotal = 0, IsVerified = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
+
 		);
 
 		modelBuilder.Entity<Database.FavoriteCompetition>().HasData(
@@ -1499,27 +1503,27 @@ public static class ModelBuilderExtensions
 		);
 
 		modelBuilder.Entity<Team>().HasData(
-			new Team { Id = 1, UserId = 4, SelectionId = 1, Name = "MNK Lavovi Sarajevo", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 1, UserId = 4, SelectionId = 2, Name = "MNK Lavovi Sarajevo", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new Team { Id = 2, UserId = 4, SelectionId = 2, Name = "MNK Vitezovi Zenica", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 3, UserId = 4, SelectionId = 3, Name = "MNK Borci Mostar", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 4, UserId = 4, SelectionId = 4, Name = "MNK Pobjeda Tuzla", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 5, UserId = 4, SelectionId = 5, Name = "MNK Sloga Banja Luka", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 6, UserId = 4, SelectionId = 6, Name = "MNK Olimp Ilidža", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 7, UserId = 4, SelectionId = 7, Name = "MNK Tempo Bihać", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 8, UserId = 4, SelectionId = 8, Name = "MNK Stijena Livno", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 9, UserId = 4, SelectionId = 9, Name = "MNK Energija Kakanj", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 10, UserId = 4, SelectionId = 10, Name = "MNK Fortuna Goražde", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 3, UserId = 4, SelectionId = 2, Name = "MNK Borci Mostar", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 4, UserId = 4, SelectionId = 2, Name = "MNK Pobjeda Tuzla", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 5, UserId = 4, SelectionId = 2, Name = "MNK Sloga Banja Luka", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 6, UserId = 4, SelectionId = 2, Name = "MNK Olimp Ilidža", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 7, UserId = 4, SelectionId = 2, Name = "MNK Tempo Bihać", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 8, UserId = 4, SelectionId = 2, Name = "MNK Stijena Livno", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 9, UserId = 4, SelectionId = 2, Name = "MNK Energija Kakanj", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 10, UserId = 4, SelectionId = 2, Name = "MNK Fortuna Goražde", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
-			new Team { Id = 11, UserId = 5, SelectionId = 11, Name = "MNK Korner Trebinje", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 12, UserId = 5, SelectionId = 12, Name = "MNK Delta Čapljina", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 13, UserId = 5, SelectionId = 1, Name = "MNK Željezno Srce Živinice", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 11, UserId = 5, SelectionId = 2, Name = "MNK Korner Trebinje", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 12, UserId = 5, SelectionId = 2, Name = "MNK Delta Čapljina", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 13, UserId = 5, SelectionId = 2, Name = "MNK Željezno Srce Živinice", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 			new Team { Id = 14, UserId = 5, SelectionId = 2, Name = "MNK Horizont Gradačac", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 15, UserId = 5, SelectionId = 3, Name = "MNK Bljesak Sanski Most", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 16, UserId = 5, SelectionId = 4, Name = "MNK Olimpik Jablanica", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 17, UserId = 5, SelectionId = 5, Name = "MNK Tornado Visoko", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 18, UserId = 5, SelectionId = 6, Name = "MNK Bosna Uskoplje", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 19, UserId = 5, SelectionId = 7, Name = "MNK Mladost Lukavac", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-			new Team { Id = 20, UserId = 5, SelectionId = 8, Name = "MNK Union Travnik", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
+			new Team { Id = 15, UserId = 5, SelectionId = 2, Name = "MNK Bljesak Sanski Most", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 16, UserId = 5, SelectionId = 2, Name = "MNK Olimpik Jablanica", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 17, UserId = 5, SelectionId = 2, Name = "MNK Tornado Visoko", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 18, UserId = 5, SelectionId = 2, Name = "MNK Bosna Uskoplje", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 19, UserId = 5, SelectionId = 2, Name = "MNK Mladost Lukavac", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+			new Team { Id = 20, UserId = 5, SelectionId = 2, Name = "MNK Union Travnik", Picture = null, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
 		);
 		modelBuilder.Entity<User>().HasData(
 	        new User

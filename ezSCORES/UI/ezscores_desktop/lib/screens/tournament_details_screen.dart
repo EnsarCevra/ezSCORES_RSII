@@ -121,6 +121,6 @@ class _CompetitionsDetailsScreenState extends State<CompetitionsDetailsScreen> {
   }
   Widget _buildMatchesContent()
   {
-    return Expanded(child: MatchesTab(competitionId: widget.competition!.id!, competitionType: widget.competition!.competitionType!,selectedIndex: widget.selectedIndex,));
+    return Expanded(child: MatchesTab(competition: widget.competition!,selectedIndex: widget.selectedIndex,));
   }
 }

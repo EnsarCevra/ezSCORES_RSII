@@ -1,6 +1,7 @@
 import 'package:ezscores_desktop/dialogs/fixture_upsert_dialog.dart';
 import 'package:ezscores_desktop/models/DTOs/fixtureDto.dart';
-import 'package:ezscores_desktop/models/enums/competitionType.dart';
+import 'package:ezscores_desktop/models/competitions.dart';
+import 'package:ezscores_desktop/models/enums/competitionStatus.dart';
 import 'package:ezscores_desktop/models/enums/gameStage.dart';
 import 'package:ezscores_desktop/providers/FixturesProvider.dart';
 import 'package:ezscores_desktop/providers/MatchesProvider.dart';
@@ -12,9 +13,8 @@ import 'package:intl/intl.dart';
 
 class MatchesTab extends StatefulWidget {
   final int selectedIndex;
-  final int competitionId;
-  final CompetitionType competitionType;
-  const MatchesTab({super.key, required this.competitionId, required this.competitionType, required this.selectedIndex});
+  final Competitions competition;
+  const MatchesTab({super.key, required this.competition, required this.selectedIndex});
 
   @override
   State<MatchesTab> createState() => _MatchesTabState();
@@ -42,7 +42,7 @@ class _MatchesTabState extends State<MatchesTab> {
   Future initForm() async {
     fixturesProvider = context.read<FixtureProvider>();
     matchProvider = context.read<MatchesProvider>();
-    var fixtureData = await fixturesProvider.getByCompetitionId(widget.competitionId);
+    var fixtureData = await fixturesProvider.getByCompetitionId(widget.competition.id!);
     setState(() {
       fixtures = fixtureData;
       try {
@@ -71,7 +71,7 @@ class _MatchesTabState extends State<MatchesTab> {
                 onPressed: () async{
                   final actionResult = await showDialog<bool>(
                   context: context,
-                  builder: (context) => FixtureDialog(competitionId: widget.competitionId, competitionType: widget.competitionType,),
+                  builder: (context) => FixtureDialog(competitionId: widget.competition.id!, competitionType: widget.competition.competitionType!,),
                   );
                   if (actionResult == true) {
                     initForm();
@@ -105,8 +105,12 @@ class _MatchesTabState extends State<MatchesTab> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const Spacer(),  
-                            if((activeFixtureId != null && fixture.id == activeFixtureId) || 
-                                  (activeFixtureId == null && fixture.isCompleted == false))
+                            if((widget.competition.status == CompetitionStatus.underway) &&
+                                 ( 
+                                  (activeFixtureId != null && fixture.id == activeFixtureId) || 
+                                  (activeFixtureId == null && fixture.isCompleted == false)
+                                 )
+                              )
                                 Row(
                                 children: [
                                   Text(fixture.isCurrentlyActive == true ? 'Deaktiviraj' : 'Aktiviraj' ),
@@ -124,7 +128,7 @@ class _MatchesTabState extends State<MatchesTab> {
                               onPressed: () async{
                                 final actionResult = await showDialog<bool>(
                                 context: context,
-                                builder: (context) => FixtureDialog(competitionId: widget.competitionId, fixtureId: fixture.id, competitionType: widget.competitionType),
+                                builder: (context) => FixtureDialog(competitionId: widget.competition.id!, fixtureId: fixture.id, competitionType: widget.competition.competitionType!),
                                 );
                                 if (actionResult == true) {
                                   initForm();
@@ -152,7 +156,7 @@ class _MatchesTabState extends State<MatchesTab> {
                             if(fixtureLimitReached(fixture)) ElevatedButton(onPressed: () async {
                               final actionResult = await Navigator.of(context).push(
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competitionId,selectedIndex: widget.selectedIndex,),
+                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competition.id!,selectedIndex: widget.selectedIndex,),
                                         transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                           return FadeTransition(opacity: animation, child: child);
                                         },
@@ -174,7 +178,7 @@ class _MatchesTabState extends State<MatchesTab> {
                                     onTap: () async{
                                       final actionResult = await Navigator.of(context).push(
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(matchID: match.matchId, fixture: fixture, competitionId: widget.competitionId,selectedIndex: widget.selectedIndex,),
+                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(matchID: match.matchId, fixture: fixture, competitionId: widget.competition.id!,selectedIndex: widget.selectedIndex,),
                                         transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                           return FadeTransition(opacity: animation, child: child);
                                         },
