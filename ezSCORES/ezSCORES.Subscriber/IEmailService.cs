@@ -1,4 +1,5 @@
-﻿using ezSCORES.Subscriber;
+﻿using ezSCORES.Model.Messages;
+using ezSCORES.Subscriber;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace ezSCORESSubscriber
 {
 	public interface IEmailService
 	{
-		Task SendEmail(ApplicationStatusChanged msg);
+		Task SendEmail(ezSCORES.Model.Messages.ApplicationStatusChanged msg);
 	}
 }
