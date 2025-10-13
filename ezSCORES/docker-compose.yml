@@ -71,23 +71,23 @@ services:
     restart: on-failure
     build:
       context: ./ezSCORES.Subscriber
-      dockerfile: Dockerfile   
+      dockerfile: Dockerfile
     env_file:
-      - .env
+        - .env
     depends_on:
-      - rabbitmq
+      - rabbitmq      
     environment:
-      - _fromAddress=${SMTP_FROM}
-      - _password=${SMTP_EZ_PASS}
-      - _host=${SMTP_HOST}
-      - _enableSSL=true
-      - _displayName=${DISPLAY_NAME}
-      - _timeout=${TIMEOUT}
-      - _port=${SMTP_PORT}
-      - _rabbitMqHost=${RABBIT_MQ_HOST}
-      - _rabbitMqUser=${RABBITMQ_DEFAULT_USER}
-      - _rabbitMqPassword=${RABBITMQ_DEFAULT_PASS}
-      - _rabbitMqPort=${RABBIT_MQ_PORT}
+        - _fromAddress=${SMTP_FROM}
+        - _password=${SMTP_EZ_PASS}
+        - _host=${SMTP_HOST}
+        - _enableSSL=true
+        - _displayName=${DISPLAY_NAME}
+        - _timeout=${TIMEOUT}
+        - _port=${SMTP_PORT}
+        - _rabbitMqHost=${RABBIT_MQ_HOST}
+        - _rabbitMqUser=${RABBITMQ_DEFAULT_USER}
+        - _rabbitMqPassword=${RABBITMQ_DEFAULT_PASS}
+        - _rabbitMqPort=${RABBIT_MQ_PORT}
     networks:
       - ezscoresnet
 

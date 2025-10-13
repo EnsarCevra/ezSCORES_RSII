@@ -1,5 +1,4 @@
-﻿using ezSCORES.Model.Messages;
-using ezSCORES.Subscriber;
+﻿using ezSCORES.Subscriber;
 using System.Net;
 using System.Net.Mail;
 
@@ -7,7 +6,7 @@ namespace ezSCORESSubscriber
 {
 	public class EmailService : IEmailService
 	{
-		public async Task SendEmail(ezSCORES.Model.Messages. ApplicationStatusChanged msg)
+		public async Task SendEmail(ApplicationStatusChanged msg)
 		{
 			try
 			{

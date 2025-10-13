@@ -24,14 +24,13 @@ var rabbitPort = Environment.GetEnvironmentVariable("RABBIT_MQ_PORT") ?? "5672";
 
 var connectionString = $"host={rabbitHost};username={rabbitUser};password={rabbitPass};port={rabbitPort}";
 
-var bus = RabbitHutch.CreateBus(connectionString); 
-bus.PubSub.SubscribeAsync<ezSCORES.Model.Messages.ApplicationStatusChanged>("application-accepted-group", async msg =>
+var bus = RabbitHutch.CreateBus(connectionString); await bus.PubSub.SubscribeAsync<ApplicationStatusChanged>("application-accepted-group", async msg =>
 
 {
 
 	Console.WriteLine($"Received application accepted for {msg.UserEmail}.");
 
-	emailService.SendEmail(msg);
+	await emailService.SendEmail(msg);
 
 });
 
