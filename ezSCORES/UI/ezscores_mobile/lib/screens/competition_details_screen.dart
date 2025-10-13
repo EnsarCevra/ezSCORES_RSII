@@ -565,7 +565,7 @@ class _CompetitionsDetailsScreenState
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(
+          if(competition!.competitionType != CompetitionType.tournamentKnockOutOnly)Expanded(
             child: ElevatedButton.icon(
               onPressed: () {
                 Navigator.of(context).push(

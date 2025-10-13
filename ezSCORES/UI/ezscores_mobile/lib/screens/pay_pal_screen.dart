@@ -71,9 +71,8 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
       appBar: AppBar(
         title: const Text(
           "Uplata kotizacije",
-          style: TextStyle(fontSize: 20),
+          style: TextStyle(fontSize: 15, color: Colors.black),
         ),
-        backgroundColor: const Color.fromARGB(255, 0, 83, 86),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -81,6 +80,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
           children: [
             Card(
               elevation: 5,
+              color: Colors.blue,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               child: Padding(
@@ -93,7 +93,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                       style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87),
+                          color: Colors.white),
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -101,12 +101,12 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                       style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Color.fromARGB(255, 0, 83, 86)),
+                          color: Colors.white),
                     ),
                     const SizedBox(height: 12),
                     const Text(
                       "Molimo Vas da pregledate detalje prije plaćanja!",
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                      style: TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ],
                 ),
@@ -119,14 +119,14 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[400],
+                      backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
                     child: const Text(
                       "Odustani",
-                      style: TextStyle(fontSize: 18, color: Colors.black87),
+                      style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
                 ),
@@ -232,7 +232,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 0, 83, 86),
+                      backgroundColor: Colors.blue,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),

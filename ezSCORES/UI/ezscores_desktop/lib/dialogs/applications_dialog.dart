@@ -39,7 +39,9 @@ void dispose() {
     var filter = {
       "teamId" : widget.application.team?.id,
        "competitionId" : widget.application.competitionId,
-       "isPlayersIncluded" : true
+       "isPlayersIncluded" : true,
+       "includeDeletedRecords" : widget.application.isAccepted == false,//if declined players are soft deleted
+       "applicationId" : widget.application.id
        };
     var competitionTeamsData = await competitionTeamsProvider.get(filter: filter);
     setState(() {

@@ -143,6 +143,7 @@ class _CompetitionsListScreenState extends State<CompetitionsListScreen> {
                         : null,
                       ),
                       items: CompetitionStatus.values
+                          .where((status) => status != CompetitionStatus.initial)//exclude initial status, not needed
                           .map((status) => DropdownMenuItem<int>(
                                 value: status.value,
                                 child: Text(

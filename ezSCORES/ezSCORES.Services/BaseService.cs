@@ -62,7 +62,7 @@ namespace ezSCORES.Services
 					query = query.Where(x => EF.Property<string>(x, "Name").ToLower().StartsWith(search.Name.ToLower()));
 				}
 			}
-			return query;
+			return query.OrderByDescending(x => ((ICreated)x).CreatedAt);
 		}
 		public TModel GetById(int id)
 		{
