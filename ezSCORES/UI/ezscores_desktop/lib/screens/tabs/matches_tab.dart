@@ -66,24 +66,7 @@ class _MatchesTabState extends State<MatchesTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              const Spacer(),
-              ElevatedButton.icon(
-                onPressed: () async{
-                  final actionResult = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => FixtureDialog(competitionId: widget.competition.id!, competitionType: widget.competition.competitionType!,),
-                  );
-                  if (actionResult == true) {
-                    initForm();
-                  }
-                },
-                icon: const Icon(Icons.add),
-                label: const Text("Dodaj kolo"),
-              ),
-            ],
-          ),
+          if(widget.competition.status != CompetitionStatus.finished)_addFixtureButton(),
           const SizedBox(height: 16),
           Expanded(
             child: ListView.builder(
@@ -363,5 +346,26 @@ class _MatchesTabState extends State<MatchesTab> {
     final current = fixture.matches?.length ?? 0;
 
     return current < limit;
+  }
+  
+  _addFixtureButton() {
+    return Row(
+      children: [
+        const Spacer(),
+        ElevatedButton.icon(
+          onPressed: () async{
+            final actionResult = await showDialog<bool>(
+            context: context,
+            builder: (context) => FixtureDialog(competitionId: widget.competition.id!, competitionType: widget.competition.competitionType!,),
+            );
+            if (actionResult == true) {
+              initForm();
+            }
+          },
+          icon: const Icon(Icons.add),
+          label: const Text("Dodaj kolo"),
+        ),
+      ],
+    );
   }
 }

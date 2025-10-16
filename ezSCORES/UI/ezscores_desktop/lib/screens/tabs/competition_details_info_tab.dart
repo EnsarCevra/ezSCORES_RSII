@@ -12,6 +12,7 @@ import 'package:ezscores_desktop/providers/CitiesProvider.dart';
 import 'package:ezscores_desktop/providers/CompetitionsProvider.dart';
 import 'package:ezscores_desktop/providers/SelectionProvider.dart';
 import 'package:ezscores_desktop/providers/auth_provider.dart';
+import 'package:ezscores_desktop/providers/base_provider.dart';
 import 'package:ezscores_desktop/providers/utils.dart';
 import 'package:ezscores_desktop/screens/tabs/competitions_aditidional_settings_tab.dart';
 import 'package:file_picker/file_picker.dart';
@@ -626,7 +627,16 @@ Widget _buildStateNavigation() {
   }
 }
 void _goToNextStage() async {
-    await nextCallback!(widget.competition!.id!, context);
+    try {
+      await nextCallback!(widget.competition!.id!, context);
+    } on UserException catch(exception){
+      showDialog(
+        context: context, 
+        builder: (context) => AlertDialog(
+          title: const Text("Greška"), 
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Ok"))], 
+          content: Text(exception.toString()),));
+    }
       setState(() {
         widget.competition!.status = nextState!;
       });
@@ -646,7 +656,10 @@ Future<void> _showConfirmStateChangeDialog(String message) async
           child: const Text("Odustani"),
         ),
         ElevatedButton( 
-          onPressed: _goToNextStage,
+          onPressed: (){
+            Navigator.pop(context);
+            _goToNextStage();
+          },
           child: const Text("Nastavi"),
         ),
       ],

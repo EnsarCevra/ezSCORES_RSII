@@ -52,7 +52,6 @@ class _ApplyStepOneScreenState extends State<ApplyStepOneScreen> {
           "selectionId" : _selectedSelectionID,
           "includeTeamsThatAlreadyAppliedForCompetition" : false,
           "competitionId" : widget.competition.id,
-          "onlyUsersTeams" : true,
           "page": page,
           "pageSize": pageSize,
         };

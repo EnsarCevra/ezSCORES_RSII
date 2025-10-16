@@ -228,14 +228,14 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
               }on Exception catch(exception)
               {
                 showDialog(
-                                      context: context, 
-                                      builder: (context) => AlertDialog(
-                                        title: Text("Error"), 
-                                        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("Ok"))], 
-                                        content: Text(exception.toString()),));
+                  context: context, 
+                  builder: (context) => AlertDialog(
+                    title: const Text("Greška"), 
+                    actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Ok"))], 
+                    content: Text(exception.toString()),));
               }
               }
-            }, child: Text("Sačuvaj"))
+            }, child: const Text("Sačuvaj"))
           ],
         ),
       );

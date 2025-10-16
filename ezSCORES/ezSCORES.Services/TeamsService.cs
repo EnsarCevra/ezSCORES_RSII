@@ -35,11 +35,11 @@ namespace ezSCORES.Services
 			{
 				query = query.Where(x => x.SelectionId == search.SelectionId);
 			}
-			if(search.OnlyUsersTeams && _activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)//used when applying to a new competition when we don't want to show teams with whom user already applied for compeition
+			if(_activeUserService.GetActiveUserRole() == Model.Constants.Roles.Manager)
 			{
 				var currrentUserId = _activeUserService.GetActiveUserId();
-				query = query.Where(x => x.UserId == currrentUserId).Include(x=>x.Selection);
-				if (search.IncludeTeamsThatAlreadyAppliedForCompetition != null)
+				query = query.Where(x => x.UserId == currrentUserId);
+				if (search.IncludeTeamsThatAlreadyAppliedForCompetition != null)//used when applying to a new competition when we don't want to show teams with whom user already applied for compeition
 				{
 					if (search.IncludeTeamsThatAlreadyAppliedForCompetition == false && search.CompetitionId != null)
 					{

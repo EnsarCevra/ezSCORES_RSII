@@ -149,7 +149,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                                 "amount": {
                                   "total":
                                       competitionFeeDouble.toStringAsFixed(2),
-                                  "currency": "USD",
+                                  "currency": "BAM",
                                   "details": {
                                     "subtotal":
                                         competitionFeeDouble.toStringAsFixed(2),
@@ -167,7 +167,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                                       "quantity": 1,
                                       "price":
                                           competitionFeeDouble.toStringAsFixed(2),
-                                      "currency": "USD"
+                                      "currency": "BAM"
                                     }
                                   ],
                                 }
@@ -175,7 +175,6 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                             ],
                             note: "Thanks for registering!",
                             onSuccess: (Map params) async{
-                              //Navigator.pop(context);
                               try {
                                 var request = {'paidAmount':competitionFeeDouble};
                                 await applicationProvider.makePayment(widget.applicationId, request);
