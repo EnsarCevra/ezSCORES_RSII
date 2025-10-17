@@ -98,7 +98,7 @@ class _SponsorsListScreenState extends State<SponsorsListScreen> {
             onPressed: () async {
               final actionResult = await showDialog<bool>(
                 context: context,
-                builder: (context) => StadiumDialog());
+                builder: (context) => const SponsorDialog());
               if (actionResult == true) {
                 initForm();
               }

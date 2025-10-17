@@ -295,22 +295,59 @@ Future<void> _showRecommendationDialog() async {
                           ),
                           firstDate: DateTime.now(),
                           lastDate: DateTime(DateTime.now().year + 100),
-                          validator: FormBuilderValidators.required(errorText: 'Datum je obavezan'),
+                          validator: FormBuilderValidators.required(errorText: 'Obavezno polje')
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: FormBuilderDateTimePicker(
+                        child: FormBuilderField<DateTime>(
                           name: 'applicationEndDate',
-                          format: DateFormat('dd.MM.yyyy'),
-                          inputType: InputType.date,
-                          decoration: const InputDecoration(
-                            labelText: 'Kraj prijava',
-                            suffixIcon: Icon(Icons.calendar_today),
-                          ),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(DateTime.now().year + 100),
-                          validator: FormBuilderValidators.required(errorText: 'Datum je obavezan'),
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Obavezno polje';
+                            }
+
+                            final startDate = _formKey.currentState?.fields['startDate']?.value;
+                            if (startDate != null && value.isAfter(startDate) || value == startDate) {
+                              return 'Prijave se moraju zatvoriti prije početka takmičenja!';
+                            }
+
+                            return null;
+                          },
+                          builder: (field) {
+                            final value = field.value;
+                            final errorText = field.errorText;
+                            return GestureDetector(
+                              onTap: () async {
+                                final pickedDate = await showDatePicker(
+                                  context: field.context,
+                                  initialDate: value ?? DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(DateTime.now().year + 100),
+                                );
+
+                                if (pickedDate != null) {
+                                  field.didChange(pickedDate);
+                                }
+                              },
+                              child: AbsorbPointer(
+                                child: TextFormField(
+                                  controller: TextEditingController(
+                                    text: value == null
+                                        ? ''
+                                        : DateFormat('dd.MM.yyyy').format(value),
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: 'Kraj prijava',
+                                    suffixIcon: const Icon(Icons.calendar_today),
+                                    errorText: errorText,
+                                    enabled: _isFormEditable
+                                  ),
+                                  readOnly: true,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -487,6 +524,7 @@ Future<void> _showRecommendationDialog() async {
           const SizedBox(width: 10,),
           if(_isFormEditable)ElevatedButton(
             onPressed: () async {
+              FocusScope.of(context).unfocus();
               final isValid = _formKey.currentState?.saveAndValidate();
               if (isValid == true) {
                 final originalFormData = _formKey.currentState?.value;
@@ -629,6 +667,12 @@ Widget _buildStateNavigation() {
 void _goToNextStage() async {
     try {
       await nextCallback!(widget.competition!.id!, context);
+      setState(() {
+        widget.competition!.status = nextState!;
+        if(_isFormEditable == true)_isFormEditable = false;
+      });
+      widget.onStateChanged?.call();
+      showBottomRightNotification(context, 'Status promijenjen na "${nextState!.displayName}".');
     } on UserException catch(exception){
       showDialog(
         context: context, 
@@ -637,11 +681,6 @@ void _goToNextStage() async {
           actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Ok"))], 
           content: Text(exception.toString()),));
     }
-      setState(() {
-        widget.competition!.status = nextState!;
-      });
-      widget.onStateChanged?.call();
-      showBottomRightNotification(context, 'Status promijenjen na "${nextState!.displayName}".');
 }
 Future<void> _showConfirmStateChangeDialog(String message) async
 {
@@ -697,6 +736,7 @@ Future<void> _showConfirmStateChangeDialog(String message) async
                   onPressed: () async {
                     try {
                       await previousCallback!(widget.competition!.id!, context);
+                      if(previousState == CompetitionStatus.preparation)_isFormEditable = true;
                       setState(() {
                         widget.competition!.status = previousState!;
                       });

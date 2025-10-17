@@ -83,77 +83,7 @@ class _MatchesTabState extends State<MatchesTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              '${fixture.gameStage!.displayName} ${fixture.gameStage == GameStage.groupPhase || fixture.gameStage == GameStage.league ? '• ${fixture.sequenceNumber! + 1}. kolo' : ''} ${fixture.isCompleted == true ? '•  Kompletirano' : ''}',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const Spacer(),  
-                            if((widget.competition.status == CompetitionStatus.underway) &&
-                                 ( 
-                                  (activeFixtureId != null && fixture.id == activeFixtureId) || 
-                                  (activeFixtureId == null && fixture.isCompleted == false)
-                                 )
-                              )
-                                Row(
-                                children: [
-                                  Text(fixture.isCurrentlyActive == true ? 'Deaktiviraj' : 'Aktiviraj' ),
-                                  Switch(
-                                    value: fixture.isCurrentlyActive ?? false,
-                                    onChanged: (value) {
-                                      _activateFixture(fixture.id!, value);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
-                              tooltip: 'Uredi kolo',
-                              onPressed: () async{
-                                final actionResult = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => FixtureDialog(competitionId: widget.competition.id!, fixtureId: fixture.id, competitionType: widget.competition.competitionType!),
-                                );
-                                if (actionResult == true) {
-                                  initForm();
-                                }
-                              },
-                            ),
-                            if(fixture.isCompleted != true && fixture.isCurrentlyActive == true) IconButton(
-                              icon: const Icon(Icons.flag, color: Colors.orange),
-                              tooltip: 'Završi kolo',
-                              onPressed: () {
-                                _finishFixture(fixture.id!);
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              tooltip: 'Obriši kolo',
-                              onPressed: () {
-                                deleteEntity(
-                                  context: context,
-                                  deleteFunction: fixturesProvider.delete,
-                                  entityId: fixture.id!,
-                                  onDeleted: initForm);
-                              },
-                            ),
-                            if(fixtureLimitReached(fixture)) ElevatedButton(onPressed: () async {
-                              final actionResult = await Navigator.of(context).push(
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competition.id!,selectedIndex: widget.selectedIndex,),
-                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                          return FadeTransition(opacity: animation, child: child);
-                                        },
-                                      ),
-                                    );
-
-                                    if (actionResult == true) {
-                                      initForm();
-                                    }
-                            }, child: const Text('Dodaj utakmicu')), 
-                          ],
-                        ),
+                        _buildFixtureHeader(fixture),
                         const SizedBox(height: 8),
                         fixture.matches!.isEmpty
                             ? const Text('Nema utakmica u ovom kolu.')
@@ -333,7 +263,7 @@ class _MatchesTabState extends State<MatchesTab> {
     }
   }
   
-  bool fixtureLimitReached(FixtureDTO fixture) {
+  bool fixtureLimitNotReached(FixtureDTO fixture) {
     final limits = {
       GameStage.finals: 1,
       GameStage.semiFinals: 2,
@@ -364,6 +294,91 @@ class _MatchesTabState extends State<MatchesTab> {
           },
           icon: const Icon(Icons.add),
           label: const Text("Dodaj kolo"),
+        ),
+      ],
+    );
+  }
+  
+  _buildFixtureHeader(FixtureDTO fixture) {
+    return Row(
+      children: [
+        Text(
+          '${fixture.gameStage!.displayName} ${fixture.gameStage == GameStage.groupPhase || fixture.gameStage == GameStage.league ? '• ${fixture.sequenceNumber! + 1}. kolo' : ''} ${fixture.isCompleted == true ? '•  Kompletirano' : ''}',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const Spacer(),
+        if((widget.competition.status == CompetitionStatus.underway) &&
+             ( 
+              (activeFixtureId != null && fixture.id == activeFixtureId) || 
+              (activeFixtureId == null && fixture.isCompleted == false)
+             )
+          )
+          _buildFixtureStatusToogler(fixture),
+        if(widget.competition.status != CompetitionStatus.finished)_buildFixtureControlls(fixture)
+      ],
+    );
+  }
+  
+  _buildFixtureControlls(FixtureDTO fixture) {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.edit, color: Colors.blue),
+          tooltip: 'Uredi kolo',
+          onPressed: () async{
+            final actionResult = await showDialog<bool>(
+            context: context,
+            builder: (context) => FixtureDialog(competitionId: widget.competition.id!, fixtureId: fixture.id, competitionType: widget.competition.competitionType!),
+            );
+            if (actionResult == true) {
+              initForm();
+            }
+          },
+        ),
+        if(fixture.isCompleted != true && fixture.isCurrentlyActive == true) IconButton(
+          icon: const Icon(Icons.flag, color: Colors.orange),
+          tooltip: 'Završi kolo',
+          onPressed: () {
+            _finishFixture(fixture.id!);
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete, color: Colors.red),
+          tooltip: 'Obriši kolo',
+          onPressed: () {
+            deleteEntity(
+              context: context,
+              deleteFunction: fixturesProvider.delete,
+              entityId: fixture.id!,
+              onDeleted: initForm);
+          },
+        ),
+        if(fixtureLimitNotReached(fixture)) ElevatedButton(onPressed: () async {
+          final actionResult = await Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => MatchDetailsScreen(fixture: fixture, competitionId: widget.competition.id!,selectedIndex: widget.selectedIndex,),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ));
+    
+                if (actionResult == true) {
+                  initForm();
+                }
+        }, child: const Text('Dodaj utakmicu')),
+      ],
+    );
+  }
+  
+  _buildFixtureStatusToogler(FixtureDTO fixture) {
+    return Row(
+      children: [
+        Text(fixture.isCurrentlyActive == true ? 'Deaktiviraj' : 'Aktiviraj' ),
+        Switch(
+          value: fixture.isCurrentlyActive ?? false,
+          onChanged: (value) {
+            _activateFixture(fixture.id!, value);
+          },
         ),
       ],
     );

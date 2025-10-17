@@ -336,12 +336,22 @@ Widget _buildResultView() {
                                       icon: const Icon(Icons.delete, color: Colors.red),
                                       tooltip: 'Obriši',
                                       onPressed: () async{
-                                        await deleteEntity(context: context,
-                                        deleteFunction: competitionProvider.delete,
-                                        entityId: e.id!, 
-                                        onDeleted: (){
-                                          _paginationController.loadPage(_paginationController.currentPage);
-                                        });
+                                        if(e.status != CompetitionStatus.finished)
+                                        {
+                                          var message = 'Jeste li sigurni da želite izbrisati takmičenje?'
+                                          '\n\nSve informacije vezane za isto će biti obrisane!\n\n'
+                                          'Ovo je nepovratna operacija, potvrdi samo ukoliko ste sigurni!';
+                                          await deleteEntity(context: context,
+                                          deleteFunction: competitionProvider.delete,
+                                          entityId: e.id!, 
+                                          message: message,
+                                          onDeleted: (){
+                                            _paginationController.loadPage(_paginationController.currentPage);
+                                          });
+                                        }
+                                        else{
+                                          showErrorBottomNotification(context, 'Završena takmičenja nije moguće obrisati!');
+                                        }
                                       },)
                                   )),
                                   DataCell(Padding(

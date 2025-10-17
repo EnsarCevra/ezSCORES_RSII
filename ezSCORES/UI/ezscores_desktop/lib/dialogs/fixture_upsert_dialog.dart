@@ -72,7 +72,9 @@ class _FixtureDialogState extends State<FixtureDialog> {
                         name: "gameStage",
                         initialValue: fixture?.gameStage,
                         decoration: const InputDecoration(labelText: "Faza igre"),
-                        items: GameStage.values
+                        items: GameStage.values.where((gameStage) => widget.competitionType == CompetitionType.tournamentKnockOutOnly ?
+                            gameStage != GameStage.league && gameStage != GameStage.groupPhase : 
+                            gameStage != GameStage.league)
                             .map((stage) => DropdownMenuItem(
                                   value: stage,
                                   child: Text(stage.displayName),

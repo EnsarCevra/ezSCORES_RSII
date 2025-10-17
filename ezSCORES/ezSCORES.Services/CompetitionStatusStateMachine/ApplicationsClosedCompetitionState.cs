@@ -36,6 +36,15 @@ namespace ezSCORES.Services.CompetitionStatusStateMachine
 		{
 			var set = Context.Set<Competition>();
 			var entity = set.Find(id);
+			var applications = Context.Applications.Where(app => app.CompetitionId == id).ToList();
+			if (applications.Any(app => app.IsAccepted == null))
+			{
+				throw new UserException("Da biste pokrenuli takmičenje morate pregledati i odgovoriti na sve prijave!");
+			}
+			if (applications.Count(app => app.IsAccepted == true) < 4)
+			{
+				throw new UserException("Da biste pokrenuli takmičenje morate imati minimalno 4 prihvaćene ekipe!");
+			}
 			entity.Status = Model.ENUMs.CompetitionStatus.Underway;
 			Context.SaveChanges();
 			return Mapper.Map<Competitions>(entity);

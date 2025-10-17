@@ -38,6 +38,7 @@ namespace ezSCORES.Services
 		}
 		public override IQueryable<Competition> AddFilter(CompetitionsSearchObject search, IQueryable<Competition> query)
 		{
+			query = base.AddFilter(search, query);
 			if (search.SelectionId != null)
 			{
 				query = query.Where(x=>x.SelectionId == search.SelectionId);
@@ -90,7 +91,8 @@ namespace ezSCORES.Services
 			{
 				query = query.Include(x => x.Fixtures).ThenInclude(x => x.Matches.Where(x => x.DateAndTime.Date == search.MatchDay.Value.Date));
 			}
-			return base.AddFilter(search, query);
+			query = query.OrderByDescending(x => x.CreatedAt);
+			return query;
 		}
 		protected override Competition? ApplyIncludes(int id, DbSet<Competition> set)
 		{

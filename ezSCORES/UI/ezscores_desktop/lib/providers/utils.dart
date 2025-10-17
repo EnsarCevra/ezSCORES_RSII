@@ -229,10 +229,12 @@ Future<void> deleteEntity({
   required Future<void> Function(int id) deleteFunction,
   required int entityId,
   required VoidCallback onDeleted,
+  String? message
 }) async {
+  var contentMessage = message ?? 'Jeste li sigurni da želite izbrisati stavku?';
   bool confirmed = await showConfirmDeleteDialog(
     context,
-    content: 'Jeste li sigurni da želite izbrisati stavku?',
+    content: contentMessage,
   );
 
   if (confirmed) {

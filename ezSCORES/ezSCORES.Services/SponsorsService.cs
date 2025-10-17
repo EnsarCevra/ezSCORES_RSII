@@ -20,7 +20,7 @@ namespace ezSCORES.Services
 		}
 		public override IQueryable<Sponsor> AddFilter(BaseCompetitionSearchObject search, IQueryable<Sponsor> query)
 		{
-			base.AddFilter(search, query);
+			query = base.AddFilter(search, query);
 			if (search.CompetitionId != null)
 			{
 				var existingSponsors = Context.CompetitionsSponsors.Where(x => x.CompetitionId == search.CompetitionId).Select(x => x.SponsorId).ToList();

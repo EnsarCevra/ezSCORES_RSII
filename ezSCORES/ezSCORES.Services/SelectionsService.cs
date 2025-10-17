@@ -18,5 +18,12 @@ namespace ezSCORES.Services
 		public SelectionsService(EzScoresdbRsiiContext context, IMapper mapper) : base(context, mapper)
 		{
 		}
+
+		public override IQueryable<Selection> AddFilter(BaseSearchObject search, IQueryable<Selection> query)
+		{
+			query = query.OrderBy(s => s.Name == "Veterani" ? 0 : s.Name == "Seniori" ? 1 : 2)
+				.ThenByDescending(s => s.AgeMax.HasValue ? s.AgeMax.Value : int.MaxValue);
+			return query;
+		}
 	}
 }
