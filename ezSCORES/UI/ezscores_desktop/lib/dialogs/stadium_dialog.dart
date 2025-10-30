@@ -56,6 +56,7 @@ class _StadiumDialogState extends State<StadiumDialog> {
                 initialValue: widget.stadium?.name ?? "",
                 decoration: const InputDecoration(labelText: "Naziv"),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
+                valueTransformer: (text) => text?.trim(),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.match(
                     r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ\s]*$',

@@ -130,14 +130,15 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
                       decoration: InputDecoration(labelText: "Ime"),
                        name: 'firstName',
                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                       valueTransformer: (text) => text?.trim(),
                        validator: FormBuilderValidators.compose(
                         [
                           FormBuilderValidators.required(errorText: 'Ime je obavezno'),
                           FormBuilderValidators.minLength(3, errorText: 'Ime mora imati barem 3 slova'),
                           FormBuilderValidators.match(
-                            r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
-                            errorText: 'Ime mora početi velikim slovom i sadržavati samo slova'
-                          )
+                            r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ\s]*$',
+                            errorText: 'Naziv mora početi velikim slovom i sadržavati samo slova',
+                          ),
                         ]
                        ),),
                     ),
@@ -151,11 +152,12 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
                       decoration: InputDecoration(labelText: "Prezime"),
                        name: 'lastName',
                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                       valueTransformer: (text) => text?.trim(),
                        validator: FormBuilderValidators.compose(
                         [
                           FormBuilderValidators.match(
-                            r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
-                            errorText: 'Prezime mora početi velikim slovom i sadržavati samo slova'
+                            r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ\s]*$',
+                            errorText: 'Naziv mora početi velikim slovom i sadržavati samo slova',
                           ),
                           FormBuilderValidators.required(errorText: 'Prezime je obavezno'),
                           FormBuilderValidators.minLength(3, errorText: 'Prezime mora imati barem 3 slova'),
