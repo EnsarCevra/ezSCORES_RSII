@@ -24,7 +24,18 @@ var rabbitPort = Environment.GetEnvironmentVariable("RABBIT_MQ_PORT") ?? "5672";
 
 var connectionString = $"host={rabbitHost};username={rabbitUser};password={rabbitPass};port={rabbitPort}";
 
-var bus = RabbitHutch.CreateBus(connectionString); await bus.PubSub.SubscribeAsync<ApplicationStatusChanged>("application-accepted-group", async msg =>
+var bus = RabbitHutch.CreateBus(connectionString);
+bus.Advanced.Connected += (s, e) => Console.WriteLine("✅ Connected to RabbitMQ!");
+bus.Advanced.Disconnected += (s, e) => Console.WriteLine("❌ Disconnected from RabbitMQ!");
+await Task.Delay(1000);
+
+if (!bus.Advanced.IsConnected)
+{
+	Console.WriteLine("⚠️ Bus is not connected. Retrying...");
+	await Task.Delay(2000);
+}
+
+await bus.PubSub.SubscribeAsync<ezSCORES.Model.Messages.ApplicationStatusChanged>("application-accepted-group", async msg =>
 
 {
 
@@ -33,6 +44,9 @@ var bus = RabbitHutch.CreateBus(connectionString); await bus.PubSub.SubscribeAsy
 	await emailService.SendEmail(msg);
 
 });
+
+bus.Advanced.Connected += (s, e) => Console.WriteLine("Connected to RabbitMQ!");
+bus.Advanced.Disconnected += (s, e) => Console.WriteLine("Disconnected from RabbitMQ!");
 
 Console.WriteLine("Listening for messages, press <return> key to close");
 

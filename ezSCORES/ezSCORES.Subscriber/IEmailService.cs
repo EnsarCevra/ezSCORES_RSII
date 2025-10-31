@@ -9,6 +9,6 @@ namespace ezSCORESSubscriber
 {
 	public interface IEmailService
 	{
-		Task SendEmail(ApplicationStatusChanged msg);
+		Task SendEmail(ezSCORES.Model.Messages.ApplicationStatusChanged msg);
 	}
 }

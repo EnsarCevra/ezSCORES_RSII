@@ -6,7 +6,7 @@ namespace ezSCORESSubscriber
 {
 	public class EmailService : IEmailService
 	{
-		public async Task SendEmail(ApplicationStatusChanged msg)
+		public async Task SendEmail(ezSCORES.Model.Messages.ApplicationStatusChanged msg)
 		{
 			try
 			{
