@@ -1,9 +1,6 @@
 ﻿using DotNetEnv;
 
 using EasyNetQ;
-
-using ezSCORES.Subscriber;
-
 Env.Load();
 
 var emailService = new ezSCORESSubscriber.EmailService();

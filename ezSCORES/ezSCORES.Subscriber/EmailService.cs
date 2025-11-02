@@ -1,5 +1,4 @@
-﻿using ezSCORES.Subscriber;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 
 namespace ezSCORESSubscriber

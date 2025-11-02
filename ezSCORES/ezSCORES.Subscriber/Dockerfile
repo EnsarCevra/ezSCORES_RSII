@@ -1,14 +1,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+WORKDIR /src
 
-COPY *.csproj ./
+COPY ezSCORES.Model/ ezSCORES.Model/
+COPY ezSCORES.Subscriber/ ezSCORES.Subscriber/
+
+WORKDIR /src/ezSCORES.Subscriber
+
 RUN dotnet restore
+RUN dotnet publish -c Release -o /app
 
-COPY . ./
-RUN dotnet build "ezSCORES.Subscriber.csproj" -c Release -o /app/build
-
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:8.0
 WORKDIR /app
-COPY --from=build /app/build .
+COPY --from=build /app .
 
 ENTRYPOINT ["dotnet", "ezSCORES.Subscriber.dll"]
