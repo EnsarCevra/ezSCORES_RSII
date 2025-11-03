@@ -46,6 +46,8 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
   bool hasFee = false;
   bool _isFormEditable = false;
 
+  late Competitions? _competition;
+
   @override
   void initState() {
     super.initState();
@@ -67,6 +69,7 @@ class _CompetitionDetailsTabState extends State<CompetitionDetailsTab> {
       "fee" : widget.competition?.fee.toString(),
       "imageId": widget.competition?.picture,
     };
+    _competition = widget.competition;
     initForm();
   }
   
@@ -89,19 +92,19 @@ Future<void> _showRecommendationDialog() async {
   Future initForm() async {
     var selectionData = await selectionProvider.get();
     setState(() {
-      _isFormEditable = widget.competition == null || widget.competition?.status == CompetitionStatus.preparation;
-      hasFee = widget.competition?.fee != null;
+      _isFormEditable = _competition == null || _competition?.status == CompetitionStatus.preparation;
+      hasFee = _competition?.fee != null;
       selectionResult = selectionData;
-      _base64Image = widget.competition?.picture;
-      _selectedCity = widget.competition?.city;
-      _selectedCompetitionType = widget.competition?.competitionType!.index;
-      _selectedStatus = widget.competition?.status!.index;
+      _base64Image = _competition?.picture;
+      _selectedCity = _competition?.city;
+      _selectedCompetitionType = _competition?.competitionType!.index;
+      _selectedStatus = _competition?.status!.index;
       if(_selectedCity != null)
       {
         _cityController.text = _selectedCity!.name ?? '';
       } 
     });
-    if(widget.competition == null)
+    if(_competition == null)
     {
       _showRecommendationDialog();
     }
@@ -121,7 +124,7 @@ Future<void> _showRecommendationDialog() async {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if(widget.competition != null && widget.competition?.status != CompetitionStatus.finished)_buildStateNavigation(),
+                if(_competition != null && _competition?.status != CompetitionStatus.finished)_buildStateNavigation(),
                 _buildForm(),
                 _saveRow(),
               ],
@@ -460,7 +463,7 @@ Future<void> _showRecommendationDialog() async {
                               padding: const EdgeInsets.only(top: 8.0),
                               child: FormBuilderTextField(
                                 name: 'fee',
-                                initialValue: widget.competition?.fee != null ? widget.competition!.fee.toString() : '',
+                                initialValue: _competition?.fee != null ? _competition!.fee.toString() : '',
                                 decoration: const InputDecoration(
                                   labelText: 'Kotizacija (KM)',
                                 ),
@@ -514,7 +517,7 @@ Future<void> _showRecommendationDialog() async {
           if (_isAllowed()) ElevatedButton(
             onPressed: () async {
               await Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => CompetitionAditionalSettingsScreen(selectedIndex: 1, competitionId: widget.competition!.id!,),
+              pageBuilder: (context, animation, secondaryAnimation) => CompetitionAditionalSettingsScreen(selectedIndex: 1, competitionId: _competition!.id!,),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
                   opacity: animation,
@@ -541,11 +544,11 @@ Future<void> _showRecommendationDialog() async {
                 request["cityId"] = _selectedCity!.id!;
                 request["fee"] = hasFee ? formData["fee"] : null;
                 try {
-                  final bool isNewCompetition = widget.competition == null;
-                  if (widget.competition == null) {
-                    widget.competition = await competitionProvider.insert(request);
+                  final bool isNewCompetition = _competition == null;
+                  if (_competition == null) {
+                    _competition = await competitionProvider.insert(request);
                   } else {
-                    widget.competition = await competitionProvider.update(widget.competition!.id!, request);
+                    _competition = await competitionProvider.update(_competition!.id!, request);
                   }
                   if (context.mounted) {
                     if(isNewCompetition)
@@ -593,9 +596,9 @@ Future<void> _showRecommendationDialog() async {
   }
   
   _isAllowed() {//should be allowed as soon as competition is created and user should be notified that he can edit this as well after he creates competition
-    if(widget.competition != null)
+    if(_competition != null)
     {
-      if(widget.competition!.status! == CompetitionStatus.preparation || widget.competition!.status! == CompetitionStatus.applicationsOpen || widget.competition!.status! == CompetitionStatus.applicationsClosed || widget.competition!.status! == CompetitionStatus.underway ||widget.competition!.status! == CompetitionStatus.finished)
+      if(_competition!.status! == CompetitionStatus.preparation || _competition!.status! == CompetitionStatus.applicationsOpen || _competition!.status! == CompetitionStatus.applicationsClosed || _competition!.status! == CompetitionStatus.underway ||_competition!.status! == CompetitionStatus.finished)
       {
         return true;
       }
@@ -621,7 +624,7 @@ Future<void> _showRecommendationDialog() async {
             onPressed: () async {
               Navigator.pop(context);
               await Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => CompetitionAditionalSettingsScreen(selectedIndex: 1, competitionId: widget.competition!.id!,),
+              pageBuilder: (context, animation, secondaryAnimation) => CompetitionAditionalSettingsScreen(selectedIndex: 1, competitionId: _competition!.id!,),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
                   opacity: animation,
@@ -639,9 +642,9 @@ Future<void> _showRecommendationDialog() async {
   }
   
 Widget _buildStateNavigation() {
-  if (widget.competition == null || widget.competition!.status == null) return const SizedBox();
+  if (_competition == null || _competition!.status == null) return const SizedBox();
 
-  final current = widget.competition!.status!;
+  final current = _competition!.status!;
   final availableTransitions = transitionActions[current] ?? {};
   CompetitionStatus? previousState;
   TransitionCallback? previousCallback;
@@ -669,9 +672,31 @@ Widget _buildStateNavigation() {
 }
 void _goToNextStage() async {
     try {
-      await nextCallback!(widget.competition!.id!, context);
+      await nextCallback!(_competition!.id!, context);
       setState(() {
-        widget.competition!.status = nextState!;
+        _competition = Competitions(
+        id: _competition!.id,
+        userId: _competition!.userId,
+        selectionId: _competition!.selectionId,
+        season: _competition!.season,
+        cityId: _competition!.cityId,
+        name: _competition!.name,
+        description: _competition!.description,
+        maxTeamCount: _competition!.maxTeamCount,
+        picture: _competition!.picture,
+        startDate: _competition!.startDate,
+        applicationEndDate: _competition!.applicationEndDate,
+        fee: _competition!.fee,
+        maxPlayersPerTeam: _competition!.maxPlayersPerTeam,
+        competitionType: _competition!.competitionType,
+        status: nextState!, // updated status
+        city: _competition!.city,
+        selection: _competition!.selection,
+        competitionsReferees: _competition!.competitionsReferees,
+        competitionsSponsors: _competition!.competitionsSponsors,
+        rewards: _competition!.rewards,
+        reviews: _competition!.reviews,
+      );
         if(_isFormEditable == true)_isFormEditable = false;
       });
       widget.onStateChanged?.call();
@@ -738,10 +763,10 @@ Future<void> _showConfirmStateChangeDialog(String message) async
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () async {
                     try {
-                      await previousCallback!(widget.competition!.id!, context);
+                      await previousCallback!(_competition!.id!, context);
                       if(previousState == CompetitionStatus.preparation)_isFormEditable = true;
                       setState(() {
-                        widget.competition!.status = previousState!;
+                        _competition!.status = previousState!;
                       });
                       widget.onStateChanged?.call();
                       showBottomRightNotification(context, 'Status vraćen na "${previousState!.displayName}".');

@@ -38,7 +38,29 @@ class Competitions {
   List<Rewards>? rewards;
   List<Reviews>? reviews;
  
-	Competitions();
+	Competitions({
+    this.id,
+    this.userId,
+    this.selectionId,
+    this.season,
+    this.cityId,
+    this.name,
+    this.description,
+    this.maxTeamCount,
+    this.picture,
+    this.startDate,
+    this.applicationEndDate,
+    this.fee,
+    this.maxPlayersPerTeam,
+    this.competitionType,
+    this.status,
+    this.city,
+    this.selection,
+    this.competitionsReferees,
+    this.competitionsSponsors,
+    this.rewards,
+    this.reviews,
+  });
 
 	factory Competitions.fromJson(Map<String, dynamic> json) => _$CompetitionsFromJson(json);
 
