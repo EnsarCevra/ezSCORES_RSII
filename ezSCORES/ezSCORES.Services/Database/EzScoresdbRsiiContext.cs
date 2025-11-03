@@ -1081,38 +1081,38 @@ public static class ModelBuilderExtensions
 		);
 		modelBuilder.Entity<Database.Goal>().HasData(
 		// Match 3 — Quarterfinal 1 (Team 26 vs Team 27)
-		new Goal { Id = 1, MatchId = 3, CompetitionTeamPlayerId = 115, SequenceNumber = 1, ScoredAtMinute = 2, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 2, MatchId = 3, CompetitionTeamPlayerId = 116, SequenceNumber = 2, ScoredAtMinute = 7, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 3, MatchId = 3, CompetitionTeamPlayerId = 117, SequenceNumber = 3, ScoredAtMinute = 12, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 4, MatchId = 3, CompetitionTeamPlayerId = 121, SequenceNumber = 4, ScoredAtMinute = 15, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 1, MatchId = 3, CompetitionTeamPlayerId = 122, SequenceNumber = 1, ScoredAtMinute = 2, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 2, MatchId = 3, CompetitionTeamPlayerId = 123, SequenceNumber = 2, ScoredAtMinute = 7, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 3, MatchId = 3, CompetitionTeamPlayerId = 123, SequenceNumber = 3, ScoredAtMinute = 12, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 4, MatchId = 3, CompetitionTeamPlayerId = 128, SequenceNumber = 4, ScoredAtMinute = 15, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 		// Match 4 — Quarterfinal 2 (Team 28 vs Team 29)
-		new Goal { Id = 5, MatchId = 4, CompetitionTeamPlayerId = 126, SequenceNumber = 1, ScoredAtMinute = 1, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 6, MatchId = 4, CompetitionTeamPlayerId = 127, SequenceNumber = 2, ScoredAtMinute = 6, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 7, MatchId = 4, CompetitionTeamPlayerId = 128, SequenceNumber = 3, ScoredAtMinute = 11, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 8, MatchId = 4, CompetitionTeamPlayerId = 133, SequenceNumber = 4, ScoredAtMinute = 17, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 5, MatchId = 4, CompetitionTeamPlayerId = 133, SequenceNumber = 1, ScoredAtMinute = 1, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 6, MatchId = 4, CompetitionTeamPlayerId = 133, SequenceNumber = 2, ScoredAtMinute = 6, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 7, MatchId = 4, CompetitionTeamPlayerId = 134, SequenceNumber = 3, ScoredAtMinute = 11, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 8, MatchId = 4, CompetitionTeamPlayerId = 140, SequenceNumber = 4, ScoredAtMinute = 17, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 		// Match 5 — Quarterfinal 3 (Team 30 vs Team 31)
-		new Goal { Id = 9, MatchId = 5, CompetitionTeamPlayerId = 139, SequenceNumber = 1, ScoredAtMinute = 3, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 10, MatchId = 5, CompetitionTeamPlayerId = 140, SequenceNumber = 2, ScoredAtMinute = 8, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 11, MatchId = 5, CompetitionTeamPlayerId = 144, SequenceNumber = 3, ScoredAtMinute = 14, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 9, MatchId = 5, CompetitionTeamPlayerId = 146, SequenceNumber = 1, ScoredAtMinute = 3, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 10, MatchId = 5, CompetitionTeamPlayerId = 147, SequenceNumber = 2, ScoredAtMinute = 8, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 11, MatchId = 5, CompetitionTeamPlayerId = 152, SequenceNumber = 3, ScoredAtMinute = 14, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 		// Match 6 — Quarterfinal 4 (Team 32 vs Team 33)
-		new Goal { Id = 12, MatchId = 6, CompetitionTeamPlayerId = 150, SequenceNumber = 1, ScoredAtMinute = 2, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 13, MatchId = 6, CompetitionTeamPlayerId = 151, SequenceNumber = 2, ScoredAtMinute = 9, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 14, MatchId = 6, CompetitionTeamPlayerId = 155, SequenceNumber = 3, ScoredAtMinute = 16, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 12, MatchId = 6, CompetitionTeamPlayerId = 157, SequenceNumber = 1, ScoredAtMinute = 2, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 13, MatchId = 6, CompetitionTeamPlayerId = 157, SequenceNumber = 2, ScoredAtMinute = 9, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 14, MatchId = 6, CompetitionTeamPlayerId = 162, SequenceNumber = 3, ScoredAtMinute = 16, IsHomeGoal = false, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 		// Match 7 — SemiFinal 1 (Winner Match3: Team26 vs Winner Match4: Team28)
-		new Goal { Id = 15, MatchId = 7, CompetitionTeamPlayerId = 115, SequenceNumber = 1, ScoredAtMinute = 4, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 16, MatchId = 7, CompetitionTeamPlayerId = 115, SequenceNumber = 2, ScoredAtMinute = 10, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 15, MatchId = 7, CompetitionTeamPlayerId = 122, SequenceNumber = 1, ScoredAtMinute = 4, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 16, MatchId = 7, CompetitionTeamPlayerId = 122, SequenceNumber = 2, ScoredAtMinute = 10, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 		// Match 8 — SemiFinal 2 (Winner Match5: Team30 vs Winner Match6: Team32)
-		new Goal { Id = 17, MatchId = 8, CompetitionTeamPlayerId = 139, SequenceNumber = 1, ScoredAtMinute = 5, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 18, MatchId = 8, CompetitionTeamPlayerId = 139, SequenceNumber = 2, ScoredAtMinute = 12, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 17, MatchId = 8, CompetitionTeamPlayerId = 146, SequenceNumber = 1, ScoredAtMinute = 5, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 18, MatchId = 8, CompetitionTeamPlayerId = 147, SequenceNumber = 2, ScoredAtMinute = 12, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
 
 		// Match 9 — Final (Winner Match7: Team26 vs Winner Match8: Team30)
-		new Goal { Id = 19, MatchId = 9, CompetitionTeamPlayerId = 115, SequenceNumber = 1, ScoredAtMinute = 3, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
-		new Goal { Id = 20, MatchId = 9, CompetitionTeamPlayerId = 115, SequenceNumber = 2, ScoredAtMinute = 15, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
+		new Goal { Id = 19, MatchId = 9, CompetitionTeamPlayerId = 122, SequenceNumber = 1, ScoredAtMinute = 3, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") },
+		new Goal { Id = 20, MatchId = 9, CompetitionTeamPlayerId = 123, SequenceNumber = 2, ScoredAtMinute = 15, IsHomeGoal = true, IsDeleted = false, IsActive = true, CreatedAt = DateTime.Parse("2025-10-04 14:30:00") }
 	);
 
 
