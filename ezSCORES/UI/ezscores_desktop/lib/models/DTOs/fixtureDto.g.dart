@@ -14,6 +14,7 @@ FixtureDTO _$FixtureDTOFromJson(Map<String, dynamic> json) => FixtureDTO(
     )
       ..gameStage = const GameStageConverter()
           .fromJson((json['gameStage'] as num?)?.toInt())
+      ..matchLength = (json['matchLength'] as num?)?.toInt()
       ..matches = (json['matches'] as List<dynamic>?)
           ?.map((e) => MatchDTO.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -23,6 +24,7 @@ Map<String, dynamic> _$FixtureDTOToJson(FixtureDTO instance) =>
       'id': instance.id,
       'gameStage': const GameStageConverter().toJson(instance.gameStage),
       'sequenceNumber': instance.sequenceNumber,
+      'matchLength': instance.matchLength,
       'isCurrentlyActive': instance.isCurrentlyActive,
       'isCompleted': instance.isCompleted,
       'matches': instance.matches,

@@ -14,6 +14,7 @@ class FixtureDTO {
   GameStage? gameStage;
 
 	int? sequenceNumber;
+  int? matchLength;
 	bool? isCurrentlyActive;
 	bool? isCompleted;
   List<MatchDTO>? matches;

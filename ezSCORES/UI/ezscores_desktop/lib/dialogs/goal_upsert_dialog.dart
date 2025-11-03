@@ -13,7 +13,8 @@ class GoalUpsertDialog extends StatefulWidget {
   final int competitionTeamId;
   final bool isHomeGoal;
   final GoalDTO? goal;
-  const GoalUpsertDialog({super.key, this.goal, required this.matchId, required this.competitionTeamId, required this.isHomeGoal});
+  final matchLength;
+  const GoalUpsertDialog({super.key, this.goal, required this.matchId, required this.competitionTeamId, required this.isHomeGoal, required this.matchLength});
 
   @override
   State<GoalUpsertDialog> createState() => _GoalUpsertDialogState();
@@ -83,7 +84,7 @@ class _GoalUpsertDialogState extends State<GoalUpsertDialog> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: List.generate(20, (index) => _buildMinuteBox(index + 1)),
+                    children: List.generate(widget.matchLength, (index) => _buildMinuteBox(index + 1)),
                   ),
                   if (_minuteNotSelectedError)
                     const Padding(

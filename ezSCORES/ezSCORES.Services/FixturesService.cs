@@ -114,6 +114,7 @@ namespace ezSCORES.Services
 								Id = f.Id,
 								GameStage = f.GameStage,
 								SequenceNumber = f.SequenceNumber,
+								MatchLength = f.MatchLength,
 								IsCurrentlyActive = f.IsCurrentlyActive,
 								IsCompleted = f.IsCompleted,
 								Matches = f.Matches

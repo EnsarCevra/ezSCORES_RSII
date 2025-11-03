@@ -6,46 +6,47 @@ part of 'competitions.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Competitions _$CompetitionsFromJson(Map<String, dynamic> json) => Competitions()
-  ..id = (json['id'] as num?)?.toInt()
-  ..userId = (json['userId'] as num?)?.toInt()
-  ..selectionId = (json['selectionId'] as num?)?.toInt()
-  ..season = json['season'] as String?
-  ..cityId = (json['cityId'] as num?)?.toInt()
-  ..name = json['name'] as String?
-  ..description = json['description'] as String?
-  ..maxTeamCount = (json['maxTeamCount'] as num?)?.toInt()
-  ..picture = json['picture'] as String?
-  ..startDate = json['startDate'] == null
-      ? null
-      : DateTime.parse(json['startDate'] as String)
-  ..applicationEndDate = json['applicationEndDate'] == null
-      ? null
-      : DateTime.parse(json['applicationEndDate'] as String)
-  ..fee = (json['fee'] as num?)?.toInt()
-  ..maxPlayersPerTeam = (json['maxPlayersPerTeam'] as num?)?.toInt()
-  ..competitionType = const CompetitionTypeConverter()
-      .fromJson((json['competitionType'] as num?)?.toInt())
-  ..status = const CompetitionStatusConverter()
-      .fromJson((json['status'] as num?)?.toInt())
-  ..city = json['city'] == null
-      ? null
-      : Cities.fromJson(json['city'] as Map<String, dynamic>)
-  ..selection = json['selection'] == null
-      ? null
-      : Selections.fromJson(json['selection'] as Map<String, dynamic>)
-  ..competitionsReferees = (json['competitionsReferees'] as List<dynamic>?)
-      ?.map((e) => CompetitionsReferees.fromJson(e as Map<String, dynamic>))
-      .toList()
-  ..competitionsSponsors = (json['competitionsSponsors'] as List<dynamic>?)
-      ?.map((e) => CompetitionsSponsors.fromJson(e as Map<String, dynamic>))
-      .toList()
-  ..rewards = (json['rewards'] as List<dynamic>?)
-      ?.map((e) => Rewards.fromJson(e as Map<String, dynamic>))
-      .toList()
-  ..reviews = (json['reviews'] as List<dynamic>?)
-      ?.map((e) => Reviews.fromJson(e as Map<String, dynamic>))
-      .toList();
+Competitions _$CompetitionsFromJson(Map<String, dynamic> json) => Competitions(
+      id: (json['id'] as num?)?.toInt(),
+      userId: (json['userId'] as num?)?.toInt(),
+      selectionId: (json['selectionId'] as num?)?.toInt(),
+      season: json['season'] as String?,
+      cityId: (json['cityId'] as num?)?.toInt(),
+      name: json['name'] as String?,
+      description: json['description'] as String?,
+      maxTeamCount: (json['maxTeamCount'] as num?)?.toInt(),
+      picture: json['picture'] as String?,
+      startDate: json['startDate'] == null
+          ? null
+          : DateTime.parse(json['startDate'] as String),
+      applicationEndDate: json['applicationEndDate'] == null
+          ? null
+          : DateTime.parse(json['applicationEndDate'] as String),
+      fee: (json['fee'] as num?)?.toInt(),
+      maxPlayersPerTeam: (json['maxPlayersPerTeam'] as num?)?.toInt(),
+      competitionType: const CompetitionTypeConverter()
+          .fromJson((json['competitionType'] as num?)?.toInt()),
+      status: const CompetitionStatusConverter()
+          .fromJson((json['status'] as num?)?.toInt()),
+      city: json['city'] == null
+          ? null
+          : Cities.fromJson(json['city'] as Map<String, dynamic>),
+      selection: json['selection'] == null
+          ? null
+          : Selections.fromJson(json['selection'] as Map<String, dynamic>),
+      competitionsReferees: (json['competitionsReferees'] as List<dynamic>?)
+          ?.map((e) => CompetitionsReferees.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      competitionsSponsors: (json['competitionsSponsors'] as List<dynamic>?)
+          ?.map((e) => CompetitionsSponsors.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      rewards: (json['rewards'] as List<dynamic>?)
+          ?.map((e) => Rewards.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      reviews: (json['reviews'] as List<dynamic>?)
+          ?.map((e) => Reviews.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
 
 Map<String, dynamic> _$CompetitionsToJson(Competitions instance) =>
     <String, dynamic>{

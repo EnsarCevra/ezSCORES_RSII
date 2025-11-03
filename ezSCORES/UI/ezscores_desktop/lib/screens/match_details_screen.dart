@@ -794,6 +794,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
       competitionTeamId: competitionTeamId,
       isHomeGoal: isHomeGoal,
       goal: goal,
+      matchLength: widget.fixture.matchLength,
     ),
   );
 
