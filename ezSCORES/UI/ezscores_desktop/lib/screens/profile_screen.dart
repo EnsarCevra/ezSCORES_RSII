@@ -236,17 +236,18 @@ class _ProfileSettingsScreenState extends State<ProfileScreen> {
                       }
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: FormBuilderTextField(
-                      decoration: InputDecoration(labelText: "Telefon"),
+                      decoration: const InputDecoration(labelText: "Telefon"),
                       name: 'phoneNumber',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(errorText: 'Broj telefona je obavezan'),
+                        FormBuilderValidators.maxLength(20, errorText: 'Maksimalno 20 karaktera'),
                         FormBuilderValidators.match(
-                          r'^\+?[0-9]+([ -]?[0-9]+)*$',
-                          errorText: 'Unesite ispravan broj \n(razmaci i crtice moraju biti pojedinačni i između brojeva)',
+                          r'^\+?[0-9](?:[0-9]|[ -](?=[0-9])){0,19}$',
+                          errorText: 'Broj telefona mora sadržavati samo brojeve, razmake ili "-"',
                         ),
                       ]),
                     ),

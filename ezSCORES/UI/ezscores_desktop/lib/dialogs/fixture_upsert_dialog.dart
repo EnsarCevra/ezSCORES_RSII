@@ -97,6 +97,10 @@ class _FixtureDialogState extends State<FixtureDialog> {
                           if (parsed == null || parsed <= 0) {
                             return 'Unesite važeći broj minuta';
                           }
+                          if(parsed > 90)
+                          {
+                            return 'Maksimalna vrijednost je 90 min!';
+                          }
                           return null;
                         },
                       ),

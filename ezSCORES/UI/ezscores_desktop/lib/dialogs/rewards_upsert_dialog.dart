@@ -38,17 +38,6 @@ class _RewardsDialogState extends State<RewardsDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // FormBuilderTextField(
-              //   name: 'name',
-              //   initialValue: widget.reward?.name ?? '',
-              //   decoration: const InputDecoration(labelText: 'Naziv'),
-              //   autovalidateMode: AutovalidateMode.onUserInteraction,
-              //   validator: FormBuilderValidators.compose([
-              //     FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
-              //     FormBuilderValidators.minLength(2, errorText: 'Naziv mora imati barem 2 znaka'),
-              //   ]),
-              // ),
-              //const SizedBox(height: 12),
               FormBuilderField<int>(
                 name: 'rankingPosition',
                 initialValue: widget.reward?.rankingPosition,
@@ -100,6 +89,7 @@ class _RewardsDialogState extends State<RewardsDialog> {
                   FormBuilderValidators.required(errorText: 'Iznos je obavezan'),
                   FormBuilderValidators.integer(errorText: 'Unesite cijeli broj'),
                   FormBuilderValidators.min(0, errorText: 'Iznos ne može biti negativan'),
+                  FormBuilderValidators.max(10000, errorText: 'Maksimalno 10 000'),
                 ]),
               ),
               const SizedBox(height: 12),

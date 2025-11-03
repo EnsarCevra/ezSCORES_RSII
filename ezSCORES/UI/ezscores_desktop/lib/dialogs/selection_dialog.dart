@@ -44,25 +44,32 @@ class _SelectionDialogState extends State<SelectionDialog> {
                 validator:  FormBuilderValidators.compose(
                   [
                     FormBuilderValidators.match(
-                      r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
-                      errorText: 'Naziv mora početi velikim slovom i sadržavati samo slova'
+                      r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ0-9]*(?:-[a-zčćžšđA-ZČĆŽŠĐ0-9]+)*$',
+                      errorText: 'Nepravilan format'
                     ),
                     FormBuilderValidators.required(errorText: 'Naziv je obavezan'),
-                    FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 3 slova'),
+                    FormBuilderValidators.minLength(3, errorText: 'Naziv mora imati barem 3 karaktera'),
                   ]),
               ),
               const SizedBox(height: 16),
               FormBuilderTextField(
                 name: "ageMax",
                 initialValue: widget.selection?.ageMax?.toString() ?? "",
-                decoration: const InputDecoration(labelText: "Max. godine"),
+                decoration: const InputDecoration(labelText: "Dobna granica"),
                 keyboardType: TextInputType.number,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return "Unesite maksimalne godine";
                   }
                   if (int.tryParse(value) == null) {
                     return "Unesite ispravan broj";
+                  }
+                  if (int.tryParse(value)! < 0) {
+                    return "Neispravan formatr";
+                  }
+                  if (int.tryParse(value)! < 5 || int.tryParse(value)! > 60) {
+                    return "Dobna skupina nije podržana";
                   }
                   return null;
                 },
