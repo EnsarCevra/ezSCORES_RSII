@@ -144,12 +144,12 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
                     ),
                 ],
               ),
-              SizedBox(width: 30,),
+              const SizedBox(width: 30,),
               Row(
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
-                      decoration: InputDecoration(labelText: "Prezime"),
+                      decoration: const InputDecoration(labelText: "Prezime"),
                        name: 'lastName',
                        autovalidateMode: AutovalidateMode.onUserInteraction,
                        valueTransformer: (text) => text?.trim(),
@@ -166,24 +166,58 @@ class _PlayerDetailsScreenState extends State<PlayersDetailsScreen>{
                     ),
                 ],
               ),
-              SizedBox(width: 30,),
+              const SizedBox(width: 30,),
               Row(
                 children: [
                   Expanded(
-                      child: FormBuilderDateTimePicker(
+                    child: FormBuilderField<DateTime>(
                       name: 'birthDate',
-                      format: DateFormat('dd.MM.yyyy'),
-                      inputType: InputType.date,
-                      decoration: InputDecoration(
-                        labelText: 'Datum rođenja',
-                        suffixIcon: Icon(Icons.calendar_today),
-                      ),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
-                      initialEntryMode: DatePickerEntryMode.calendar,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: "Datum je obavezan"),
-                      ]),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Obavezno polje';
+                        }
+
+                        final now = DateTime.now();
+                        final fiveYearsAgo = DateTime(now.year - 5, now.month, now.day);
+                        if (value.isAfter(fiveYearsAgo)) {
+                          return 'Igrač mora imati najmanje 5 godina';
+                        }
+
+                        return null;
+                      },
+                      builder: (field) {
+                        final value = field.value;
+                        final errorText = field.errorText;
+                        return GestureDetector(
+                          onTap: () async {
+                            final pickedDate = await showDatePicker(
+                              context: field.context,
+                              initialDate: value ?? DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now(),
+                            );
+
+                            if (pickedDate != null) {
+                              field.didChange(pickedDate);
+                            }
+                          },
+                          child: AbsorbPointer(
+                            child: TextFormField(
+                              controller: TextEditingController(
+                                text: value == null
+                                    ? ''
+                                    : DateFormat('dd.MM.yyyy').format(value),
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'Datum rođenja',
+                                suffixIcon: const Icon(Icons.calendar_today),
+                                errorText: errorText,
+                              ),
+                              readOnly: true,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
