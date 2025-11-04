@@ -13,7 +13,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
-    baseUrl = dotenv.env['baseUrl'] ?? "http://localhost:5000/api/";
+    baseUrl = dotenv.env['baseUrl'] ?? "http://10.0.2.2:5000/api/";
   }
 
   Future<SearchResult<T>> get({dynamic filter}) async {

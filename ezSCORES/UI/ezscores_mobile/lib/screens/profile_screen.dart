@@ -190,9 +190,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: const InputDecoration(labelText: "Telefon"),
             validator: FormBuilderValidators.compose([
               FormBuilderValidators.required(errorText: 'Broj telefona je obavezan'),
+              FormBuilderValidators.maxLength(20, errorText: 'Maksimalno 20 karaktera'),
               FormBuilderValidators.match(
-                r'^\+?[0-9]+([ -]?[0-9]+)*$',
-                errorText: 'Unesite ispravan broj',
+                r'^\+?[0-9](?:[0-9]|[ -](?=[0-9])){0,19}$',
+                errorText: 'Neispravan format (ispravno: +387 62 444 555)',
               ),
             ]),
           ),
