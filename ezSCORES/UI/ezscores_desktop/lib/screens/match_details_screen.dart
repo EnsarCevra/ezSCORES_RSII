@@ -588,9 +588,10 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                   competitionId: widget.competitionId,
                   matchId: match!.matchId!,
                   initiallyAssignedReferees: match!.referees!,
-                  onClose: () {
+                  onClose: (updatedReferees) {
                     setState(() {
-                      initForm();
+                      match?.referees = updatedReferees;
+                      _loadMatch(match!.matchId!);
                     });
                   },
                 ),

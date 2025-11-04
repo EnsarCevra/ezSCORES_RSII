@@ -29,5 +29,14 @@ namespace ezSCORES.Services
 			}
 			return base.AddFilter(search, query);
 		}
+		public override void BeforeInsert(CompetitionRefereeMatchUpsertRequest request, CompetitionsRefereesMatch entity)
+		{
+			if(Context.CompetitionsRefereesMatches.
+				Where(x=>x.CompetitionsRefereesId == request.CompetitionsRefereesId &&
+						x.MatchId == request.MatchId).Any())
+			{
+				throw new UserException("Sudac je već dodijeljen na takmičenje!");
+			}
+		}
 	}
 }

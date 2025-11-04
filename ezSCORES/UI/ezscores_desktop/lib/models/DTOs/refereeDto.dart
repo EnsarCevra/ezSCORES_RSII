@@ -8,7 +8,7 @@ class RefereeDTO {
   int? competitionRefereeId;
 	String? name;
 
-	RefereeDTO();
+	RefereeDTO({this.id, this.competitionRefereeId, this.name});
 
 	factory RefereeDTO.fromJson(Map<String, dynamic> json) => _$RefereeDTOFromJson(json);
 

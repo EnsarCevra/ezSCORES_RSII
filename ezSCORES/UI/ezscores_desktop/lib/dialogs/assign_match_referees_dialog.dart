@@ -13,7 +13,7 @@ class AssignRefereesDialog extends StatefulWidget {
   final int competitionId;
   final int matchId;
   final List<RefereeDTO> initiallyAssignedReferees;
-  final VoidCallback onClose;
+  final void Function(List<RefereeDTO> updatedReferees) onClose;
 
   const AssignRefereesDialog({
     super.key,
@@ -104,8 +104,15 @@ Widget build(BuildContext context) {
                       alignment: Alignment.topRight,
                       child: ElevatedButton.icon(
                         onPressed: () {
+                          final updatedReferees = competitionRefereeResult!.result
+                          .where((r) => assignedIds.contains(r.id))
+                          .map((r) => RefereeDTO(
+                            competitionRefereeId: r.id!,
+                            name: '${r.referee!.firstName!} ${r.referee!.lastName!}',
+                          ))
+                          .toList();
+                          widget.onClose(updatedReferees); // notify parent
                           Navigator.of(context).pop();
-                          widget.onClose(); // notify parent
                         },
                         icon: const Icon(Icons.close),
                         label: const Text("Zatvori"),

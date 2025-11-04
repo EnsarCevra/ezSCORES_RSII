@@ -44,7 +44,7 @@ namespace ezSCORES.Services
 		}
 		public override void BeforeUpdate(RefereeUpsertRequest request, Referee entity)
 		{
-			if (Context.Referees.Where(x => request.FirstName == x.FirstName && request.LastName == x.LastName).Any())
+			if (Context.Referees.Where(x => x.Id != entity.Id && (request.FirstName == x.FirstName && request.LastName == x.LastName)).Any())
 			{
 				throw new UserException("Sudac sa unesenim imenom i prezimenom već postoji!");
 			}
