@@ -5,6 +5,7 @@ using ezSCORES.Model.SearchObjects;
 using ezSCORES.Services.Database;
 using Mapster;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,22 @@ namespace ezSCORES.Services
 			query = query.OrderBy(s => s.Name == "Veterani" ? 0 : s.Name == "Seniori" ? 1 : 2)
 				.ThenByDescending(s => s.AgeMax.HasValue ? s.AgeMax.Value : int.MaxValue);
 			return query;
+		}
+		public override Selection? BeforeDelete(int id, DbSet<Selection> set)
+		{
+			var entity = base.BeforeDelete(id, set);
+			if (entity == null)
+				return null;
+
+			bool isUsedInCompetition = Context.Competitions
+				.Any(c => c.SelectionId == id);
+
+			bool isUsedInTeam = Context.Teams
+				.Any(t => t.SelectionId == id);
+
+			if (isUsedInCompetition || isUsedInTeam)
+				throw new UserException("Ne možete obrisati selekciju koja se već koristi u takmičenju ili ekipi.");
+			return entity;
 		}
 	}
 }
