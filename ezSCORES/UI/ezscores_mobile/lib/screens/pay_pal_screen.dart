@@ -149,7 +149,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                                 "amount": {
                                   "total":
                                       competitionFeeDouble.toStringAsFixed(2),
-                                  "currency": "BAM",
+                                  "currency": "USD",
                                   "details": {
                                     "subtotal":
                                         competitionFeeDouble.toStringAsFixed(2),
@@ -167,7 +167,7 @@ class _CompetitionPaymentScreenState extends State<CompetitionPaymentScreen> {
                                       "quantity": 1,
                                       "price":
                                           competitionFeeDouble.toStringAsFixed(2),
-                                      "currency": "BAM"
+                                      "currency": "USD"
                                     }
                                   ],
                                 }

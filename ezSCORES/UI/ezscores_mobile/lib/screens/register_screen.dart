@@ -196,6 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         validators.addAll([
           FormBuilderValidators.required(errorText: 'Ime je obavezno'),
           FormBuilderValidators.minLength(3, errorText: 'Prekratko ime'),
+          FormBuilderValidators.maxLength(20, errorText: 'Maksimalno 20 karaktera'),
           FormBuilderValidators.match(
             r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
             errorText: 'Ime mora početi velikim slovom\nSadržava samo slova',
@@ -207,6 +208,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         validators.addAll([
           FormBuilderValidators.required(errorText: 'Prezime je obavezno'),
           FormBuilderValidators.minLength(3, errorText: 'Prekratko prezime'),
+          FormBuilderValidators.maxLength(20, errorText: 'Maksimalno 20 karaktera'),
           FormBuilderValidators.match(
             r'^[A-ZČĆŽŠĐ][a-zčćžšđA-ZČĆŽŠĐ]*$',
             errorText: 'Prezime mora početi velikim slovom\nSadržava samo slova',
@@ -218,6 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         validators.addAll([
           FormBuilderValidators.required(errorText: 'Email je obavezan'),
           FormBuilderValidators.email(errorText: 'Neispravan email format'),
+          FormBuilderValidators.maxLength(40, errorText: 'Maksimalno 40 karaktera'),
         ]);
         break;
 
@@ -225,6 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         validators.addAll([
           FormBuilderValidators.required(errorText: 'Korisničko ime je obavezno'),
           FormBuilderValidators.minLength(3, errorText: 'Prekratko korisničko ime'),
+          FormBuilderValidators.maxLength(20, errorText: 'Maksimalno 20 karaktera'),
           FormBuilderValidators.match(
             r'^[a-zA-Z0-9_]+$',
             errorText: 'Korisničko ime smije sadržavati samo slova,\n brojeve i donje crte (_)',
@@ -238,6 +242,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (value.length < 3) {
           return 'Prekratko ime organizacije';
         }
+        if (value.length > 30) {
+          return 'Predugo ime, maksimalno je 30 karaktera';
+        }
 
         final regex = RegExp(r'^[a-zA-ZčćžšđČĆŽŠĐ\s]+$');
         if (!regex.hasMatch(value)) {
@@ -249,10 +256,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       case 'phoneNumber':
         validators.addAll([
           FormBuilderValidators.required(errorText: 'Broj telefona je obavezan'),
-          FormBuilderValidators.match(
-            r'^\+?[0-9]+([ -]?[0-9]+)*$',
-            errorText: 'Unesite ispravan broj \n(razmaci i crtice moraju biti pojedinačni i između brojeva)',
-          ),
+           FormBuilderValidators.maxLength(20, errorText: 'Maksimalno 20 karaktera'),
+           FormBuilderValidators.match(
+             r'^\+?[0-9](?:[0-9]|[ -](?=[0-9])){0,19}$',
+             errorText: 'Broj telefona mora sadržavati samo brojeve, razmake ili "-"',
+           ),
         ]);
         break;
 

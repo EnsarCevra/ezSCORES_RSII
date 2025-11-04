@@ -57,6 +57,7 @@ docker-compose up --build
 ## 💳 PayPal Kredencijali
 - Email: `sb-nd47ol46242435@personal.example.com`
 - Lozinka: `PF+^xp18`
+- Plaćanje se odvija na mobilnoj aplikaciji kada organizator prihvati menadžeru prijavu na takmičenje i to samo ukoliko je postoji kotizacija na istom
 
 ---
 
