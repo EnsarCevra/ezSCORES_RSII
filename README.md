@@ -1,4 +1,4 @@
-# NaTanjir_RS2
+# ezSCORES
 Seminarski rad iz predmeta Razvoj softvera 2 na Fakultetu informacijskih tehnologija u Mostaru.
 
 ---
@@ -62,4 +62,4 @@ docker-compose up --build
 ---
 
 ## 🐇 RabbitMQ
-- RabbitMQ je korišten za slanje mailova menadžerima ukoliko admin/organizator promijeni prihvati/odbije njihovu prijavu na takmičenje (za testiranje kreirati novi manager nalog sa pravim emailom kako bi poruka stigla na ispravnu adresu)
+- RabbitMQ je korišten za slanje mailova menadžerima ukoliko admin/organizator prihvati/odbije njihovu prijavu na takmičenje (za testiranje kreirati novi manager nalog sa ispravnim emailom kako bi poruka stigla na adresu)
